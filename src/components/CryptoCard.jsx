@@ -1,8 +1,7 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { formatPrice } from '../core/utils.js';
+import { getImageUrl } from '../core/imageCache.js';
 import PriceChart from './PriceChart.jsx';
-
-const preloadedImages = new Set();
 
 export default function CryptoCard({ coin }) {
   const [showChart, setShowChart] = useState(false);
@@ -15,14 +14,7 @@ export default function CryptoCard({ coin }) {
   const changeSign = isPositive ? '+' : '';
 
   const sparklineData = coin.sparkline_in_7d?.price || [];
-
-  useEffect(() => {
-    if (!preloadedImages.has(coin.id)) {
-      const img = new Image();
-      img.src = coin.image;
-      preloadedImages.add(coin.id);
-    }
-  }, [coin.id, coin.image]);
+  const imageUrl = getImageUrl(coin.id, coin.image);
 
   const handleMouseEnter = useCallback(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -44,7 +36,7 @@ export default function CryptoCard({ coin }) {
       onMouseLeave={handleMouseLeave}
     >
       <div className="crypto-header">
-        <img src={coin.image} alt={coin.name} className="crypto-icon" />
+        <img src={imageUrl} alt={coin.name} className="crypto-icon" />
         <div>
           <div className="crypto-name">{coin.name}</div>
           <div className="crypto-symbol">{coin.symbol}</div>

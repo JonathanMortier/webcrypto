@@ -10,8 +10,8 @@ Application React pour suivre les cours des principales cryptomonnaies en temps 
 - Ticker des actions tech majeures (xStocks via CoinGecko)
 - Auto-refresh automatique (60s par défaut)
 - Graphique 7 jours au survol des cartes (Chart.js)
-- Images locales pour les xStocks (pré-chargées)
-- Pré-chargement des images crypto
+- Images locales pour les cryptos et xStocks
+- Mise à jour automatique des images (hebdomadaire)
 - Cache API 60s pour éviter le rate limiting
 - Actualisation manuelle des données
 
@@ -53,13 +53,18 @@ src/
 │   ├── api.js     # Appels API
 │   ├── constants.js # Configuration
 │   ├── imageCache.js # Cache des images
+│   ├── cryptoImages.json # URLs des images cryptos
 │   └── utils.js   # Utilitaires
 ├── components/     # Composants React
 └── styles/        # Fichiers CSS
 
 public/
-└── images/        # Images locales (xStocks)
+└── images/        # Images locales
+    ├── cryptos/   # Logos des cryptos
     └── xstocks/   # Logos des actions
+
+scripts/
+└── refreshImages.py # Script de mise à jour des images
 ```
 
 ## Scripts disponibles
@@ -69,3 +74,17 @@ public/
 | `npm run dev` | Démarrer le serveur de développement |
 | `npm run build` | Build pour la production |
 | `npm run preview` | Prévisualiser le build production |
+
+## Mise à jour des images
+
+Les images sont automatiquement mises à jour une fois par semaine via le script :
+
+```bash
+python3 scripts/refreshImages.py
+```
+
+Pour forcer la mise à jour :
+
+```bash
+python3 scripts/refreshImages.py --force
+```

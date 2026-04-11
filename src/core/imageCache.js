@@ -1,16 +1,6 @@
+import cryptoImages from './cryptoImages.json';
+
 const imageCache = new Map();
-
-export function cacheImage(coinId, imageUrl) {
-  if (!imageCache.has(coinId)) {
-    const img = new Image();
-    img.src = imageUrl;
-    imageCache.set(coinId, imageUrl);
-  }
-}
-
-export function getImageUrl(coinId, defaultUrl) {
-  return imageCache.get(coinId) || defaultUrl;
-}
 
 export const XSTOCK_IMAGES = {
   'apple-xstock': '/images/xstocks/apple.png',
@@ -21,3 +11,20 @@ export const XSTOCK_IMAGES = {
   'nvidia-xstock': '/images/xstocks/nvidia.png',
   'tesla-xstock': '/images/xstocks/tesla.png',
 };
+
+export const CRYPTO_IMAGES = {};
+cryptoImages.forEach(({ id, image }) => {
+  CRYPTO_IMAGES[id] = `/images/cryptos/${id}.png`;
+});
+
+export function getImageUrl(coinId, defaultUrl) {
+  return CRYPTO_IMAGES[coinId] || XSTOCK_IMAGES[coinId] || defaultUrl;
+}
+
+export function cacheImage(coinId, imageUrl) {
+  if (!imageCache.has(coinId)) {
+    const img = new Image();
+    img.src = imageUrl;
+    imageCache.set(coinId, imageUrl);
+  }
+}

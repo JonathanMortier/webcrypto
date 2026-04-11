@@ -16,7 +16,8 @@
 
 .ticker {
   display: flex;
-  animation: ticker 30s linear infinite;
+  width: max-content;
+  animation: ticker 40s linear infinite;
 }
 
 @keyframes ticker {
@@ -30,6 +31,7 @@
   gap: 8px;
   padding: 0 30px;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .ticker-item img {
@@ -41,26 +43,22 @@
 .ticker-item .rank {
   font-weight: bold;
   margin-right: 5px;
+  color: #000;
 }
 
-.ticker-item:nth-child(1) .rank,
-.ticker-item:nth-child(11) .rank {
+.ticker-item:nth-of-type(1) .rank,
+.ticker-item:nth-of-type(12) .rank {
   color: var(--gold);
 }
 
-.ticker-item:nth-child(2) .rank,
-.ticker-item:nth-child(12) .rank {
+.ticker-item:nth-of-type(2) .rank,
+.ticker-item:nth-of-type(13) .rank {
   color: var(--silver);
 }
 
-.ticker-item:nth-child(3) .rank,
-.ticker-item:nth-child(13) .rank {
+.ticker-item:nth-of-type(3) .rank,
+.ticker-item:nth-of-type(14) .rank {
   color: var(--bronze);
-}
-
-.ticker-item:nth-child(n+4) .rank,
-.ticker-item:nth-child(n+14) .rank {
-  color: #000;
 }
 
 .ticker-item .name {
@@ -69,6 +67,15 @@
 
 .ticker-item .gain {
   font-weight: bold;
+}
+
+.ticker-separator {
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  color: rgba(0, 255, 136, 0.5);
+  font-size: 1.2rem;
+  flex-shrink: 0;
 }
 
 .gain.positive {

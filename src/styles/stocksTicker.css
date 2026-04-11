@@ -13,3 +13,26 @@
 .stocks-ticker-wrapper:hover .ticker {
   animation-play-state: paused;
 }
+
+.stocks-ticker-wrapper .ticker-separator {
+  color: rgba(100, 149, 237, 0.5);
+}
+
+.stocks-ticker-wrapper .ticker-item .rank {
+  color: #000;
+}
+
+.stocks-ticker-wrapper .ticker-item:nth-of-type(1) .rank,
+.stocks-ticker-wrapper .ticker-item:nth-of-type(9) .rank {
+  color: var(--gold);
+}
+
+.stocks-ticker-wrapper .ticker-item:nth-of-type(2) .rank,
+.stocks-ticker-wrapper .ticker-item:nth-of-type(10) .rank {
+  color: var(--silver);
+}
+
+.stocks-ticker-wrapper .ticker-item:nth-of-type(3) .rank,
+.stocks-ticker-wrapper .ticker-item:nth-of-type(11) .rank {
+  color: var(--bronze);
+}

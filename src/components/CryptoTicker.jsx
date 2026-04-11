@@ -14,6 +14,7 @@ export default function CryptoTicker({ cryptos }) {
             </span>
           </div>
         ))}
+        <div className="ticker-separator" aria-hidden="true">✦</div>
         {cryptos.map((coin, index) => (
           <div key={`${coin.id}-dup-${index}`} className="ticker-item">
             <span className="rank">{index + 1}.</span>
@@ -24,6 +25,7 @@ export default function CryptoTicker({ cryptos }) {
             </span>
           </div>
         ))}
+        <div className="ticker-separator" aria-hidden="true">✦</div>
       </div>
     </div>
   );

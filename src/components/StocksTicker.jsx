@@ -21,6 +21,7 @@ export default function StocksTicker({ stocks }) {
             </div>
           );
         })}
+        <div className="ticker-separator" aria-hidden="true">✦</div>
         {stocks.map((stock, index) => {
           const change = stock.price_change_percentage_24h ?? 0;
           const gainClass = change >= 0 ? 'positive' : 'negative';
@@ -38,6 +39,7 @@ export default function StocksTicker({ stocks }) {
             </div>
           );
         })}
+        <div className="ticker-separator" aria-hidden="true">✦</div>
       </div>
     </div>
   );

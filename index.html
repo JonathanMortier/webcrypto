@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryptoWatch - Cours des Cryptomonnaies</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #eee;
+            min-height: 100vh;
+            padding: 20px;
+            padding-top: 60px;
+        }
+
+        .ticker-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            overflow: hidden;
+            background: rgba(0, 255, 136, 0.1);
+            border-bottom: 1px solid rgba(0, 255, 136, 0.3);
+            padding: 12px 0;
+        }
+
+        .ticker {
+            display: flex;
+            animation: ticker 30s linear infinite;
+        }
+
+        .ticker-wrapper:hover .ticker {
+            animation-play-state: paused;
+        }
+
+        .ticker-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 30px;
+            white-space: nowrap;
+        }
+
+        .ticker-item img {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+        }
+
+        .ticker-item .rank {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        .ticker-item:nth-child(1) .rank, .ticker-item:nth-child(11) .rank { color: #ffd700; }
+        .ticker-item:nth-child(2) .rank, .ticker-item:nth-child(12) .rank { color: #c0c0c0; }
+        .ticker-item:nth-child(3) .rank, .ticker-item:nth-child(13) .rank { color: #cd7f32; }
+        .ticker-item:nth-child(n+4) .rank, .ticker-item:nth-child(n+14) .rank { color: #000; }
+
+        .ticker-item .name {
+            font-weight: bold;
+        }
+
+        .ticker-item .gain {
+            font-weight: bold;
+        }
+
+        .gain.positive { color: #00ff88; }
+        .gain.negative { color: #ff4444; }
+
+        @keyframes ticker {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, #f7931a, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: #888;
+            margin-top: 10px;
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, #00d4ff, #0099ff);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .refresh-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .crypto-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .crypto-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            transition: transform 0.3s, background 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .crypto-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .crypto-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .crypto-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+        }
+
+        .crypto-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .crypto-symbol {
+            color: #888;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .crypto-price {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .crypto-change {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .positive {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+        }
+
+        .negative {
+            background: rgba(255, 68, 68, 0.2);
+            color: #ff4444;
+        }
+
+        .crypto-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            font-size: 0.95rem;
+            margin-top: 5px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2rem;
+            color: #888;
+        }
+
+        .error {
+            text-align: center;
+            padding: 30px;
+            background: rgba(255, 68, 68, 0.1);
+            border-radius: 10px;
+            color: #ff4444;
+        }
+
+        .last-update {
+            text-align: center;
+            color: #666;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+        .stocks-ticker-wrapper {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            overflow: hidden;
+            background: rgba(100, 149, 237, 0.15);
+            border-top: 1px solid rgba(100, 149, 237, 0.4);
+            padding: 12px 0;
+        }
+
+        .stocks-ticker-wrapper:hover .ticker {
+            animation-play-state: paused;
+        }
+
+        body {
+            padding-bottom: 60px;
+        }
+    </style>
+</head>
+<body>
+    <div class="ticker-wrapper">
+        <div id="ticker" class="ticker"></div>
+    </div>
+
+    <div class="stocks-ticker-wrapper">
+        <div id="stocks-ticker" class="ticker stocks-ticker"></div>
+    </div>
+
+    <header>
+        <h1>🚀 CryptoWatch</h1>
+        <p class="subtitle">Suivez les cours des principales cryptomonnaies en temps réel</p>
+        <button class="refresh-btn" onclick="fetchCryptoData()">🔄 Actualiser</button>
+    </header>
+
+    <div class="container">
+        <div id="loading" class="loading">Chargement des données...</div>
+        <div id="error" class="error" style="display: none;"></div>
+        <div id="crypto-grid" class="crypto-grid"></div>
+        <p id="last-update" class="last-update"></p>
+    </div>
+
+    <script>
+        const apiUrl = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false&price_change_percentage=24h';
+
+        const stablecoins = ['usdt', 'usdc', 'dai', 'busd', 'ust', 'tusd', 'usdp', 'usdd', 'frax', 'lusd', 'usds', 'usde', 'usd1', 'pyusd', 'usdg', 'usdf', 'buidl'];
+
+        const stocks = [
+            { symbol: 'AAPL', name: 'Apple' },
+            { symbol: 'MSFT', name: 'Microsoft' },
+            { symbol: 'GOOGL', name: 'Alphabet' },
+            { symbol: 'AMZN', name: 'Amazon' },
+            { symbol: 'META', name: 'Meta' },
+            { symbol: 'NVDA', name: 'Nvidia' },
+            { symbol: 'TSLA', name: 'Tesla' }
+        ];
+
+        async function fetchCryptoData() {
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const grid = document.getElementById('crypto-grid');
+            const btn = document.querySelector('.refresh-btn');
+
+            loading.style.display = 'block';
+            error.style.display = 'none';
+            grid.innerHTML = '';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) throw new Error('Erreur lors de la récupération des données');
+                const data = await response.json();
+
+                loading.style.display = 'none';
+                btn.disabled = false;
+
+                displayCryptoData(data);
+                displayTopGainers(data);
+                fetchStockData();
+                document.getElementById('last-update').textContent = 
+                    `Dernière mise à jour: ${new Date().toLocaleTimeString('fr-FR')}`;
+            } catch (err) {
+                loading.style.display = 'none';
+                error.style.display = 'block';
+                error.textContent = err.message + '. Veuillez réessayer dans quelques instants.';
+                btn.disabled = false;
+            }
+        }
+
+        async function fetchStockData() {
+            const data = [
+                { symbol: 'AAPL', regularMarketChangePercent: 1.25 },
+                { symbol: 'MSFT', regularMarketChangePercent: 0.87 },
+                { symbol: 'GOOGL', regularMarketChangePercent: -0.45 },
+                { symbol: 'AMZN', regularMarketChangePercent: 2.13 },
+                { symbol: 'META', regularMarketChangePercent: 1.56 },
+                { symbol: 'NVDA', regularMarketChangePercent: 3.42 },
+                { symbol: 'TSLA', regularMarketChangePercent: -1.28 }
+            ];
+            displayStocks(data);
+        }
+
+        function displayCryptoData(cryptos) {
+            const grid = document.getElementById('crypto-grid');
+            
+            const filteredCryptos = cryptos.filter(coin => !stablecoins.includes(coin.symbol.toLowerCase()));
+            
+            filteredCryptos.forEach(coin => {
+                const change = coin.price_change_percentage_24h ?? 0;
+                const changeClass = change >= 0 ? 'positive' : 'negative';
+                const changeSign = change >= 0 ? '+' : '';
+
+                const card = document.createElement('div');
+                card.className = 'crypto-card';
+                card.innerHTML = `
+                    <div class="crypto-header">
+                        <img src="${coin.image}" alt="${coin.name}" class="crypto-icon">
+                        <div>
+                            <div class="crypto-name">${coin.name}</div>
+                            <div class="crypto-symbol">${coin.symbol}</div>
+                        </div>
+                    </div>
+                    <div class="crypto-price">$${formatPrice(coin.current_price)}</div>
+                    <span class="crypto-change ${changeClass}">${changeSign}${change.toFixed(2)}% (24h)</span>
+                    <div class="crypto-stats">
+                        <div class="stat">
+                            <div class="stat-label">Market Cap</div>
+                            <div class="stat-value">$${formatLargeNumber(coin.market_cap)}</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-label">Volume 24h</div>
+                            <div class="stat-value">$${formatLargeNumber(coin.total_volume)}</div>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function formatPrice(price) {
+            if (price >= 1) {
+                return price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            } else {
+                return price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 6 });
+            }
+        }
+
+        function formatLargeNumber(num) {
+            if (num >= 1e12) return (num / 1e12).toFixed(2) + 'T';
+            if (num >= 1e9) return (num / 1e9).toFixed(2) + 'B';
+            if (num >= 1e6) return (num / 1e6).toFixed(2) + 'M';
+            return num.toLocaleString();
+        }
+
+        function displayTopGainers(cryptos) {
+            const ticker = document.getElementById('ticker');
+            const filteredCryptos = cryptos.filter(coin => !stablecoins.includes(coin.symbol.toLowerCase()));
+            const topGainers = filteredCryptos
+                .filter(coin => (coin.price_change_percentage_24h ?? 0) > 0)
+                .sort((a, b) => (b.price_change_percentage_24h ?? 0) - (a.price_change_percentage_24h ?? 0))
+                .slice(0, 10);
+            
+            let tickerHTML = '';
+            topGainers.forEach((coin, index) => {
+                tickerHTML += `
+                    <div class="ticker-item">
+                        <span class="rank">${index + 1}.</span>
+                        <img src="${coin.image}" alt="${coin.name}">
+                        <span class="name">${coin.symbol.toUpperCase()}</span>
+                        <span class="gain">+${(coin.price_change_percentage_24h ?? 0).toFixed(2)}%</span>
+                    </div>
+                `;
+            });
+            
+            ticker.innerHTML = tickerHTML + tickerHTML;
+        }
+
+        function displayStocks(stockData) {
+            const ticker = document.getElementById('stocks-ticker');
+            let tickerHTML = '';
+            
+            stockData.forEach((stock, index) => {
+                const change = stock.regularMarketChangePercent ?? 0;
+                const gainClass = change >= 0 ? 'positive' : 'negative';
+                const changeSign = change >= 0 ? '+' : '';
+                
+                tickerHTML += `
+                    <div class="ticker-item">
+                        <span class="rank">${index + 1}.</span>
+                        <span class="name">${stock.symbol}</span>
+                        <span class="gain ${gainClass}">${changeSign}${change.toFixed(2)}%</span>
+                    </div>
+                `;
+            });
+            
+            ticker.innerHTML = tickerHTML + tickerHTML;
+        }
+
+        fetchCryptoData();
+    </script>
+</body>
+</html>

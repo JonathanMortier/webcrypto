@@ -9,12 +9,14 @@ Application React pour suivre les cours des principales cryptomonnaies en temps 
 - Ticker animé des meilleures performances (24h)
 - Ticker des actions tech majeures (xStocks via CoinGecko)
 - Auto-refresh automatique (60s par défaut)
+- Graphique 24h au survol des cartes (Chart.js)
 - Actualisation manuelle des données
 
 ## Stack technique
 
 - **React 18** avec hooks
 - **Vite** pour le build et le dev server
+- **Chart.js** pour les graphiques
 - **CoinGecko API** pour les données en temps réel
 
 ## Installation

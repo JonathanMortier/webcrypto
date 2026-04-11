@@ -27,3 +27,12 @@ export function getTopGainers(cryptos, limit = 10) {
     .sort((a, b) => (b.price_change_percentage_24h ?? 0) - (a.price_change_percentage_24h ?? 0))
     .slice(0, limit);
 }
+
+export async function fetchCryptoChart(coinId) {
+  const url = `https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=1`;
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error('Erreur lors de la récupération du graphique');
+  }
+  return response.json();
+}

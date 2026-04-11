@@ -1,6 +1,6 @@
 import { formatTime } from '../core/utils.js';
 
-export default function Header({ onRefresh, lastUpdate, isLoading }) {
+export default function Header({ onRefresh, lastUpdate, isLoading, countdown }) {
   return (
     <header className="header">
       <h1>CryptoWatch</h1>
@@ -13,7 +13,9 @@ export default function Header({ onRefresh, lastUpdate, isLoading }) {
         Actualiser
       </button>
       {lastUpdate && (
-        <p className="last-update">Dernière mise à jour: {formatTime(lastUpdate)}</p>
+        <p className="last-update">
+          Dernière mise à jour: {formatTime(lastUpdate)} • Prochaine actualisation dans {countdown}s
+        </p>
       )}
     </header>
   );

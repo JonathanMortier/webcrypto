@@ -7,7 +7,8 @@ Application React pour suivre les cours des principales cryptomonnaies en temps 
 - Affichage des 50 premières cryptomonnaies par capitalisation boursière
 - Filtre automatique des stablecoins
 - Ticker animé des meilleures performances (24h)
-- Ticker des actions tech majeures
+- Ticker des actions tech majeures (xStocks via CoinGecko)
+- Auto-refresh automatique (60s par défaut)
 - Actualisation manuelle des données
 
 ## Stack technique
@@ -29,6 +30,14 @@ npm run dev
 ```
 
 L'application sera accessible sur `http://localhost:5173`
+
+## Configuration
+
+L'intervalle d'actualisation automatique peut être modifié dans `src/core/constants.js` :
+
+```javascript
+export const REFRESH_INTERVAL = 60; // en secondes
+```
 
 ## Structure du projet
 

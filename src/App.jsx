@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { fetchCryptoData, filterStablecoins, getTopGainers } from './core/api.js';
-import { MOCK_STOCK_DATA } from './core/constants.js';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { fetchCryptoData, fetchXStocks, filterStablecoins, getTopGainers } from './core/api.js';
+import { REFRESH_INTERVAL } from './core/constants.js';
 import { Header, CryptoGrid, CryptoTicker, StocksTicker, Loading, Error } from './components/index.js';
 import './styles/index.css';
 
@@ -11,30 +11,62 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [lastUpdate, setLastUpdate] = useState(null);
+  const [countdown, setCountdown] = useState(REFRESH_INTERVAL);
+  
+  const countdownRef = useRef(null);
+  const intervalRef = useRef(null);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const data = await fetchCryptoData();
-      const filtered = filterStablecoins(data);
+      const [cryptoData, xstockData] = await Promise.all([
+        fetchCryptoData(),
+        fetchXStocks()
+      ]);
+      
+      const filtered = filterStablecoins(cryptoData);
       const gainers = getTopGainers(filtered);
 
       setCryptos(filtered);
       setTopGainers(gainers);
-      setStocks(MOCK_STOCK_DATA);
+      setStocks(xstockData);
       setLastUpdate(new Date());
+      setCountdown(REFRESH_INTERVAL);
     } catch (err) {
       setError(err.message);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  const startCountdown = useCallback(() => {
+    if (countdownRef.current) clearInterval(countdownRef.current);
+    
+    countdownRef.current = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) {
+          return REFRESH_INTERVAL;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  }, []);
 
   useEffect(() => {
     loadData();
-  }, []);
+    startCountdown();
+
+    intervalRef.current = setInterval(() => {
+      loadData();
+    }, REFRESH_INTERVAL * 1000);
+
+    return () => {
+      if (countdownRef.current) clearInterval(countdownRef.current);
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [loadData, startCountdown]);
 
   return (
     <>
@@ -46,6 +78,7 @@ export default function App() {
           onRefresh={loadData} 
           lastUpdate={lastUpdate}
           isLoading={isLoading}
+          countdown={countdown}
         />
 
         {isLoading && <Loading />}

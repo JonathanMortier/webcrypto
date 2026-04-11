@@ -1,7 +1,16 @@
-import { API_URL, STABLECOINS } from './constants.js';
+import { API_URL, XSTOCKS_API_URL, XSTOCK_IDS, STABLECOINS } from './constants.js';
 
 export async function fetchCryptoData() {
   const response = await fetch(API_URL);
+  if (!response.ok) {
+    throw new Error('Erreur lors de la récupération des données');
+  }
+  return response.json();
+}
+
+export async function fetchXStocks() {
+  const ids = XSTOCK_IDS.join(',');
+  const response = await fetch(XSTOCKS_API_URL(ids));
   if (!response.ok) {
     throw new Error('Erreur lors de la récupération des données');
   }

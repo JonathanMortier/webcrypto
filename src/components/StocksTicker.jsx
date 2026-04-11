@@ -3,14 +3,15 @@ export default function StocksTicker({ stocks }) {
     <div className="stocks-ticker-wrapper">
       <div className="ticker">
         {stocks.map((stock, index) => {
-          const change = stock.regularMarketChangePercent ?? 0;
+          const change = stock.price_change_percentage_24h ?? 0;
           const gainClass = change >= 0 ? 'positive' : 'negative';
           const changeSign = change >= 0 ? '+' : '';
           
           return (
-            <div key={stock.symbol} className="ticker-item">
+            <div key={stock.id} className="ticker-item">
               <span className="rank">{index + 1}.</span>
-              <span className="name">{stock.symbol}</span>
+              <img src={stock.image} alt={stock.name} style={{ width: 24, height: 24, borderRadius: '50%' }} />
+              <span className="name">{stock.symbol.toUpperCase()}</span>
               <span className={`gain ${gainClass}`}>
                 {changeSign}{change.toFixed(2)}%
               </span>
@@ -18,14 +19,15 @@ export default function StocksTicker({ stocks }) {
           );
         })}
         {stocks.map((stock, index) => {
-          const change = stock.regularMarketChangePercent ?? 0;
+          const change = stock.price_change_percentage_24h ?? 0;
           const gainClass = change >= 0 ? 'positive' : 'negative';
           const changeSign = change >= 0 ? '+' : '';
           
           return (
-            <div key={`${stock.symbol}-dup`} className="ticker-item">
+            <div key={`${stock.id}-dup`} className="ticker-item">
               <span className="rank">{index + 1}.</span>
-              <span className="name">{stock.symbol}</span>
+              <img src={stock.image} alt={stock.name} style={{ width: 24, height: 24, borderRadius: '50%' }} />
+              <span className="name">{stock.symbol.toUpperCase()}</span>
               <span className={`gain ${gainClass}`}>
                 {changeSign}{change.toFixed(2)}%
               </span>

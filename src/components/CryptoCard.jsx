@@ -1,15 +1,11 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { formatPrice } from '../core/utils.js';
-import { fetchCryptoChart } from '../core/api.js';
 import PriceChart from './PriceChart.jsx';
 
-const chartCache = new Map();
-const debounceTimers = new Map();
+const preloadedImages = new Set();
 
 export default function CryptoCard({ coin }) {
   const [showChart, setShowChart] = useState(false);
-  const [chartData, setChartData] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
   
   const debounceRef = useRef(null);
 
@@ -18,42 +14,27 @@ export default function CryptoCard({ coin }) {
   const changeClass = isPositive ? 'positive' : 'negative';
   const changeSign = isPositive ? '+' : '';
 
-  const loadChart = useCallback(async () => {
-    if (chartCache.has(coin.id)) {
-      setChartData(chartCache.get(coin.id));
-      return;
-    }
+  const sparklineData = coin.sparkline_in_7d?.price || [];
 
-    setIsLoading(true);
-    try {
-      const data = await fetchCryptoChart(coin.id);
-      chartCache.set(coin.id, data.prices);
-      setChartData(data.prices);
-    } catch (err) {
-      console.error('Failed to load chart:', err);
-    } finally {
-      setIsLoading(false);
+  useEffect(() => {
+    if (!preloadedImages.has(coin.id)) {
+      const img = new Image();
+      img.src = coin.image;
+      preloadedImages.add(coin.id);
     }
-  }, [coin.id]);
+  }, [coin.id, coin.image]);
 
   const handleMouseEnter = useCallback(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     
     debounceRef.current = setTimeout(() => {
       setShowChart(true);
-      loadChart();
     }, 300);
-  }, [loadChart]);
+  }, []);
 
   const handleMouseLeave = useCallback(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     setShowChart(false);
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
   }, []);
 
   return (
@@ -86,12 +67,10 @@ export default function CryptoCard({ coin }) {
 
       {showChart && (
         <div className="chart-overlay">
-          {isLoading ? (
-            <div className="chart-loading">Chargement...</div>
-          ) : chartData ? (
-            <PriceChart prices={chartData} isPositive={isPositive} />
+          {sparklineData.length > 0 ? (
+            <PriceChart prices={sparklineData} isPositive={isPositive} />
           ) : (
-            <div className="chart-loading">Erreur</div>
+            <div className="chart-loading">Graphique indisponible</div>
           )}
         </div>
       )}

@@ -13,12 +13,27 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Filler);
 
 export default function PriceChart({ prices, isPositive }) {
   const data = useMemo(() => {
-    const labels = prices.map(([timestamp]) => {
-      const date = new Date(timestamp);
-      return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-    });
+    if (!prices || !Array.isArray(prices) || prices.length === 0) {
+      return { labels: [], datasets: [] };
+    }
 
-    const priceValues = prices.map(([, price]) => price);
+    let priceValues;
+    const firstItem = prices[0];
+    
+    if (typeof firstItem === 'number') {
+      priceValues = prices;
+    } else if (Array.isArray(firstItem)) {
+      priceValues = prices.map(([, price]) => price);
+    } else {
+      return { labels: [], datasets: [] };
+    }
+
+    const labels = priceValues.map((_, i) => {
+      const percentage = (i / priceValues.length) * 100;
+      if (percentage === 0) return '7j';
+      if (percentage === 100) return 'Maintenant';
+      return '';
+    });
 
     return {
       labels,

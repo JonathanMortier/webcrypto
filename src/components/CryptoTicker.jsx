@@ -1,4 +1,18 @@
+import { useEffect } from 'react';
+
+const preloadedImages = new Set();
+
 export default function CryptoTicker({ cryptos }) {
+  useEffect(() => {
+    cryptos.forEach(coin => {
+      if (!preloadedImages.has(coin.id)) {
+        const img = new Image();
+        img.src = coin.image;
+        preloadedImages.add(coin.id);
+      }
+    });
+  }, [cryptos]);
+
   return (
     <div className="ticker-wrapper">
       <div className="ticker">

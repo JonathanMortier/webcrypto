@@ -9,7 +9,10 @@ Application React pour suivre les cours des principales cryptomonnaies en temps 
 - Ticker animé des meilleures performances (24h)
 - Ticker des actions tech majeures (xStocks via CoinGecko)
 - Auto-refresh automatique (60s par défaut)
-- Graphique 24h au survol des cartes (Chart.js)
+- Graphique 7 jours au survol des cartes (Chart.js)
+- Images locales pour les xStocks (pré-chargées)
+- Pré-chargement des images crypto
+- Cache API 60s pour éviter le rate limiting
 - Actualisation manuelle des données
 
 ## Stack technique
@@ -35,10 +38,11 @@ L'application sera accessible sur `http://localhost:5173`
 
 ## Configuration
 
-L'intervalle d'actualisation automatique peut être modifié dans `src/core/constants.js` :
+Les paramètres suivants peuvent être modifiés dans `src/core/constants.js` :
 
 ```javascript
-export const REFRESH_INTERVAL = 60; // en secondes
+export const REFRESH_INTERVAL = 60; // intervalle auto-refresh en secondes
+export const CACHE_TTL = 60;        // durée du cache API en secondes
 ```
 
 ## Structure du projet
@@ -48,9 +52,14 @@ src/
 ├── core/           # Logique métier
 │   ├── api.js     # Appels API
 │   ├── constants.js # Configuration
+│   ├── imageCache.js # Cache des images
 │   └── utils.js   # Utilitaires
 ├── components/     # Composants React
 └── styles/        # Fichiers CSS
+
+public/
+└── images/        # Images locales (xStocks)
+    └── xstocks/   # Logos des actions
 ```
 
 ## Scripts disponibles

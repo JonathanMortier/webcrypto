@@ -1,0 +1,80 @@
+.ticker-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  overflow: hidden;
+  background: rgba(0, 255, 136, 0.1);
+  border-bottom: 1px solid rgba(0, 255, 136, 0.3);
+  padding: 12px 0;
+}
+
+.ticker-wrapper:hover .ticker {
+  animation-play-state: paused;
+}
+
+.ticker {
+  display: flex;
+  animation: ticker 30s linear infinite;
+}
+
+@keyframes ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.ticker-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 30px;
+  white-space: nowrap;
+}
+
+.ticker-item img {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+.ticker-item .rank {
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+.ticker-item:nth-child(1) .rank,
+.ticker-item:nth-child(11) .rank {
+  color: var(--gold);
+}
+
+.ticker-item:nth-child(2) .rank,
+.ticker-item:nth-child(12) .rank {
+  color: var(--silver);
+}
+
+.ticker-item:nth-child(3) .rank,
+.ticker-item:nth-child(13) .rank {
+  color: var(--bronze);
+}
+
+.ticker-item:nth-child(n+4) .rank,
+.ticker-item:nth-child(n+14) .rank {
+  color: #000;
+}
+
+.ticker-item .name {
+  font-weight: bold;
+}
+
+.ticker-item .gain {
+  font-weight: bold;
+}
+
+.gain.positive {
+  color: var(--positive);
+}
+
+.gain.negative {
+  color: var(--negative);
+}

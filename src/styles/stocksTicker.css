@@ -1,0 +1,15 @@
+.stocks-ticker-wrapper {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  overflow: hidden;
+  background: rgba(100, 149, 237, 0.15);
+  border-top: 1px solid rgba(100, 149, 237, 0.4);
+  padding: 12px 0;
+}
+
+.stocks-ticker-wrapper:hover .ticker {
+  animation-play-state: paused;
+}

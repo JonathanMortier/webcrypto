@@ -1,0 +1,84 @@
+.crypto-card {
+  background: var(--card-bg);
+  border-radius: 15px;
+  padding: 20px;
+  transition: transform 0.3s, background 0.3s;
+  border: 1px solid var(--card-border);
+}
+
+.crypto-card:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.crypto-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.crypto-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+}
+
+.crypto-name {
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+
+.crypto-symbol {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+.crypto-price {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin: 15px 0;
+}
+
+.crypto-change {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.crypto-change.positive {
+  background: rgba(0, 255, 136, 0.2);
+  color: var(--positive);
+}
+
+.crypto-change.negative {
+  background: rgba(255, 68, 68, 0.2);
+  color: var(--negative);
+}
+
+.crypto-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid var(--card-border);
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.stat-value {
+  font-size: 0.95rem;
+  margin-top: 5px;
+}

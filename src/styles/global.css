@@ -1,0 +1,36 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg-primary: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  --text-primary: #eee;
+  --text-secondary: #888;
+  --text-muted: #666;
+  --accent-primary: #00d4ff;
+  --accent-secondary: #0099ff;
+  --positive: #00ff88;
+  --negative: #ff4444;
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --card-border: rgba(255, 255, 255, 0.1);
+  --gold: #ffd700;
+  --silver: #c0c0c0;
+  --bronze: #cd7f32;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  padding: 20px;
+  padding-top: 60px;
+  padding-bottom: 60px;
+}
+
+.app {
+  max-width: 1200px;
+  margin: 0 auto;
+}

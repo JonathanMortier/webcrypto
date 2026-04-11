@@ -1,13 +1,15 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { fetchCryptoData, fetchXStocks, filterStablecoins, getTopGainers } from './core/api.js';
+import { fetchCryptoData, fetchXStocks, fetchFearAndGreed, filterStablecoins, getTopGainers, calculateMarketStats } from './core/api.js';
 import { REFRESH_INTERVAL } from './core/constants.js';
-import { Header, CryptoGrid, CryptoTicker, StocksTicker, Loading, Error } from './components/index.js';
+import { Header, CryptoGrid, CryptoTicker, StocksTicker, FearGreedIndex, MarketIndicators, Loading, Error } from './components/index.js';
 import './styles/index.css';
 
 export default function App() {
   const [cryptos, setCryptos] = useState([]);
   const [topGainers, setTopGainers] = useState([]);
   const [stocks, setStocks] = useState([]);
+  const [fearGreed, setFearGreed] = useState(null);
+  const [fearGreedLoading, setFearGreedLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [lastUpdate, setLastUpdate] = useState(null);
@@ -41,6 +43,20 @@ export default function App() {
     }
   }, []);
 
+  const loadFearGreed = useCallback(async () => {
+    setFearGreedLoading(true);
+    try {
+      const data = await fetchFearAndGreed();
+      if (data.data && data.data.length > 0) {
+        setFearGreed(data.data[0]);
+      }
+    } catch (err) {
+      console.error('Failed to load Fear & Greed:', err);
+    } finally {
+      setFearGreedLoading(false);
+    }
+  }, []);
+
   const startCountdown = useCallback(() => {
     if (countdownRef.current) clearInterval(countdownRef.current);
     
@@ -56,6 +72,7 @@ export default function App() {
 
   useEffect(() => {
     loadData();
+    loadFearGreed();
     startCountdown();
 
     intervalRef.current = setInterval(() => {
@@ -66,12 +83,19 @@ export default function App() {
       if (countdownRef.current) clearInterval(countdownRef.current);
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [loadData, startCountdown]);
+  }, [loadData, loadFearGreed, startCountdown]);
+
+  const marketStats = calculateMarketStats(cryptos);
 
   return (
     <>
       <CryptoTicker cryptos={topGainers} />
       <StocksTicker stocks={stocks} />
+      <FearGreedIndex 
+        fearGreedData={fearGreed}
+        isLoading={fearGreedLoading}
+        onRefresh={loadFearGreed}
+      />
       
       <div className="app">
         <Header 
@@ -80,6 +104,13 @@ export default function App() {
           isLoading={isLoading}
           countdown={countdown}
         />
+
+        {!isLoading && !error && (
+          <MarketIndicators 
+            marketStats={marketStats}
+            fearGreed={fearGreed}
+          />
+        )}
 
         {isLoading && <Loading />}
         {error && <Error message={error} />}

@@ -1,0 +1,59 @@
+.market-indicators {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  background: var(--card-bg);
+  border-radius: 12px;
+  border: 1px solid var(--card-border);
+}
+
+.indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 100px;
+}
+
+.indicator-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.indicator-value {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: var(--text-primary);
+}
+
+.indicator-value.positive {
+  color: var(--positive);
+}
+
+.indicator-value.negative {
+  color: var(--negative);
+}
+
+@media (max-width: 768px) {
+  .market-indicators {
+    gap: 16px;
+    padding: 12px;
+  }
+
+  .indicator {
+    min-width: 80px;
+  }
+
+  .indicator-label {
+    font-size: 0.65rem;
+  }
+
+  .indicator-value {
+    font-size: 0.95rem;
+  }
+}

@@ -5,8 +5,8 @@
   right: 0;
   z-index: 1000;
   overflow: hidden;
-  background: rgba(0, 255, 136, 0.1);
-  border-bottom: 1px solid rgba(0, 255, 136, 0.3);
+  background: rgba(11, 92, 54, 0.8);
+  border-bottom: 1px solid rgba(0, 255, 136, 0.5);
   padding: 12px 0;
 }
 

@@ -1,0 +1,162 @@
+.fear-greed-container {
+  position: fixed;
+  top: 60px;
+  right: 20px;
+  z-index: 998;
+}
+
+.fear-greed-toggle {
+  background: rgba(30, 30, 50, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: var(--text-primary);
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.fear-greed-toggle:hover {
+  background: rgba(50, 50, 80, 0.95);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.fear-greed-content {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background: rgba(20, 20, 40, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 16px;
+  width: 180px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fear-greed-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.fear-greed-title {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: var(--text-primary);
+}
+
+.fear-greed-source {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.fear-greed-refresh {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 4px;
+  transition: transform 0.3s ease;
+}
+
+.fear-greed-refresh:hover {
+  transform: rotate(180deg);
+  color: var(--text-primary);
+}
+
+.fear-greed-refresh:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.fear-greed-loading {
+  text-align: center;
+  padding: 10px 0;
+}
+
+.skeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.1) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+.skeleton-value {
+  width: 60%;
+  height: 40px;
+  margin: 0 auto 8px;
+}
+
+.skeleton-text {
+  width: 80%;
+  height: 16px;
+  margin: 0 auto;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.fear-greed-value {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.fear-greed-number {
+  font-size: 2.5rem;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.fear-greed-icon {
+  font-size: 1.5rem;
+}
+
+.fear-greed-classification {
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.fear-greed-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.fear-greed-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease, background-color 0.3s ease;
+}
+
+.fear-greed-error {
+  text-align: center;
+  color: var(--negative);
+  font-size: 0.85rem;
+  padding: 10px 0;
+}

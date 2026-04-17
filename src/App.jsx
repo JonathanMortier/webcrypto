@@ -14,6 +14,7 @@ export default function App() {
   const [error, setError] = useState(null);
   const [lastUpdate, setLastUpdate] = useState(null);
   const [countdown, setCountdown] = useState(REFRESH_INTERVAL);
+  const [searchQuery, setSearchQuery] = useState('');
   const [theme, setTheme] = useState(() => {
     const saved = localStorage.getItem('theme');
     return saved || 'dark';
@@ -100,6 +101,27 @@ export default function App() {
 
   const marketStats = calculateMarketStats(cryptos);
 
+  const filteredCryptos = searchQuery 
+    ? cryptos.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()) || c.symbol.toLowerCase().includes(searchQuery.toLowerCase()))
+    : cryptos;
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.target.tagName === 'INPUT') return;
+      
+      if (e.key.toLowerCase() === 'r') {
+        loadData();
+      } else if (e.key.toLowerCase() === 'f') {
+        document.querySelector('.search-input')?.focus();
+      } else if (e.key.toLowerCase() === 't') {
+        toggleTheme();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [loadData, toggleTheme]);
+
   return (
     <>
       <CryptoTicker cryptos={topGainers} />
@@ -113,6 +135,8 @@ export default function App() {
             countdown={countdown}
             theme={theme}
             onThemeToggle={toggleTheme}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
           />
 
         {!isLoading && !error && (
@@ -124,7 +148,7 @@ export default function App() {
 
         {isLoading && <Loading />}
         {error && <Error message={error} />}
-        {!isLoading && !error && <CryptoGrid cryptos={cryptos} />}
+        {!isLoading && !error && <CryptoGrid cryptos={filteredCryptos} />}
       </div>
     </>
   );

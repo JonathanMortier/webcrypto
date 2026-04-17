@@ -13,7 +13,7 @@
 ## 📱 Expérience utilisateur
 - [x] **Mode sombre/clair** - Toggle theme
 - **Responsive mobile** - Adaptation tablette/téléphone
-- **Raccourcis clavier** - Ex: R pour refresh, F pour recherche
+- [x] **Raccourcis clavier** - Ex: R pour refresh, F pour recherche
 
 ## 📉 Données complémentaires
 - **Graphique prix interactif** - Chart complet (1h, 24h, 7j, 30j, 1an)

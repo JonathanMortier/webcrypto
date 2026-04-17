@@ -20,10 +20,35 @@
   margin-top: 10px;
 }
 
+.header .header-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.header .search-input {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 25px;
+  padding: 12px 20px;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  width: 220px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.header .search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.header .search-input:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+}
+
 .header .theme-toggle-btn {
-  position: absolute;
-  top: 20px;
-  right: 0;
   background: var(--card-bg);
   border: 1px solid var(--card-border);
   padding: 8px 10px;
@@ -46,10 +71,10 @@
   background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
   border: none;
   color: white;
-  padding: 12px 30px;
+  padding: 12px 25px;
   border-radius: 25px;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 0.95rem;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 

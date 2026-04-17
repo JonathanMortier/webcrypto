@@ -8,9 +8,12 @@ Application React pour suivre les cours des principales cryptomonnaies en temps 
 - Filtre automatique des stablecoins
 - Ticker animé des meilleures performances (24h)
 - Ticker des actions tech majeures (xStocks via CoinGecko)
-- Indicateurs de marché : Market Cap, Volume 24h, BTC/ETH Dominance
+- Indicateurs de marché : Market Cap, Volume 24h, BTC/ETH Dominance, Change 24h
 - Altcoin Season Index (Alternative.me)
-- Index Fear & Greed (Alternative.me) avec bouton toggle
+- Index Fear & Greed (Alternative.me)
+- **Mode sombre/clair** avec toggle et persistance locale
+- **Recherche** de cryptos par nom ou symbole
+- **Raccourcis clavier** : R (refresh), F (recherche), T (thème)
 - Auto-refresh automatique (60s par défaut)
 - Graphique 7 jours au survol des cartes (Chart.js)
 - Images locales pour les cryptos et xStocks
@@ -78,6 +81,15 @@ scripts/
 | `npm run dev` | Démarrer le serveur de développement |
 | `npm run build` | Build pour la production |
 | `npm run preview` | Prévisualiser le build production |
+| `npm test` | Lancer les tests |
+
+## Raccourcis clavier
+
+| Touche | Action |
+|--------|--------|
+| `R` |Rafraîchir les données |
+| `F` | Activer la recherche |
+| `T` | Basculer le thème (sombre/clair) |
 
 ## Mise à jour des images
 

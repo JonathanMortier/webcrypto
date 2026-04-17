@@ -20,6 +20,19 @@
   --bronze: #cd7f32;
 }
 
+[data-theme="light"] {
+  --bg-primary: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  --text-primary: #333;
+  --text-secondary: #555;
+  --text-muted: #777;
+  --accent-primary: #0066cc;
+  --accent-secondary: #0055aa;
+  --positive: #00aa55;
+  --negative: #cc3333;
+  --card-bg: rgba(255, 255, 255, 0.8);
+  --card-border: rgba(0, 0, 0, 0.1);
+}
+
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: var(--bg-primary);

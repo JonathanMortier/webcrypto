@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export default function FearGreedIndex({ fearGreedData, isLoading, onRefresh }) {
+export default function FearGreedIndex({ fearGreedData, isLoading, onRefresh, theme, onThemeToggle }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const getClassification = (value) => {
@@ -18,6 +18,13 @@ export default function FearGreedIndex({ fearGreedData, isLoading, onRefresh }) 
   if (!isExpanded) {
     return (
       <div className="fear-greed-container">
+        <button 
+          className="theme-toggle-btn"
+          onClick={onThemeToggle}
+          title={theme === 'dark' ? 'Mode clair' : 'Mode sombre'}
+        >
+          {theme === 'dark' ? '☀️' : '🌙'}
+        </button>
         <button 
           className="fear-greed-toggle"
           onClick={handleToggle}
@@ -44,6 +51,13 @@ export default function FearGreedIndex({ fearGreedData, isLoading, onRefresh }) 
       <div className="fear-greed-content">
         <div className="fear-greed-header">
           <span className="fear-greed-title">Fear & Greed</span>
+          <button 
+            className="theme-toggle-btn"
+            onClick={onThemeToggle}
+            title={theme === 'dark' ? 'Mode clair' : 'Mode sombre'}
+          >
+            {theme === 'dark' ? '☀️' : '🌙'}
+          </button>
           <button 
             className="fear-greed-refresh"
             onClick={onRefresh}

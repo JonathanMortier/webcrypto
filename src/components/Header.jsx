@@ -1,6 +1,6 @@
 import { formatTime } from '../core/utils.js';
 
-export default function Header({ onRefresh, lastUpdate, isLoading, countdown }) {
+export default function Header({ onRefresh, lastUpdate, isLoading, countdown, theme, onThemeToggle }) {
   return (
     <header className="header">
       <h1>CryptoWatch</h1>
@@ -11,6 +11,13 @@ export default function Header({ onRefresh, lastUpdate, isLoading, countdown }) 
         disabled={isLoading}
       >
         Actualiser
+      </button>
+      <button 
+        className="theme-toggle-btn" 
+        onClick={onThemeToggle}
+        title={theme === 'dark' ? 'Mode clair' : 'Mode sombre'}
+      >
+        {theme === 'dark' ? '☀️' : '🌙'}
       </button>
       {lastUpdate && (
         <p className="last-update">

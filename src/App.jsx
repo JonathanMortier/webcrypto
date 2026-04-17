@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { fetchCryptoData, fetchXStocks, fetchFearAndGreed, filterStablecoins, getTopGainers, calculateMarketStats } from './core/api.js';
 import { REFRESH_INTERVAL } from './core/constants.js';
-import { Header, CryptoGrid, CryptoTicker, StocksTicker, FearGreedIndex, MarketIndicators, Loading, Error } from './components/index.js';
+import { Header, CryptoGrid, CryptoTicker, StocksTicker, MarketIndicators, Loading, Error } from './components/index.js';
 import './styles/index.css';
 
 export default function App() {
@@ -14,6 +14,10 @@ export default function App() {
   const [error, setError] = useState(null);
   const [lastUpdate, setLastUpdate] = useState(null);
   const [countdown, setCountdown] = useState(REFRESH_INTERVAL);
+  const [theme, setTheme] = useState(() => {
+    const saved = localStorage.getItem('theme');
+    return saved || 'dark';
+  });
   
   const countdownRef = useRef(null);
   const intervalRef = useRef(null);
@@ -71,6 +75,15 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = useCallback(() => {
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  }, []);
+
+  useEffect(() => {
     loadData();
     loadFearGreed();
     startCountdown();
@@ -91,19 +104,16 @@ export default function App() {
     <>
       <CryptoTicker cryptos={topGainers} />
       <StocksTicker stocks={stocks} />
-      <FearGreedIndex 
-        fearGreedData={fearGreed}
-        isLoading={fearGreedLoading}
-        onRefresh={loadFearGreed}
-      />
       
       <div className="app">
-        <Header 
-          onRefresh={loadData} 
-          lastUpdate={lastUpdate}
-          isLoading={isLoading}
-          countdown={countdown}
-        />
+<Header 
+            onRefresh={loadData} 
+            lastUpdate={lastUpdate}
+            isLoading={isLoading}
+            countdown={countdown}
+            theme={theme}
+            onThemeToggle={toggleTheme}
+          />
 
         {!isLoading && !error && (
           <MarketIndicators 

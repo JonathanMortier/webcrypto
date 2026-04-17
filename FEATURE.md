@@ -11,7 +11,7 @@
 - **Notifications navigateur** - Alertes même hors onglet
 
 ## 📱 Expérience utilisateur
-- **Mode sombre/clair** - Toggle theme
+- [x] **Mode sombre/clair** - Toggle theme
 - **Responsive mobile** - Adaptation tablette/téléphone
 - **Raccourcis clavier** - Ex: R pour refresh, F pour recherche
 

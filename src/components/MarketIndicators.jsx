@@ -12,7 +12,7 @@ export default function MarketIndicators({ marketStats, fearGreed }) {
   };
   const altcoinStatus = getAltcoinSeasonStatus(altcoinSeason);
 
-  const fearGreedValue = fearGreed?.data?.[0]?.value || 50;
+  const fearGreedValue = fearGreed?.value || 50;
   const getFearGreedClass = (value) => {
     if (value <= 25) return { text: 'Extreme Fear', color: '#ff4444' };
     if (value <= 45) return { text: 'Fear', color: '#ff9933' };
@@ -51,17 +51,17 @@ export default function MarketIndicators({ marketStats, fearGreed }) {
         <span className="indicator-value">{ethDominance}%</span>
       </div>
 
-      <div className="indicator">
-        <span className="indicator-label">Alt. Season</span>
-        <span className="indicator-value" style={{ color: altcoinStatus.color }}>
-          {altcoinSeason}/100
-        </span>
-      </div>
-
       <div className="indicator indicator-fear-greed">
         <span className="indicator-label">Fear & Greed</span>
         <span className="indicator-value" style={{ color: fearGreedStatus.color }}>
           {fearGreedValue}/100
+        </span>
+      </div>
+
+      <div className="indicator">
+        <span className="indicator-label">Alt. Season</span>
+        <span className="indicator-value" style={{ color: altcoinStatus.color }}>
+          {altcoinSeason}/100
         </span>
       </div>
     </div>

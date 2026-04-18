@@ -4,7 +4,7 @@ import { getImageUrl } from '../core/imageCache.js';
 import { fetchCoinHistory } from '../core/api.js';
 import PriceChart from './PriceChart.jsx';
 
-export default function CryptoCard({ coin }) {
+export default function CryptoCard({ coin, isFavorite, onToggleFavorite }) {
   const [showChart, setShowChart] = useState(false);
   const [timeframe, setTimeframe] = useState('7d');
   const [chartData, setChartData] = useState([]);
@@ -82,6 +82,15 @@ export default function CryptoCard({ coin }) {
             <div className="crypto-name">{coin.name}</div>
             <div className="crypto-symbol">{coin.symbol}</div>
           </div>
+          <button 
+            className={`favorite-btn ${isFavorite ? 'active' : ''}`}
+            onClick={(e) => { e.preventDefault(); onToggleFavorite(coin.id); }}
+            title={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill={isFavorite ? '#ffd700' : 'none'} stroke={isFavorite ? '#ffd700' : '#888'} strokeWidth="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+            </svg>
+          </button>
         </div>
         <div className="crypto-price">${formatPrice(coin.current_price)}</div>
         <span className={`crypto-change ${changeClass}`}>

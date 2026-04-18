@@ -6,4 +6,5 @@ export { default as StocksTicker } from './StocksTicker.jsx';
 export { default as PriceChart } from './PriceChart.jsx';
 export { default as FearGreedIndex } from './FearGreedIndex.jsx';
 export { default as MarketIndicators } from './MarketIndicators.jsx';
+export { default as InstallPrompt } from './InstallPrompt.jsx';
 export { Loading, Error } from './Status.jsx';

@@ -150,6 +150,22 @@
   text-transform: uppercase;
 }
 
+.favorite-btn {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+}
+
+.favorite-btn:hover {
+  transform: scale(1.2);
+}
+
 .crypto-price {
   font-size: 1.8rem;
   font-weight: bold;

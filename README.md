@@ -13,21 +13,24 @@ Application React pour suivre les cours des principales cryptomonnaies en temps 
 - Index Fear & Greed (Alternative.me)
 - **Mode sombre/clair** avec toggle et persistance locale
 - **Recherche** de cryptos par nom ou symbole
+- **Favoris** avec icône étoile et filtre dans le header
 - **Raccourcis clavier** : R (refresh), F (recherche), T (thème)
 - Auto-refresh automatique (60s par défaut)
-- Graphique 7 jours au survol des cartes (Chart.js)
+- Graphique interactif au survol des cartes (Chart.js)
+- **PWA** installable sur mobile
 - Images locales pour les cryptos et xStocks
 - Mise à jour automatique des images (hebdomadaire)
-- Cache API 60s pour éviter le rate limiting
+- Cache API 120s avec fallback 429 pour éviter le rate limiting
 - Actualisation manuelle des données
 
 ## Stack technique
 
-- **React 18** avec hooks
-- **Vite** pour le build et le dev server
+- **React 19** avec hooks
+- **Vite 8** pour le build et le dev server
 - **Chart.js** pour les graphiques
 - **CoinGecko API** pour les données cryptos
 - **Alternative.me API** pour Fear & Greed et Altcoin Season
+- **vite-plugin-pwa** pour l'installation mobile
 
 ## Installation
 

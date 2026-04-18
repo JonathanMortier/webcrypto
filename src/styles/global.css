@@ -59,3 +59,22 @@ body {
     max-width: 100%;
   }
 }
+
+.install-pwa-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 12px 24px;
+  background: var(--accent-primary);
+  color: #1a1a2e;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3);
+}
+
+.install-pwa-btn:hover {
+  background: var(--accent-secondary);
+}

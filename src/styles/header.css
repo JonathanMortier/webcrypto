@@ -48,6 +48,67 @@
   box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
 }
 
+.header .favorites-filter-btn {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+}
+
+.header .favorites-filter-btn:hover {
+  background: var(--card-border);
+  color: var(--text-primary);
+}
+
+.header .favorites-filter-btn.active {
+  background: rgba(255, 215, 0, 0.15);
+  border-color: #ffd700;
+  color: #ffd700;
+}
+
+.header .favorites-count {
+  background: #ffd700;
+  color: #1a1a2e;
+  font-size: 0.75rem;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+.header .favorites-filter-btn.active .favorites-count {
+  background: #1a1a2e;
+  color: #ffd700;
+}
+
+.header .notifications-btn {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.header .notifications-btn:hover {
+  background: var(--card-border);
+  color: var(--text-primary);
+}
+
+.header .notifications-btn.active {
+  background: rgba(0, 212, 255, 0.15);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
 .header .theme-toggle-btn {
   background: var(--card-bg);
   border: 1px solid var(--card-border);

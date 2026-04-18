@@ -111,3 +111,11 @@ export function calculateMarketStats(cryptos) {
     altcoinSeason,
   };
 }
+
+export async function fetchCoinHistory(coinId, days = 7) {
+  const response = await fetch(`https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=${days}`);
+  if (!response.ok) {
+    throw new Error('Erreur lors de la récupération de l\'historique');
+  }
+  return response.json();
+}

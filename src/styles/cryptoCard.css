@@ -13,16 +13,107 @@
   background: rgba(255, 255, 255, 0.08);
 }
 
+.crypto-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.crypto-chart {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid var(--card-border);
+}
+
+.crypto-chart .chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.crypto-chart .chart-title {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.crypto-chart .chart-timeframes {
+  display: flex;
+  gap: 6px;
+  padding: 0;
+  border: none;
+}
+
+.crypto-chart .chart-content {
+  height: 120px;
+}
+
+.crypto-chart .chart-content .price-chart {
+  width: 100%;
+  height: 100%;
+}
+
 .chart-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(10, 10, 30, 0.95);
+  background: rgba(10, 10, 30, 0.98);
   border-radius: 15px;
   z-index: 10;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
   animation: fadeIn 0.2s ease-in-out;
+}
+
+.chart-overlay .chart-timeframes {
+  flex-shrink: 0;
+}
+
+.chart-overlay .price-chart {
+  flex: 1;
+  min-height: 0;
+}
+
+.chart-timeframes {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.timeframe-btn {
+  background: transparent;
+  border: 1px solid var(--card-border);
+  border-radius: 15px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.timeframe-btn:hover {
+  background: var(--card-border);
+  color: var(--text-primary);
+}
+
+.timeframe-btn.active {
+  background: var(--accent-primary);
+  color: white;
+  border-color: var(--accent-primary);
+}
+
+[data-theme="light"] .crypto-card-link {
+  color: inherit;
+}
+
+.timeframe-btn {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+[data-theme="light"] .chart-overlay {
+  background: rgba(245, 247, 250, 0.98);
 }
 
 .chart-loading {

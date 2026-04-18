@@ -16,6 +16,6 @@
 - [x] **Raccourcis clavier** - Ex: R pour refresh, F pour recherche
 
 ## 📉 Données complémentaires
-- **Graphique prix interactif** - Chart complet (1h, 24h, 7j, 30j, 1an)
-- **Liens vers CMC** - Clic sur crypto → page détail CoinMarketCap
+- [x] **Graphique prix interactif** - Chart complet (1h, 24h, 7j, 30j, 1an)
+- [x] **Liens vers CMC** - Clic sur crypto → page détail CoinMarketCap
 - **Historique des changements** - Liste des variations récentes

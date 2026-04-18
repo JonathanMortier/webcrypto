@@ -16,19 +16,19 @@ export default defineConfig({
         background_color: '#1a1a2e',
         display: 'standalone',
         start_url: '.',
-        icons: [
+icons: [
           {
             src: 'pwa-192x192.svg',
             sizes: '192x192',
             type: 'image/svg+xml'
           },
           {
-            src: 'pwa-192x192.svg',
+            src: 'pwa-512x512.svg',
             sizes: '512x512',
             type: 'image/svg+xml'
           },
           {
-            src: 'pwa-192x192.svg',
+            src: 'pwa-512x512.svg',
             sizes: '512x512',
             type: 'image/svg+xml',
             purpose: 'any maskable'

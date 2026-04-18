@@ -47,3 +47,15 @@ body {
   max-width: 1200px;
   margin: 0 auto;
 }
+
+@media (max-width: 768px) {
+  body {
+    padding: 10px;
+    padding-top: 50px;
+    padding-bottom: 50px;
+  }
+
+  .app {
+    max-width: 100%;
+  }
+}

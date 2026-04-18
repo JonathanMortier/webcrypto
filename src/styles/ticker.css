@@ -85,3 +85,37 @@
 .gain.negative {
   color: var(--negative);
 }
+
+@media (max-width: 600px) {
+  .ticker-wrapper {
+    padding: 8px 0;
+  }
+
+  .ticker-item {
+    padding: 0 20px;
+    gap: 5px;
+  }
+
+  .ticker-item img {
+    width: 18px;
+    height: 18px;
+  }
+
+  .ticker-item .rank {
+    font-size: 0.75rem;
+    margin-right: 3px;
+  }
+
+  .ticker-item .name {
+    font-size: 0.8rem;
+  }
+
+  .ticker-item .gain {
+    font-size: 0.8rem;
+  }
+
+  .ticker-separator {
+    padding: 0 15px;
+    font-size: 1rem;
+  }
+}

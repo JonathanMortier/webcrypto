@@ -1,8 +1,9 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, lazy, Suspense } from 'react';
 import { formatPrice } from '../core/utils.js';
 import { getImageUrl } from '../core/imageCache.js';
 import { fetchCoinHistory } from '../core/api.js';
-import PriceChart from './PriceChart.jsx';
+
+const PriceChart = lazy(() => import('./PriceChart.jsx'));
 
 export default function CryptoCard({ coin, isFavorite, onToggleFavorite }) {
   const [showChart, setShowChart] = useState(false);
@@ -77,7 +78,7 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite }) {
         className="crypto-card-link"
       >
         <div className="crypto-header">
-          <img src={imageUrl} alt={coin.name} className="crypto-icon" />
+          <img src={imageUrl} alt={coin.name} className="crypto-icon" loading="lazy" />
           <div>
             <div className="crypto-name">{coin.name}</div>
             <div className="crypto-symbol">{coin.symbol}</div>
@@ -129,9 +130,13 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite }) {
             {chartLoading ? (
               <div className="chart-loading">Chargement...</div>
             ) : chartData.length > 0 ? (
-              <PriceChart prices={chartData} isPositive={isPositive} />
+              <Suspense fallback={<div className="chart-loading">Chargement...</div>}>
+                <PriceChart prices={chartData} isPositive={isPositive} />
+              </Suspense>
             ) : sparklineData.length > 0 ? (
-              <PriceChart prices={sparklineData} isPositive={isPositive} />
+              <Suspense fallback={<div className="chart-loading">Chargement...</div>}>
+                <PriceChart prices={sparklineData} isPositive={isPositive} />
+              </Suspense>
             ) : (
               <div className="chart-loading">Graphique indisponible</div>
             )}

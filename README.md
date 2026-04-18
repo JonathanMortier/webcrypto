@@ -43,13 +43,17 @@ npm run dev
 
 L'application sera accessible sur `http://localhost:5173`
 
+## Production
+
+Application déployée sur Vercel : https://webcrypto-seven-vercel.app/
+
 ## Configuration
 
 Les paramètres suivants peuvent être modifiés dans `src/core/constants.js` :
 
 ```javascript
 export const REFRESH_INTERVAL = 60; // intervalle auto-refresh en secondes
-export const CACHE_TTL = 60;        // durée du cache API en secondes
+export const CACHE_TTL = 120;        // durée du cache API en secondes
 ```
 
 ## Structure du projet

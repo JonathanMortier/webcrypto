@@ -20,4 +20,4 @@ export const XSTOCKS_API_URL = (ids) =>
 
 export const REFRESH_INTERVAL = 60;
 
-export const CACHE_TTL = 60;
+export const CACHE_TTL = 120;

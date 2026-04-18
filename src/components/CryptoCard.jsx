@@ -70,8 +70,8 @@ export default function CryptoCard({ coin }) {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <a 
-        href={`https://coinmarketcap.com/currencies/${coin.id}/`}
+<a 
+          href={`https://coinmarketcap.com/currencies/${coin.name.toLowerCase().replace(/\s+/g, '-')}/`}
         target="_blank"
         rel="noopener noreferrer"
         className="crypto-card-link"

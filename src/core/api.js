@@ -1,16 +1,46 @@
 import { API_URL, XSTOCKS_API_URL, XSTOCK_IDS, STABLECOINS, CACHE_TTL } from './constants.js';
 
-const apiCache = new Map();
+const CACHE_PREFIX = 'cryptowatch_cache_';
+
+function getFromLocalStorage(key) {
+  try {
+    const item = localStorage.getItem(CACHE_PREFIX + key);
+    if (!item) return null;
+    const { data, timestamp } = JSON.parse(item);
+    return { data, timestamp };
+  } catch {
+    return null;
+  }
+}
+
+function setToLocalStorage(key, data) {
+  try {
+    localStorage.setItem(CACHE_PREFIX + key, JSON.stringify({ data, timestamp: Date.now() }));
+  } catch (e) {
+    console.warn('LocalStorage full or unavailable:', e);
+  }
+}
 
 function withCache(key, ttlMs, fetchFn) {
   return async (...args) => {
-    const cached = apiCache.get(key);
+    const cached = getFromLocalStorage(key);
     if (cached && (Date.now() - cached.timestamp) < ttlMs) {
       return cached.data;
     }
-    const data = await fetchFn(...args);
-    apiCache.set(key, { data, timestamp: Date.now() });
-    return data;
+
+    try {
+      const data = await fetchFn(...args);
+      setToLocalStorage(key, data);
+      return data;
+    } catch (err) {
+      if (err.status === 429 || err.message?.includes('429')) {
+        if (cached) {
+          console.warn('Rate limited, using cached data');
+          return cached.data;
+        }
+      }
+      throw err;
+    }
   };
 }
 

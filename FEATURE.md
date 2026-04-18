@@ -1,9 +1,9 @@
 # Future Features
 
 ## 📈 Outils d'analyse
-- **Filtres avancés** - Par gain/perte, par volume, par market cap
-- **Tri multi-colonnes** - Click sur les en-têtes pour trier
-- **Recherche** - Barre de recherche pour trouver une crypto rapidement
+- [x] **Filtres avancés** - Par gain/perte, par volume, par market cap
+- [x] **Tri multi-colonnes** - Click sur les en-têtes pour trier
+- [x] **Recherche** - Barre de recherche pour trouver une crypto rapidement
 - **Watchlist** - Sauvegarder des cryptos favorites en local
 
 ## 🔔 Alertes

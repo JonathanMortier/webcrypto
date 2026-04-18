@@ -15,10 +15,21 @@ export default function App() {
   const [lastUpdate, setLastUpdate] = useState(null);
   const [countdown, setCountdown] = useState(REFRESH_INTERVAL);
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortField, setSortField] = useState('market_cap');
+  const [sortDir, setSortDir] = useState('desc');
   const [theme, setTheme] = useState(() => {
     const saved = localStorage.getItem('theme');
     return saved || 'dark';
   });
+
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDir('desc');
+    }
+  };
   
   const countdownRef = useRef(null);
   const intervalRef = useRef(null);
@@ -143,12 +154,15 @@ export default function App() {
           <MarketIndicators 
             marketStats={marketStats}
             fearGreed={fearGreed}
+            onSort={handleSort}
+            sortField={sortField}
+            sortDir={sortDir}
           />
         )}
 
         {isLoading && <Loading />}
         {error && <Error message={error} />}
-        {!isLoading && !error && <CryptoGrid cryptos={filteredCryptos} />}
+        {!isLoading && !error && <CryptoGrid cryptos={filteredCryptos} sortField={sortField} sortDir={sortDir} />}
       </div>
     </>
   );

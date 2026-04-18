@@ -1,6 +1,6 @@
 import { formatLargeNumber } from '../core/utils.js';
 
-export default function MarketIndicators({ marketStats, fearGreed }) {
+export default function MarketIndicators({ marketStats, fearGreed, onSort, sortField, sortDir }) {
   if (!marketStats) return null;
 
   const { totalMarketCap, totalVolume, btcDominance, ethDominance, marketCapChange, altcoinSeason } = marketStats;
@@ -22,20 +22,25 @@ export default function MarketIndicators({ marketStats, fearGreed }) {
   };
   const fearGreedStatus = getFearGreedClass(fearGreedValue);
 
+  const getSortIndicator = (field) => {
+    if (sortField !== field) return '';
+    return sortDir === 'asc' ? ' ↑' : ' ↓';
+  };
+
   return (
     <div className="market-indicators">
-      <div className="indicator">
-        <span className="indicator-label">Market Cap</span>
+      <div className="indicator clickable" onClick={() => onSort?.('market_cap')}>
+        <span className="indicator-label">Market Cap{getSortIndicator('market_cap')}</span>
         <span className="indicator-value">${formatLargeNumber(totalMarketCap)}</span>
       </div>
 
-      <div className="indicator">
-        <span className="indicator-label">Volume 24h</span>
+      <div className="indicator clickable" onClick={() => onSort?.('volume')}>
+        <span className="indicator-label">Volume 24h{getSortIndicator('volume')}</span>
         <span className="indicator-value">${formatLargeNumber(totalVolume)}</span>
       </div>
 
-      <div className="indicator">
-        <span className="indicator-label">Change 24h</span>
+      <div className="indicator clickable" onClick={() => onSort?.('change')}>
+        <span className="indicator-label">Change 24h{getSortIndicator('change')}</span>
         <span className={`indicator-value ${parseFloat(marketCapChange) >= 0 ? 'positive' : 'negative'}`}>
           {parseFloat(marketCapChange) >= 0 ? '+' : ''}{marketCapChange}%
         </span>

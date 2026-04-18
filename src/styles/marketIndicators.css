@@ -18,6 +18,17 @@
   min-width: 100px;
 }
 
+.indicator.clickable {
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.indicator.clickable:hover {
+  background: var(--hover-bg);
+}
+
 .indicator-label {
   font-size: 0.75rem;
   color: var(--text-secondary);

@@ -20,6 +20,19 @@
   --bronze: #cd7f32;
 }
 
+[data-theme="light"] {
+  --bg-primary: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  --text-primary: #333;
+  --text-secondary: #555;
+  --text-muted: #777;
+  --accent-primary: #0066cc;
+  --accent-secondary: #0055aa;
+  --positive: #00aa55;
+  --negative: #cc3333;
+  --card-bg: rgba(255, 255, 255, 0.8);
+  --card-border: rgba(0, 0, 0, 0.1);
+}
+
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: var(--bg-primary);
@@ -33,4 +46,35 @@ body {
 .app {
   max-width: 1200px;
   margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  body {
+    padding: 10px;
+    padding-top: 50px;
+    padding-bottom: 50px;
+  }
+
+  .app {
+    max-width: 100%;
+  }
+}
+
+.install-pwa-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 12px 24px;
+  background: var(--accent-primary);
+  color: #1a1a2e;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3);
+}
+
+.install-pwa-btn:hover {
+  background: var(--accent-secondary);
 }

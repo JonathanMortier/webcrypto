@@ -3,6 +3,9 @@
   top: 60px;
   right: 20px;
   z-index: 998;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .fear-greed-toggle {
@@ -15,6 +18,36 @@
   font-weight: bold;
   cursor: pointer;
   transition: all 0.2s ease;
+}
+
+.theme-toggle-btn {
+  background: rgba(30, 30, 50, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+[data-theme="light"] .theme-toggle-btn {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  color: #333;
+}
+
+[data-theme="light"] .fear-greed-toggle {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  color: #333;
+}
+
+[data-theme="light"] .theme-toggle-btn:hover {
+  background: rgba(200, 200, 200, 0.95);
+}
+
+[data-theme="light"] .fear-greed-toggle:hover {
+  background: rgba(200, 200, 200, 0.95);
 }
 
 .fear-greed-toggle:hover {
@@ -34,6 +67,10 @@
   width: 180px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   animation: fadeIn 0.2s ease;
+}
+
+.fear-greed-container:not(.expanded) .fear-greed-content {
+  display: none;
 }
 
 @keyframes fadeIn {

@@ -1,0 +1,44 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="btc" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f7931a"/>
+      <stop offset="100%" stop-color="#ffcc00"/>
+    </linearGradient>
+    <linearGradient id="eth" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#627eea"/>
+      <stop offset="100%" stop-color="#8a92b2"/>
+    </linearGradient>
+    <linearGradient id="sol" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#00ffa3"/>
+      <stop offset="100%" stop-color="#dc1fff"/>
+    </linearGradient>
+    <linearGradient id="trx" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ff060a"/>
+      <stop offset="100%" stop-color="#a00000"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" rx="80" fill="#111"/>
+
+  <!-- B (Bitcoin style) -->
+  <text x="60" y="300" font-size="160" font-family="Arial Black, sans-serif" fill="url(#btc)">
+    B
+  </text>
+
+  <!-- E (Ethereum style) -->
+  <text x="180" y="300" font-size="160" font-family="Arial Black, sans-serif" fill="url(#eth)">
+    E
+  </text>
+
+  <!-- S (Solana style) -->
+  <text x="290" y="300" font-size="160" font-family="Arial Black, sans-serif" fill="url(#sol)">
+    S
+  </text>
+
+  <!-- T (Tron style) -->
+  <text x="400" y="300" font-size="160" font-family="Arial Black, sans-serif" fill="url(#trx)">
+    T
+  </text>
+</svg>

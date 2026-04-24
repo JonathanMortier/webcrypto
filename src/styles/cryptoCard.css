@@ -6,6 +6,7 @@
   border: 1px solid var(--card-border);
   position: relative;
   overflow: hidden;
+  text-align: center;
 }
 
 .crypto-card:hover {
@@ -128,15 +129,21 @@
 
 .crypto-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 15px;
   margin-bottom: 15px;
+  position: relative;
+}
+
+.crypto-info {
+  text-align: left;
 }
 
 .crypto-icon {
   width: 48px;
   height: 48px;
   border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .crypto-name {
@@ -151,7 +158,9 @@
 }
 
 .favorite-btn {
-  margin-left: auto;
+  position: absolute;
+  top: 0;
+  right: 0;
   background: transparent;
   border: none;
   cursor: pointer;
@@ -192,7 +201,7 @@
 
 .crypto-stats {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 10px;
   margin-top: 15px;
   padding-top: 15px;
@@ -212,6 +221,24 @@
 .stat-value {
   font-size: 0.95rem;
   margin-top: 5px;
+}
+
+.chart-toggle-btn {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  background: var(--card-border);
+  border: none;
+  border-radius: 8px;
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+
+.chart-toggle-btn:hover {
+  background: var(--accent-primary);
+  color: white;
 }
 
 @media (max-width: 480px) {

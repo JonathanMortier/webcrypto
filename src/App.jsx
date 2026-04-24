@@ -98,9 +98,11 @@ export default function App() {
       const filtered = filterStablecoins(cryptoData);
       const gainers = getTopGainers(filtered);
 
+      const sortedStocks = [...xstockData].sort((a, b) => (b.price_change_percentage_24h ?? 0) - (a.price_change_percentage_24h ?? 0));
+
       setCryptos(filtered);
       setTopGainers(gainers);
-      setStocks(xstockData);
+      setStocks(sortedStocks);
       setLastUpdate(new Date());
       setCountdown(REFRESH_INTERVAL);
       

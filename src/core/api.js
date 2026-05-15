@@ -1,4 +1,4 @@
-import { API_URL, XSTOCKS_API_URL, XSTOCK_IDS, STABLECOINS, CACHE_TTL } from './constants.js';
+import { API_URL, XSTOCKS_API_URL, XSTOCK_IDS, STABLECOINS, CACHE_TTL, INDICES } from './constants.js';
 
 const CACHE_PREFIX = 'cryptowatch_cache_';
 
@@ -141,6 +141,108 @@ export function calculateMarketStats(cryptos) {
     altcoinSeason,
   };
 }
+
+const ISIN_MAP_CACHE = 'isin_symbol_map';
+
+async function resolveIndicesSymbols() {
+  const cached = getFromLocalStorage(ISIN_MAP_CACHE);
+  if (cached && (Date.now() - cached.timestamp) < 86400000) {
+    return cached.data;
+  }
+
+  const searchResults = await Promise.allSettled(
+    INDICES.map(async (idx) => {
+      const res = await fetch(`/api/yahoo/v1/finance/search?q=${idx.isin}&quotesCount=1&newsCount=0`);
+      const json = await res.json();
+      const symbol = json?.quotes?.[0]?.symbol || null;
+      return { isin: idx.isin, symbol };
+    })
+  );
+
+  const entries = searchResults.map((r, i) =>
+    r.status === 'fulfilled' ? r.value : { isin: INDICES[i].isin, symbol: null }
+  );
+
+  const currencyResults = await Promise.allSettled(
+    entries.map(async (entry) => {
+      if (!entry.symbol) return { ...entry, currency: null };
+      const res = await fetch(`/api/yahoo/v8/finance/chart/${entry.symbol}?range=1d&interval=1d`);
+      const json = await res.json();
+      const currency = json?.chart?.result?.[0]?.meta?.currency || null;
+      return { ...entry, currency };
+    })
+  );
+
+  const mapping = {};
+  for (let i = 0; i < entries.length; i++) {
+    const entry = currencyResults[i]?.status === 'fulfilled'
+      ? currencyResults[i].value
+      : { ...entries[i], currency: null };
+    mapping[entry.isin] = { symbol: entry.symbol, currency: entry.currency };
+  }
+
+  setToLocalStorage(ISIN_MAP_CACHE, mapping);
+  return mapping;
+}
+
+const fetchIndicesRaw = async () => {
+  const symbolMapping = await resolveIndicesSymbols();
+
+  const symbols = INDICES.map(idx => symbolMapping[idx.isin]?.symbol).filter(Boolean);
+  if (symbols.length === 0) throw new Error('No symbols resolved from ISINs');
+
+  const needsFx = Object.values(symbolMapping).some(m => m?.currency && m.currency !== 'EUR');
+
+  const url = `/api/yahoo/v8/finance/spark?symbols=${symbols.join(',')}&range=1d&interval=1d`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Yahoo HTTP ${res.status}`);
+  const json = await res.json();
+
+  let eurUsdRate = null;
+  if (needsFx) {
+    try {
+      const fxRes = await fetch('/api/yahoo/v8/finance/spark?symbols=EURUSD=X&range=1d&interval=1d');
+      const fxJson = await fxRes.json();
+      const fxData = fxJson['EURUSD=X'];
+      if (fxData?.close?.length > 0) {
+        eurUsdRate = fxData.close[fxData.close.length - 1];
+      }
+    } catch (e) {
+      console.warn('Failed to fetch EUR/USD rate:', e);
+    }
+  }
+
+  const results = [];
+  for (const index of INDICES) {
+    const mapping = symbolMapping[index.isin];
+    const symbol = mapping?.symbol;
+    const data = json[symbol];
+
+    if (data?.close?.length > 0 && data.chartPreviousClose != null) {
+      let price = data.close[data.close.length - 1];
+      let prevClose = data.chartPreviousClose;
+
+      if (mapping?.currency && mapping.currency !== 'EUR' && eurUsdRate) {
+        price = price / eurUsdRate;
+        prevClose = prevClose / eurUsdRate;
+      }
+
+      const change = price - prevClose;
+      const changePercent = prevClose > 0 ? (change / prevClose) * 100 : 0;
+      results.push({ ...index, price, change, changePercent });
+    } else {
+      console.warn(`Yahoo no data for ${symbol} (ISIN ${index.isin})`);
+      results.push({ ...index, price: null, change: null, changePercent: null });
+    }
+  }
+
+  if (!results.some(r => r.price != null)) {
+    throw new Error('All index calls failed');
+  }
+  return results;
+};
+
+export const fetchIndicesData = withCache('indices_v2', 600_000, fetchIndicesRaw);
 
 export const fetchEtfData = withCache(
   'etf_markets',

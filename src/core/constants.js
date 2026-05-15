@@ -27,8 +27,8 @@ export const KEY_AVANTAGE = 'R0HKPO7I2TZ618CO';
 export const KEY_FINNHUB = 'd83j201r01qkm5c8b1qgd83j201r01qkm5c8b1r0';
 
 export const INDICES = [
-  { id: 'sp500', name: 'S&P 500', symbol: 'SXR8.DE', isin: 'FR0011871136' },
-  { id: 'nasdaq', name: 'Nasdaq 100', symbol: 'EXXT.DE' , isin: 'IE00B53SZB19'},
-  { id: 'eurostoxx', name: 'Euro Stoxx 600', symbol: 'EXSA.DE', isin: 'FR0011550193' },
+  { id: 'sp500', name: 'S&P 500', symbol: 'PSPH.PA', isin: 'FR0011871136' },
+  { id: 'nasdaq', name: 'Nasdaq 100', symbol: 'NQSE.DE' , isin: 'IE00B53SZB19'},
+  { id: 'eurostoxx', name: 'Euro Stoxx 600', symbol: 'ETSZ.DE', isin: 'FR0011550193' },
   { id: 'msci-world', name: 'MSCI World', symbol: 'EUNL.DE' , isin: 'IE00B4L5Y983'},
 ];

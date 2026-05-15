@@ -99,7 +99,7 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite }) {
           </div>
           <button 
             className={`favorite-btn ${isFavorite ? 'active' : ''}`}
-            onClick={(e) => { e.preventDefault(); onToggleFavorite(coin.id); }}
+            onClick={(e) => { e.preventDefault(); onToggleFavorite?.(coin.id); }}
             title={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill={isFavorite ? '#ffd700' : 'none'} stroke={isFavorite ? '#ffd700' : '#888'} strokeWidth="2">

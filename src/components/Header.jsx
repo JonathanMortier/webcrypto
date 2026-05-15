@@ -1,8 +1,10 @@
 import { formatTime } from '../core/utils.js';
+import NavMenu from './NavMenu.jsx';
 
 export default function Header({ onRefresh, lastUpdate, isLoading, countdown, theme, onThemeToggle, searchQuery, onSearchChange, favoritesCount, showFavoritesOnly, onToggleFavoritesFilter, notificationsEnabled, onToggleNotifications }) {
   return (
     <header className="header">
+      <NavMenu />
       <h1>CryptoWatch</h1>
       <p className="subtitle">Suivez les cours des principales cryptomonnaies en temps réel</p>
       <div className="header-controls">

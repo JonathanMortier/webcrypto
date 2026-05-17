@@ -4,7 +4,7 @@
 
 Application React moderne avec dashboard crypto, page Bourse (indices & actions tech), mode sombre, PWA, et déploiement Vercel.
 
-![Version](https://img.shields.io/badge/version-0.2.1--SNAPSHOT-1a1a2e) ![React](https://img.shields.io/badge/React-19-61dafb) ![Vite](https://img.shields.io/badge/Vite-8-646cff)
+![Version](https://img.shields.io/github/package-json/v/JonathanMortier/webcrypto/main?label=version&color=1a1a2e) ![React](https://img.shields.io/badge/React-19-61dafb) ![Vite](https://img.shields.io/badge/Vite-8-646cff)
 
 ---
 

@@ -1,7 +1,8 @@
 export default async function handler(req, res) {
-  const slug = req.query.slug || [];
-  const path = slug.join('/');
-  const qs = req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : '';
+  const path = req.query.path || '';
+  const qs = req.url.includes('?')
+    ? '?' + req.url.slice(req.url.indexOf('?') + 1).split('&').filter(p => !p.startsWith('path=')).join('&')
+    : '';
   const targetUrl = `https://query1.finance.yahoo.com/${path}${qs}`;
 
   try {

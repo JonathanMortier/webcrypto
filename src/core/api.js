@@ -148,6 +148,7 @@ const fetchIndicesRaw = async () => {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Yahoo HTTP ${res.status}`);
   const json = await res.json();
+  console.log('[Yahoo Indices] URL:', url, 'Response:', JSON.stringify(json));
 
   const results = [];
   for (const index of INDICES) {
@@ -170,7 +171,7 @@ const fetchIndicesRaw = async () => {
   return results;
 };
 
-export const fetchIndicesData = withCache('indices_v2', 600_000, fetchIndicesRaw);
+export const fetchIndicesData = withCache('indices_v3', 600_000, fetchIndicesRaw);
 
 export const fetchEtfData = withCache(
   'etf_markets',

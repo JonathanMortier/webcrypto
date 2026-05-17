@@ -1,6 +1,7 @@
 export const STABLECOINS = [
   'usdt', 'usdc', 'dai', 'busd', 'ust', 'tusd', 'usdp', 'usdd',
-  'frax', 'lusd', 'usds', 'usde', 'usd1', 'pyusd', 'usdg', 'usdf', 'buidl'
+  'frax', 'lusd', 'usds', 'usde', 'usd1', 'pyusd', 'usdg', 'usdf', 'buidl',
+  'figr_heloc', 'usyc', 'usdy'
 ];
 
 export const XSTOCK_IDS = [
@@ -28,7 +29,7 @@ export const KEY_FINNHUB = 'd83j201r01qkm5c8b1qgd83j201r01qkm5c8b1r0';
 
 export const INDICES = [
   { id: 'sp500', name: 'S&P 500', symbol: 'PSPH.PA', isin: 'FR0011871136' },
-  { id: 'nasdaq', name: 'Nasdaq 100', symbol: 'NQSE.DE' , isin: 'IE00B53SZB19'},
+  { id: 'nasdaq', name: 'Nasdaq 100', symbol: 'SXRV.DE' , isin: 'IE00B53SZB19'},
   { id: 'eurostoxx', name: 'Euro Stoxx 600', symbol: 'ETSZ.DE', isin: 'FR0011550193' },
   { id: 'msci-world', name: 'MSCI World', symbol: 'EUNL.DE' , isin: 'IE00B4L5Y983'},
 ];

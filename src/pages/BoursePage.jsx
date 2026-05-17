@@ -33,7 +33,7 @@ export default function BoursePage() {
   useEffect(() => {
     fetchIndicesData()
       .then(data => setIndices(data))
-      .catch(e => console.warn('Indices error:', e));
+      .catch(e => { console.warn('Indices error:', e); setLoading(false); });
 
     fetchXStocks()
       .then(data => {

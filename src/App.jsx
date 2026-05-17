@@ -4,6 +4,7 @@ import { fetchCryptoData, fetchXStocks, fetchFearAndGreed, filterStablecoins, ge
 import { REFRESH_INTERVAL } from './core/constants.js';
 import { Header, CryptoGrid, CryptoTicker, StocksTicker, MarketIndicators, Loading, Error, InstallPrompt } from './components/index.js';
 import { BoursePage } from './pages/index.js';
+import { Analytics } from '@vercel/analytics/react';
 import './styles/index.css';
 
 export default function App() {
@@ -271,6 +272,7 @@ export default function App() {
           <Route path="/bourse" element={<BoursePage />} />
         </Routes>
       </div>
+      <Analytics />
     </HashRouter>
   );
 }

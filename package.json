@@ -16,6 +16,7 @@
     "analyze": "ANALYZE=true npm run build"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "chart.js": "^4.4.0",
     "express": "^5.2.1",
     "express-rate-limit": "^8.5.2",

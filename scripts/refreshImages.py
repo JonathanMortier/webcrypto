@@ -20,6 +20,13 @@ IMAGES_DIR = './public/images/cryptos'
 LAST_UPDATE_FILE = './src/core/lastImageUpdate.json'
 WEEK_IN_SECONDS = 7 * 24 * 60 * 60
 
+# Stablecoins exclus de l'affichage → pas besoin de télécharger leurs images
+SKIP_SYMBOLS = {
+    'usdt', 'usdc', 'dai', 'busd', 'ust', 'tusd', 'usdp', 'usdd',
+    'frax', 'lusd', 'usds', 'usde', 'usd1', 'pyusd', 'usdg', 'usdf', 'buidl',
+    'figr_heloc', 'usyc', 'usdy',
+}
+
 HEADERS = '-H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"'
 
 
@@ -81,12 +88,16 @@ def main():
     
     # Fetch new data
     cryptos = fetch_api()
-    image_urls = [{'id': coin['id'], 'symbol': coin['symbol'], 'image': coin['image']} for coin in cryptos]
+    all_urls = [{'id': coin['id'], 'symbol': coin['symbol'], 'image': coin['image']} for coin in cryptos]
     
-    # Save new URLs
+    # Filtrer les stablecoins exclus de l'affichage
+    image_urls = [c for c in all_urls if c['symbol'] not in SKIP_SYMBOLS]
+    skipped = len(all_urls) - len(image_urls)
+    
+    # Save filtered URLs
     with open(CRYPTO_IMAGES_JSON, 'w') as f:
         json.dump(image_urls, f, indent=2)
-    print(f"\nUpdated {len(image_urls)} image URLs in {CRYPTO_IMAGES_JSON}")
+    print(f"\nUpdated {len(image_urls)} image URLs ({skipped} stablecoins filtrés) dans {CRYPTO_IMAGES_JSON}")
     
     # Ensure directory exists
     os.makedirs(IMAGES_DIR, exist_ok=True)
@@ -95,15 +106,16 @@ def main():
     print(f"\nDownloading images to {IMAGES_DIR}...")
     success = 0
     failed = 0
-    
+    total = len(image_urls)
+
     for i, item in enumerate(image_urls):
         filepath = f'{IMAGES_DIR}/{item["id"]}.png'
         if download_image(item['image'], filepath):
             success += 1
-            print(f'  [{i+1}/{len(image_urls)}] {item["id"]}')
+            print(f'  [{i+1}/{total}] {item["id"]}')
         else:
             failed += 1
-            print(f'  [{i+1}/{len(image_urls)}] FAILED: {item["id"]}')
+            print(f'  [{i+1}/{total}] FAILED: {item["id"]}')
         time.sleep(0.2)
     
     # Save last update timestamp

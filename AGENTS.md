@@ -6,6 +6,7 @@
 |---------|-------------|
 | `npm run dev` | Dev server on http://localhost:5173 |
 | `npm run build` | Production build |
+| `npm start` | Production server (Express + Yahoo proxy) |
 | `npm run test` | Run all tests (no watch mode) |
 
 ## Tech Stack
@@ -22,14 +23,23 @@
 - **No lint/typecheck scripts** in package.json - but verify tests pass before commits.
 - **Images are local**: Stored in `public/images/cryptos/` and `public/images/xstocks/`. Updated weekly via `scripts/refreshImages.py`.
 
+## Deploy
+
+- **Vercel**: Auto-deploys from GH commits. `vercel.json` rewrites all routes to `index.html` (SPA). Yahoo API proxy via `api/yahoo/[...slug].js` serverless function.
+- **Local production**: `npm run build && npm start` (Express server on `:3000` with Yahoo proxy).
+
 ## Repo Structure
 
 ```
 src/
 ├── core/api.js         # All API calls (fetchCryptoData, fetchXStocks, fetchCoinHistory, etc.)
-├── core/constants.js   # Configuration (API_URL, REFRESH_INTERVAL, CACHE_TTL, STABLECOINS)
+├── core/constants.js   # Configuration (API_URL, REFRESH_INTERVAL, CACHE_TTL, STABLECOINS, INDICES)
 ├── components/        # React components
+├── pages/            # Page-level components (BoursePage, etc.)
 └── styles/           # CSS files
+api/yahoo/[...slug].js  # Vercel serverless proxy for Yahoo Finance
+server.js               # Express production server (alternative)
+vercel.json             # Vercel config (SPA rewrites)
 ```
 
 ## Testing

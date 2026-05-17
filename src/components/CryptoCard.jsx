@@ -10,13 +10,27 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite }) {
   const [timeframe, setTimeframe] = useState('7d');
   const [chartData, setChartData] = useState([]);
   const [chartLoading, setChartLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   
   const debounceRef = useRef(null);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 580);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const toggleChart = useCallback(() => {
+    setShowChart(prev => !prev);
+  }, []);
 
   const change = coin.price_change_percentage_24h ?? 0;
   const isPositive = change >= 0;
   const changeClass = isPositive ? 'positive' : 'negative';
   const changeSign = isPositive ? '+' : '';
+
+  const ath = coin.ath || 0;
 
   const sparklineData = coin.sparkline_in_7d?.price || [];
   const imageUrl = getImageUrl(coin.id, coin.image);
@@ -67,9 +81,9 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite }) {
 
   return (
     <div 
-      className="crypto-card"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      className={`crypto-card ${isMobile ? 'mobile' : ''}`}
+      onMouseEnter={!isMobile ? handleMouseEnter : undefined}
+      onMouseLeave={!isMobile ? handleMouseLeave : undefined}
     >
 <a 
           href={`https://coinmarketcap.com/currencies/${coin.name.toLowerCase().replace(/\s+/g, '-')}/`}
@@ -79,13 +93,13 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite }) {
       >
         <div className="crypto-header">
           <img src={imageUrl} alt={coin.name} className="crypto-icon" loading="lazy" />
-          <div>
+          <div className="crypto-info">
             <div className="crypto-name">{coin.name}</div>
             <div className="crypto-symbol">{coin.symbol}</div>
           </div>
           <button 
             className={`favorite-btn ${isFavorite ? 'active' : ''}`}
-            onClick={(e) => { e.preventDefault(); onToggleFavorite(coin.id); }}
+            onClick={(e) => { e.preventDefault(); onToggleFavorite?.(coin.id); }}
             title={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill={isFavorite ? '#ffd700' : 'none'} stroke={isFavorite ? '#ffd700' : '#888'} strokeWidth="2">
@@ -106,8 +120,24 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite }) {
             <div className="stat-label">Volume 24h</div>
             <div className="stat-value">${formatLargeNumber(coin.total_volume)}</div>
           </div>
+          <div className="stat">
+            <div className="stat-label">All-Time-High</div>
+            <div className="stat-value">
+              {ath > 0 ? `$${formatPrice(ath)}` : 'N/A'}
+            </div>
+          </div>
         </div>
       </a>
+
+      {isMobile && (
+        <button 
+          type="button"
+          className="chart-toggle-btn"
+          onClick={toggleChart}
+        >
+          {showChart ? 'Masquer le graphique' : 'Afficher le graphique'}
+        </button>
+      )}
 
       {showChart && (
         <div className="crypto-chart">

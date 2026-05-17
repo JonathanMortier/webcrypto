@@ -1,4 +1,4 @@
-import { API_URL, XSTOCKS_API_URL, XSTOCK_IDS, STABLECOINS, CACHE_TTL } from './constants.js';
+import { API_URL, XSTOCKS_API_URL, XSTOCK_IDS, STABLECOINS, CACHE_TTL, INDICES } from './constants.js';
 
 const CACHE_PREFIX = 'cryptowatch_cache_';
 
@@ -141,6 +141,48 @@ export function calculateMarketStats(cryptos) {
     altcoinSeason,
   };
 }
+
+const fetchIndicesRaw = async () => {
+  const symbols = INDICES.map(i => i.symbol).join(',');
+  const url = `/api/yahoo/v8/finance/spark?symbols=${symbols}&range=1d&interval=1d`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Yahoo HTTP ${res.status}`);
+  const json = await res.json();
+
+  const results = [];
+  for (const index of INDICES) {
+    const data = json[index.symbol];
+    if (data?.close?.length > 0 && data.chartPreviousClose != null) {
+      const price = data.close[data.close.length - 1];
+      const prevClose = data.chartPreviousClose;
+      const change = price - prevClose;
+      const changePercent = prevClose > 0 ? (change / prevClose) * 100 : 0;
+      results.push({ ...index, price, change, changePercent });
+    } else {
+      console.warn(`Yahoo no data for ${index.symbol}`);
+      results.push({ ...index, price: null, change: null, changePercent: null });
+    }
+  }
+
+  if (!results.some(r => r.price != null)) {
+    throw new Error('All index calls failed');
+  }
+  return results;
+};
+
+export const fetchIndicesData = withCache('indices_v3', 600_000, fetchIndicesRaw);
+
+export const fetchEtfData = withCache(
+  'etf_markets',
+  CACHE_TTL * 1000,
+  async () => {
+    const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&category=crypto-etf&order=market_cap_desc&per_page=50&page=1&sparkline=true&price_change_percentage=24h');
+    if (!response.ok) {
+      throw new Error('Erreur lors de la récupération des ETFs');
+    }
+    return response.json();
+  }
+);
 
 export async function fetchCoinHistory(coinId, days = 7) {
   const response = await fetch(`https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=${days}`);

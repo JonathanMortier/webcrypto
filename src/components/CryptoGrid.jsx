@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import CryptoCard from './CryptoCard.jsx';
 
-export default function CryptoGrid({ cryptos, sortField, sortDir, favorites, showFavoritesOnly, onToggleFavorite }) {
+export default function CryptoGrid({ cryptos, sortField, sortDir, favorites = [], showFavoritesOnly = false, onToggleFavorite }) {
   const filteredCryptos = useMemo(() => {
     if (showFavoritesOnly) {
       return cryptos.filter(c => favorites.includes(c.id));

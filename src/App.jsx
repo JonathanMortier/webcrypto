@@ -1,7 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { HashRouter, Routes, Route } from 'react-router-dom';
 import { fetchCryptoData, fetchXStocks, fetchFearAndGreed, filterStablecoins, getTopGainers, calculateMarketStats } from './core/api.js';
 import { REFRESH_INTERVAL } from './core/constants.js';
 import { Header, CryptoGrid, CryptoTicker, StocksTicker, MarketIndicators, Loading, Error, InstallPrompt } from './components/index.js';
+import { BoursePage } from './pages/index.js';
+import { Analytics } from '@vercel/analytics/react';
 import './styles/index.css';
 
 export default function App() {
@@ -98,9 +101,11 @@ export default function App() {
       const filtered = filterStablecoins(cryptoData);
       const gainers = getTopGainers(filtered);
 
+      const sortedStocks = [...xstockData].sort((a, b) => (b.price_change_percentage_24h ?? 0) - (a.price_change_percentage_24h ?? 0));
+
       setCryptos(filtered);
       setTopGainers(gainers);
-      setStocks(xstockData);
+      setStocks(sortedStocks);
       setLastUpdate(new Date());
       setCountdown(REFRESH_INTERVAL);
       
@@ -215,7 +220,7 @@ export default function App() {
   }, [loadData, toggleTheme]);
 
   return (
-    <>
+    <HashRouter>
       <CryptoTicker cryptos={topGainers} />
       <StocksTicker stocks={stocks} />
       <InstallPrompt />
@@ -237,29 +242,37 @@ export default function App() {
             onToggleNotifications={toggleNotifications}
           />
 
-        {!isLoading && !error && (
-          <MarketIndicators 
-            marketStats={marketStats}
-            fearGreed={fearGreed}
-            onSort={handleSort}
-            sortField={sortField}
-            sortDir={sortDir}
-          />
-        )}
+        <Routes>
+          <Route path="/" element={
+            <>
+              {!isLoading && !error && (
+                <MarketIndicators 
+                  marketStats={marketStats}
+                  fearGreed={fearGreed}
+                  onSort={handleSort}
+                  sortField={sortField}
+                  sortDir={sortDir}
+                />
+              )}
 
-        {isLoading && <Loading />}
-        {error && <Error message={error} />}
-        {!isLoading && !error && (
-          <CryptoGrid 
-            cryptos={filteredCryptos} 
-            sortField={sortField} 
-            sortDir={sortDir}
-            favorites={favorites}
-            showFavoritesOnly={showFavoritesOnly}
-            onToggleFavorite={toggleFavorite}
-          />
-        )}
+              {isLoading && <Loading />}
+              {error && <Error message={error} />}
+              {!isLoading && !error && (
+                <CryptoGrid 
+                  cryptos={filteredCryptos} 
+                  sortField={sortField} 
+                  sortDir={sortDir}
+                  favorites={favorites}
+                  showFavoritesOnly={showFavoritesOnly}
+                  onToggleFavorite={toggleFavorite}
+                />
+              )}
+            </>
+          } />
+          <Route path="/bourse" element={<BoursePage />} />
+        </Routes>
       </div>
-    </>
+      <Analytics />
+    </HashRouter>
   );
 }

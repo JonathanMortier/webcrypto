@@ -1,13 +1,14 @@
 {
   "name": "cryptowatch",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.2.1-SNAPSHOT",
   "type": "module",
   "scripts": {
     "clean": "rimraf dist",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "start": "node server.js",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint src/",
@@ -15,10 +16,15 @@
     "analyze": "ANALYZE=true npm run build"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "chart.js": "^4.4.0",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.5.2",
+    "http-proxy-middleware": "^4.0.0",
     "react": "^19.2.5",
     "react-chartjs-2": "^5.2.0",
-    "react-dom": "^19.2.5"
+    "react-dom": "^19.2.5",
+    "react-router-dom": "^7.15.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

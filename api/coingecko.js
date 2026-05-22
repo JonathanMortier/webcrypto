@@ -3,7 +3,7 @@ export default async function handler(req, res) {
   const qs = req.url.includes('?')
     ? '?' + req.url.slice(req.url.indexOf('?') + 1).split('&').filter(p => !p.startsWith('path=')).join('&')
     : '';
-  const targetUrl = `https://api.coingecko.com${path}${qs}`;
+  const targetUrl = `https://api.coingecko.com/${path}${qs}`;
 
   try {
     const response = await fetch(targetUrl, {

@@ -137,7 +137,7 @@ export default function BoursePage() {
       )}
 
       <div className="section-divider" />
-      <CryptoGrid cryptos={stocks} sortField="current_price" sortDir="desc" isEtf={false} />
+      <CryptoGrid cryptos={stocks} sortField="current_price" sortDir="desc" isEtf={false} hideRank={true} />
     </>
   );
 }

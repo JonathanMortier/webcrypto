@@ -15,6 +15,12 @@
   background-clip: text;
 }
 
+[data-theme="light"] .header h1 {
+  background: linear-gradient(90deg, #f7931a, #0066cc);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
 .header .subtitle {
   color: var(--text-secondary);
   margin-top: 10px;

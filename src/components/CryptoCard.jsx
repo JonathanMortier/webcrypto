@@ -5,7 +5,7 @@ import { fetchCoinHistory } from '../core/api.js';
 
 const PriceChart = lazy(() => import('./PriceChart.jsx'));
 
-export default function CryptoCard({ coin, isFavorite, onToggleFavorite }) {
+export default function CryptoCard({ coin, isFavorite, onToggleFavorite, hideRank }) {
   const [showChart, setShowChart] = useState(false);
   const [timeframe, setTimeframe] = useState('7d');
   const [chartData, setChartData] = useState([]);
@@ -94,6 +94,7 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite }) {
         <div className="crypto-header">
           <img src={imageUrl} alt={coin.name} className="crypto-icon" loading="lazy" />
           <div className="crypto-info">
+            {!hideRank && coin.market_cap_rank && <div className="crypto-rank">#{coin.market_cap_rank}</div>}
             <div className="crypto-name">{coin.name}</div>
             <div className="crypto-symbol">{coin.symbol}</div>
           </div>

@@ -146,6 +146,18 @@
   flex-shrink: 0;
 }
 
+.crypto-rank {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+  background: rgba(99, 102, 241, 0.12);
+  padding: 1px 8px;
+  border-radius: 10px;
+  margin-bottom: 3px;
+  letter-spacing: 0.3px;
+}
+
 .crypto-name {
   font-size: 1.3rem;
   font-weight: bold;
@@ -239,6 +251,13 @@
 .chart-toggle-btn:hover {
   background: var(--accent-primary);
   color: white;
+}
+
+.crypto-card.mobile .crypto-rank {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
 }
 
 @media (max-width: 480px) {

@@ -256,7 +256,7 @@ export default function App() {
               )}
 
               {isLoading && <Loading />}
-              {error && <Error message={error} />}
+              {error && <Error message={error} onRetry={loadData} />}
               {!isLoading && !error && (
                 <CryptoGrid 
                   cryptos={filteredCryptos} 

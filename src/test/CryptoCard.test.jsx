@@ -14,6 +14,7 @@ describe('CryptoCard', () => {
     current_price: 50000,
     price_change_percentage_24h: 5.5,
     market_cap: 1000000000000,
+    market_cap_rank: 1,
     total_volume: 50000000000,
     image: 'https://example.com/btc.png',
     sparkline_in_7d: {
@@ -30,6 +31,11 @@ describe('CryptoCard', () => {
   it('should render crypto price', () => {
     render(<CryptoCard coin={mockCoin} />);
     expect(screen.getByText('$50,000.00')).toBeInTheDocument();
+  });
+
+  it('should render market cap rank badge', () => {
+    render(<CryptoCard coin={mockCoin} />);
+    expect(screen.getByText('#1')).toBeInTheDocument();
   });
 
   it('should render price change with positive sign', () => {

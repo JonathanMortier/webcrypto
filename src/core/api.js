@@ -1,4 +1,4 @@
-import { API_URL, XSTOCKS_API_URL, XSTOCK_IDS, STABLECOINS, CACHE_TTL, INDICES } from './constants.js';
+import { API_URL, XSTOCKS_API_URL, XSTOCK_IDS, STABLECOINS, CACHE_TTL, INDICES, COINGECKO_BASE } from './constants.js';
 
 const CACHE_PREFIX = 'cryptowatch_cache_';
 
@@ -176,7 +176,7 @@ export const fetchEtfData = withCache(
   'etf_markets',
   CACHE_TTL * 1000,
   async () => {
-    const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&category=crypto-etf&order=market_cap_desc&per_page=50&page=1&sparkline=true&price_change_percentage=24h');
+    const response = await fetch(`${COINGECKO_BASE}/api/v3/coins/markets?vs_currency=usd&category=crypto-etf&order=market_cap_desc&per_page=50&page=1&sparkline=true&price_change_percentage=24h`);
     if (!response.ok) {
       throw new Error('Erreur lors de la récupération des ETFs');
     }
@@ -185,7 +185,7 @@ export const fetchEtfData = withCache(
 );
 
 export async function fetchCoinHistory(coinId, days = 7) {
-  const response = await fetch(`https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=${days}`);
+  const response = await fetch(`${COINGECKO_BASE}/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=${days}`);
   if (!response.ok) {
     throw new Error('Erreur lors de la récupération de l\'historique');
   }

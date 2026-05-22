@@ -34,7 +34,7 @@ describe('XSTOCK_IDS', () => {
 
 describe('API_URL', () => {
   it('should be a valid URL string', () => {
-    expect(API_URL).toContain('coingecko.com');
+    expect(API_URL).toContain('/api/coingecko');
     expect(API_URL).toContain('coins/markets');
   });
 });
@@ -44,7 +44,7 @@ describe('XSTOCKS_API_URL', () => {
     const ids = 'bitcoin,ethereum';
     const url = XSTOCKS_API_URL(ids);
     expect(url).toContain(ids);
-    expect(url).toContain('coingecko.com');
+    expect(url).toContain('/api/coingecko');
   });
 });
 

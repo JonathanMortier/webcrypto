@@ -28,9 +28,6 @@ export const CACHE_TTL = 120;
 export const WEATHER_API_KEY = import.meta.env.VITE_WEATHER_API_KEY || '';
 export const WEATHER_BASE_URL = 'https://api.weatherapi.com/v1';
 
-export const WEATHER_API_KEY = '92366d2c8caf4e80a8b142025263105';
-export const WEATHER_BASE_URL = 'https://api.weatherapi.com/v1';
-
 export const INDICES = [
   { id: 'sp500', name: 'S&P 500', symbol: 'PSPH.PA', isin: 'FR0011871136' },
   { id: 'nasdaq', name: 'Nasdaq 100', symbol: 'SXRV.DE' , isin: 'IE00B53SZB19'},

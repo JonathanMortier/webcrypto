@@ -172,6 +172,25 @@ const fetchIndicesRaw = async () => {
 
 export const fetchIndicesData = withCache('indices_v3', 600_000, fetchIndicesRaw);
 
+export const fetchGoldPrice = withCache(
+  'gold_price',
+  300_000,
+  async () => {
+    const response = await fetch('https://aurumrates.com/api/chart?symbol=GC=F&range=5d&interval=1d');
+    if (!response.ok) throw new Error('Erreur lors de la récupération du cours de l\'or');
+    const json = await response.json();
+    if (json.regularMarketPrice == null) throw new Error('Format de réponse inattendu');
+    const price = json.regularMarketPrice;
+    const closes = json.closes ?? [];
+    const prevClose = closes.length > 1 ? closes[closes.length - 2] : price;
+    return {
+      price,
+      change: price - prevClose,
+      changePercent: prevClose > 0 ? ((price - prevClose) / prevClose) * 100 : 0,
+    };
+  }
+);
+
 export const fetchEtfData = withCache(
   'etf_markets',
   CACHE_TTL * 1000,

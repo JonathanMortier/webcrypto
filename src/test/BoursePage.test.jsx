@@ -24,9 +24,10 @@ const mockStocks = [
   },
 ];
 
-const { mockFetchIndicesData, mockFetchXStocks } = vi.hoisted(() => ({
+const { mockFetchIndicesData, mockFetchXStocks, mockFetchGoldPrice } = vi.hoisted(() => ({
   mockFetchIndicesData: vi.fn(),
   mockFetchXStocks: vi.fn(),
+  mockFetchGoldPrice: vi.fn(),
 }));
 
 vi.mock('../core/api.js', async (importOriginal) => {
@@ -35,6 +36,7 @@ vi.mock('../core/api.js', async (importOriginal) => {
     ...original,
     fetchIndicesData: mockFetchIndicesData,
     fetchXStocks: mockFetchXStocks,
+    fetchGoldPrice: mockFetchGoldPrice,
   };
 });
 
@@ -53,6 +55,7 @@ vi.mock('../core/imageCache.js', async (importOriginal) => {
 beforeEach(() => {
   mockFetchIndicesData.mockResolvedValue(mockIndices);
   mockFetchXStocks.mockResolvedValue(mockStocks);
+  mockFetchGoldPrice.mockRejectedValue(new Error('mock'));
 });
 
 afterEach(() => {
@@ -127,5 +130,26 @@ describe('BoursePage', () => {
     await waitFor(() => {
       expect(screen.getAllByPlaceholderText('0').length).toBeGreaterThan(0);
     }, { timeout: 3000 });
+  });
+
+  it('should render gold price card when fetch succeeds', async () => {
+    mockFetchGoldPrice.mockResolvedValue({ price: 4360.50, change: 25.30, changePercent: 0.58 });
+
+    render(<BoursePage />);
+    await waitFor(() => {
+      expect(screen.getByText('Gold (XAU)')).toBeInTheDocument();
+    }, { timeout: 3000 });
+    expect(screen.getByText('$4360.50')).toBeInTheDocument();
+    expect(screen.getByText('+25.30 (0.58%)')).toBeInTheDocument();
+  });
+
+  it('should hide gold card on fetch error', async () => {
+    mockFetchGoldPrice.mockRejectedValue(new Error('API error'));
+
+    render(<BoursePage />);
+    await waitFor(() => {
+      expect(screen.getByText('S&P 500')).toBeInTheDocument();
+    }, { timeout: 3000 });
+    expect(screen.queryByText('Gold (XAU)')).not.toBeInTheDocument();
   });
 });

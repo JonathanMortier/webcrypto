@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { fetchXStocks, fetchIndicesData } from '../core/api.js';
 import { Loading, Error } from '../components/Status.jsx';
 import CryptoGrid from '../components/CryptoGrid.jsx';
+import GoldPrice from '../components/GoldPrice.jsx';
 
 const HOLDINGS_KEY = 'indices_holdings';
 
@@ -138,6 +139,11 @@ export default function BoursePage() {
 
       <div className="section-divider" />
       <CryptoGrid cryptos={stocks} sortField="current_price" sortDir="desc" isEtf={false} hideRank={true} />
+
+      <div className="section-divider" />
+      <div className="gold-section">
+        <GoldPrice />
+      </div>
     </>
   );
 }

@@ -1,0 +1,40 @@
+.gold-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 300px));
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+.gold-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.gold-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.04) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.gold-card .index-price {
+  color: #ffd700;
+}
+
+.gold-card.positive {
+  border-color: rgba(255, 215, 0, 0.3);
+}
+
+.gold-card.negative {
+  border-color: rgba(255, 68, 68, 0.3);
+}
+
+.gold-icon {
+  width: 36px;
+  height: 36px;
+  margin: 0 auto 8px;
+  background: radial-gradient(circle at 35% 35%, #ffd700, #b8860b);
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+}

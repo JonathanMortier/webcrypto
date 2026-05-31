@@ -25,6 +25,8 @@ export const REFRESH_INTERVAL = 60;
 
 export const CACHE_TTL = 120;
 
+export const ALERT_THRESHOLD = 5;
+
 export const WEATHER_API_KEY = import.meta.env.VITE_WEATHER_API_KEY || '';
 export const WEATHER_BASE_URL = 'https://api.weatherapi.com/v1';
 

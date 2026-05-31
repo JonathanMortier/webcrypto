@@ -25,11 +25,7 @@ export const REFRESH_INTERVAL = 60;
 
 export const CACHE_TTL = 120;
 
-export const KEY_AVANTAGE = 'R0HKPO7I2TZ618CO';
-
-export const KEY_FINNHUB = 'd83j201r01qkm5c8b1qgd83j201r01qkm5c8b1r0';
-
-export const WEATHER_API_KEY = '92366d2c8caf4e80a8b142025263105';
+export const WEATHER_API_KEY = import.meta.env.VITE_WEATHER_API_KEY || '';
 export const WEATHER_BASE_URL = 'https://api.weatherapi.com/v1';
 
 export const INDICES = [

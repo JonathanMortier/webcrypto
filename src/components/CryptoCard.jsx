@@ -86,7 +86,7 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite, hideRan
       onMouseLeave={!isMobile ? handleMouseLeave : undefined}
     >
 <a 
-          href={`https://coinmarketcap.com/currencies/${coin.name.toLowerCase().replace(/\s+/g, '-')}/`}
+          href={`https://www.coingecko.com/en/coins/${coin.id}`}
         target="_blank"
         rel="noopener noreferrer"
         className="crypto-card-link"
@@ -94,7 +94,7 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite, hideRan
         <div className="crypto-header">
           <img src={imageUrl} alt={coin.name} className="crypto-icon" loading="lazy" />
           <div className="crypto-info">
-            {!hideRank && coin.market_cap_rank && <div className="crypto-rank">#{coin.market_cap_rank}</div>}
+            {!hideRank && coin.display_rank && <div className="crypto-rank">#{coin.display_rank}</div>}
             <div className="crypto-name">{coin.name}</div>
             <div className="crypto-symbol">{coin.symbol}</div>
           </div>

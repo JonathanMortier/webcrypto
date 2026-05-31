@@ -15,6 +15,7 @@ describe('CryptoCard', () => {
     price_change_percentage_24h: 5.5,
     market_cap: 1000000000000,
     market_cap_rank: 1,
+    display_rank: 1,
     total_volume: 50000000000,
     image: 'https://example.com/btc.png',
     sparkline_in_7d: {

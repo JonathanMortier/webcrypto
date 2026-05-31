@@ -99,11 +99,12 @@ export default function App() {
       ]);
       
       const filtered = filterStablecoins(cryptoData);
-      const gainers = getTopGainers(filtered);
+      const withRank = filtered.map((coin, index) => ({ ...coin, display_rank: index + 1 }));
+      const gainers = getTopGainers(withRank);
 
       const sortedStocks = [...xstockData].sort((a, b) => (b.price_change_percentage_24h ?? 0) - (a.price_change_percentage_24h ?? 0));
 
-      setCryptos(filtered);
+      setCryptos(withRank);
       setTopGainers(gainers);
       setStocks(sortedStocks);
       setLastUpdate(new Date());

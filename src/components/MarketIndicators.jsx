@@ -1,4 +1,5 @@
 import { formatLargeNumber } from '../core/utils.js';
+import WeatherWidget from './WeatherWidget.jsx';
 
 export default function MarketIndicators({ marketStats, fearGreed, onSort, sortField, sortDir }) {
   if (!marketStats) return null;
@@ -69,6 +70,8 @@ export default function MarketIndicators({ marketStats, fearGreed, onSort, sortF
           {altcoinSeason}/100
         </span>
       </div>
+
+      <WeatherWidget />
     </div>
   );
 }

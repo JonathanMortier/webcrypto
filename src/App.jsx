@@ -129,7 +129,13 @@ export default function App() {
         ? lines[0]
         : lines.join('\n');
 
-      new Notification(title, { body, icon: '/favicon.ico' });
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.ready.then(reg => {
+          reg.showNotification(title, { body, icon: '/favicon.ico' });
+        });
+      } else {
+        new Notification(title, { body, icon: '/favicon.ico' });
+      }
 
       const newAlerted = { ...lastAlertPricesRef.current };
       alertedIds.forEach(({ id, price }) => { newAlerted[id] = price; });

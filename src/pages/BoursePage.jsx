@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { fetchXStocks, fetchIndicesData } from '../core/api.js';
 import { Loading, Error } from '../components/Status.jsx';
+import SpaceXValue from '../components/SpaceXValue.jsx';
 import CryptoGrid from '../components/CryptoGrid.jsx';
 import GoldPrice from '../components/GoldPrice.jsx';
 
@@ -142,6 +143,7 @@ export default function BoursePage() {
 
       <div className="section-divider" />
       <div className="gold-section">
+        <SpaceXValue />
         <GoldPrice />
       </div>
     </>

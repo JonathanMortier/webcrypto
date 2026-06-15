@@ -1,7 +1,7 @@
 export const STABLECOINS = [
   'usdt', 'usdc', 'dai', 'busd', 'ust', 'tusd', 'usdp', 'usdd',
   'frax', 'lusd', 'usds', 'usde', 'usd1', 'pyusd', 'usdg', 'usdf', 'buidl',
-  'figr_heloc', 'usyc', 'usdy'
+  'figr_heloc', 'usyc', 'usdy', 'rlusd'
 ];
 
 export const COINGECKO_BASE = '/api/coingecko';

@@ -203,6 +203,28 @@ export const fetchEtfData = withCache(
   }
 );
 
+export const fetchSpaceXPrice = withCache(
+  'spacex_price',
+  300_000,
+  async () => {
+    const url = '/api/yahoo/v8/finance/spark?symbols=SPCX&range=1d&interval=1d';
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Erreur lors de la récupération du cours SpaceX');
+    const json = await res.json();
+    const data = json.SPCX;
+    if (!data?.close?.length || data.chartPreviousClose == null) {
+      throw new Error('Format de réponse SpaceX inattendu');
+    }
+    const price = data.close[data.close.length - 1];
+    const prevClose = data.chartPreviousClose;
+    return {
+      price,
+      change: price - prevClose,
+      changePercent: prevClose > 0 ? ((price - prevClose) / prevClose) * 100 : 0,
+    };
+  }
+);
+
 export async function fetchCoinHistory(coinId, days = 7) {
   const response = await fetch(`${COINGECKO_BASE}/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=${days}`);
   if (!response.ok) {

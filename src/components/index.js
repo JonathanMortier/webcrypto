@@ -8,4 +8,5 @@ export { default as MarketIndicators } from './MarketIndicators.jsx';
 export { default as InstallPrompt } from './InstallPrompt.jsx';
 export { default as NavMenu } from './NavMenu.jsx';
 export { default as WeatherWidget } from './WeatherWidget.jsx';
+export { default as SpaceXValue } from './SpaceXValue.jsx';
 export { Loading, Error } from './Status.jsx';

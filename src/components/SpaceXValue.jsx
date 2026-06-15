@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
-import { fetchGoldPrice } from '../core/api.js';
-import '../styles/goldPrice.css';
+import { fetchSpaceXPrice } from '../core/api.js';
+import '../styles/spacex.css';
 
-export default function GoldPrice() {
+export default function SpaceXValue() {
   const [data, setData] = useState(null);
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    fetchGoldPrice()
+    fetchSpaceXPrice()
       .then(setData)
       .catch(() => setError(true));
   }, []);
@@ -17,10 +17,12 @@ export default function GoldPrice() {
   const gainClass = data.change >= 0 ? 'positive' : 'negative';
 
   return (
-    <div className={`index-card gold-card ${gainClass}`}>
-      <div className="gold-icon"><img src="/images/gold-icon.svg" alt="Gold" /></div>
-      <div className="index-name">Gold (XAU)</div>
-      <div className="index-isin">XAU/USD • troy oz</div>
+    <div className={`index-card spacex-card ${gainClass}`}>
+      <div className="spacex-icon">
+        <img src="/images/spacex-logo.svg" alt="SpaceX" />
+      </div>
+      <div className="index-name">SpaceX</div>
+      <div className="index-isin">SPCX • Nasdaq</div>
       <div className="index-price">${data.price.toFixed(2)}</div>
       {data.change != null && (
         <div className="index-change">

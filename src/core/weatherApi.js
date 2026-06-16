@@ -86,7 +86,7 @@ export async function fetchWeather(lat, lon) {
     const result = {
       temp: Math.round(data.current.temp_c),
       condition: data.current.condition.text,
-      icon: data.current.condition.icon,
+      icon: data.current.condition.icon.replace(/^(https?:)?\/\//, 'https://'),
       code: data.current.condition.code,
       city: data.location.name,
       country: data.location.country,

@@ -152,4 +152,71 @@ describe('BoursePage', () => {
     }, { timeout: 3000 });
     expect(screen.queryByText('Gold (XAU)')).not.toBeInTheDocument();
   });
+
+  describe('SpaceX card', () => {
+    beforeEach(() => {
+      localStorage.removeItem('cryptowatch_cache_spacex_price');
+    });
+
+    it('should render the spacex-card div even when no cache exists', async () => {
+      render(<BoursePage />);
+      await waitFor(() => {
+        expect(screen.getByText('S&P 500')).toBeInTheDocument();
+      }, { timeout: 3000 });
+      const cards = document.querySelectorAll('.spacex-card');
+      expect(cards.length).toBe(1);
+      expect(screen.getByText('SpaceX')).toBeInTheDocument();
+      expect(screen.getByText('SPCX • Nasdaq')).toBeInTheDocument();
+    });
+
+    it('should show "--" while loading (no cache, fetch pending)', () => {
+      mockFetchXStocks.mockImplementation(() => new Promise(() => {}));
+      render(<BoursePage />);
+      const spacexCards = document.querySelectorAll('.spacex-card');
+      expect(spacexCards.length).toBe(1);
+      expect(screen.getByText('--')).toBeInTheDocument();
+    });
+
+    it('should show cached price from localStorage on mount', async () => {
+      const cached = { data: { price: 192.5, change: 31.55, changePercent: 19.6 }, timestamp: Date.now() };
+      localStorage.setItem('cryptowatch_cache_spacex_price', JSON.stringify(cached));
+
+      render(<BoursePage />);
+      await waitFor(() => {
+        expect(screen.getByText('S&P 500')).toBeInTheDocument();
+      }, { timeout: 3000 });
+      expect(document.querySelectorAll('.spacex-card').length).toBe(1);
+      expect(screen.getByText('$192.50')).toBeInTheDocument();
+    });
+
+    it('should show change when cached data has change field', async () => {
+      const cached = { data: { price: 192.5, change: 31.55, changePercent: 19.6 }, timestamp: Date.now() };
+      localStorage.setItem('cryptowatch_cache_spacex_price', JSON.stringify(cached));
+
+      render(<BoursePage />);
+      await waitFor(() => {
+        expect(screen.getByText('+31.55 (19.60%)')).toBeInTheDocument();
+      }, { timeout: 3000 });
+    });
+
+    it('should show negative change class when cached change is negative', async () => {
+      const cached = { data: { price: 150, change: -10, changePercent: -6.25 }, timestamp: Date.now() };
+      localStorage.setItem('cryptowatch_cache_spacex_price', JSON.stringify(cached));
+
+      render(<BoursePage />);
+      await waitFor(() => {
+        expect(screen.getByText('-10.00 (-6.25%)')).toBeInTheDocument();
+      }, { timeout: 3000 });
+    });
+
+    it('should display the spacex logo image', async () => {
+      render(<BoursePage />);
+      await waitFor(() => {
+        expect(screen.getByText('S&P 500')).toBeInTheDocument();
+      }, { timeout: 3000 });
+      const logo = document.querySelector('.spacex-icon img');
+      expect(logo).toBeInTheDocument();
+      expect(logo).toHaveAttribute('src', '/images/spacex-logo.svg');
+    });
+  });
 });

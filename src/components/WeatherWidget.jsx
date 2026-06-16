@@ -35,7 +35,7 @@ export default function WeatherWidget() {
       <span className="indicator-value weather-value">
         <img
           className="weather-icon"
-          src={weather.icon}
+          src={weather.icon.replace(/^(https?:)?\/\//, 'https://')}
           alt={weather.condition}
           width="24"
           height="24"

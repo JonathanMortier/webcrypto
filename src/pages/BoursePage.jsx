@@ -35,7 +35,7 @@ export default function BoursePage() {
   useEffect(() => {
     fetchIndicesData()
       .then(data => setIndices(data))
-      .catch(e => { console.warn('Indices error:', e); setLoading(false); });
+      .catch(e => console.warn('Indices error:', e));
 
     fetchXStocks()
       .then(data => {
@@ -54,92 +54,100 @@ export default function BoursePage() {
     });
   };
 
-  if (loading) return <Loading />;
-  if (error) return <Error message={error} />;
-  if (!stocks?.length) return <div className="empty-state">Aucune action disponible</div>;
-
   return (
     <>
-      {indices && (
-        <div className="indices-grid">
-          {indices.map(idx => {
-            const holding = holdings[idx.id] || {};
-            const units = holding.units;
-            const avgPrice = holding.avgPrice;
-            const currPrice = idx.price;
-            const invested = units && avgPrice ? units * avgPrice : null;
-            const currentValue = units && currPrice != null ? units * currPrice : null;
-            const gainTotal = invested != null && currentValue != null ? currentValue - invested : null;
-            const gainPercent = invested && invested > 0 ? ((currentValue - invested) / invested) * 100 : null;
-            const gainClass = gainTotal != null ? (gainTotal >= 0 ? 'positive' : 'negative') : '';
+      {loading ? <Loading /> : error ? <Error message={error} /> : (
+        <>
+          {indices && (
+            <div className="indices-grid">
+              {indices.map(idx => {
+                const holding = holdings[idx.id] || {};
+                const units = holding.units;
+                const avgPrice = holding.avgPrice;
+                const currPrice = idx.price;
+                const invested = units && avgPrice ? units * avgPrice : null;
+                const currentValue = units && currPrice != null ? units * currPrice : null;
+                const gainTotal = invested != null && currentValue != null ? currentValue - invested : null;
+                const gainPercent = invested && invested > 0 ? ((currentValue - invested) / invested) * 100 : null;
+                const gainClass = gainTotal != null ? (gainTotal >= 0 ? 'positive' : 'negative') : '';
 
-            return (
-              <div key={idx.id} className={`index-card ${gainClass}`}>
-                <div className="index-name">{idx.name}</div>
-                <div className="index-isin">{idx.isin}</div>
-                <div className="index-price">
-                  {currPrice != null ? `${currPrice.toFixed(2)} €` : 'N/A'}
-                </div>
-                {idx.change != null && (
-                  <div className="index-change">
-                    <span className={idx.change >= 0 ? 'positive' : 'negative'}>
-                      {idx.change >= 0 ? '+' : ''}{idx.change.toFixed(2)} ({idx.changePercent.toFixed(2)}%)
-                    </span>
+                return (
+                  <div key={idx.id} className={`index-card ${gainClass}`}>
+                    <div className="index-name">{idx.name}</div>
+                    <div className="index-isin">{idx.isin}</div>
+                    <div className="index-price">
+                      {currPrice != null ? `${currPrice.toFixed(2)} €` : 'N/A'}
+                    </div>
+                    {idx.change != null && (
+                      <div className="index-change">
+                        <span className={idx.change >= 0 ? 'positive' : 'negative'}>
+                          {idx.change >= 0 ? '+' : ''}{idx.change.toFixed(2)} ({idx.changePercent.toFixed(2)}%)
+                        </span>
+                      </div>
+                    )}
+
+                    <div className="holding-fields">
+                      <label className="holding-field">
+                        <span>Units</span>
+                        <input
+                          type="number"
+                          min="0"
+                          step="any"
+                          placeholder="0"
+                          value={units ?? ''}
+                          onChange={e => updateHolding(idx.id, 'units', e.target.value === '' ? null : parseFloat(e.target.value))}
+                        />
+                      </label>
+                      <label className="holding-field">
+                        <span>Prix moy.</span>
+                        <input
+                          type="number"
+                          min="0"
+                          step="any"
+                          placeholder="0"
+                          value={avgPrice ?? ''}
+                          onChange={e => updateHolding(idx.id, 'avgPrice', e.target.value === '' ? null : parseFloat(e.target.value))}
+                        />
+                      </label>
+                    </div>
+
+                    {invested != null && (
+                      <div className="holding-summary">
+                        <div className="holding-row">
+                          <span>Investi</span>
+                          <span>{formatCurrency(invested)} €</span>
+                        </div>
+                        <div className="holding-row">
+                          <span>Val. actuelle</span>
+                          <span>{formatCurrency(currentValue)} €</span>
+                        </div>
+                        <div className={`holding-row gain-row ${gainClass}`}>
+                          <span>Gain/Pert</span>
+                          <span>
+                            {gainTotal >= 0 ? '+' : ''}{formatCurrency(Math.abs(gainTotal))} €
+                            {gainPercent != null && ` (${gainPercent >= 0 ? '+' : ''}${gainPercent.toFixed(2)}%)`}
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
+                );
+              })}
+            </div>
+          )}
 
-                <div className="holding-fields">
-                  <label className="holding-field">
-                    <span>Units</span>
-                    <input
-                      type="number"
-                      min="0"
-                      step="any"
-                      placeholder="0"
-                      value={units ?? ''}
-                      onChange={e => updateHolding(idx.id, 'units', e.target.value === '' ? null : parseFloat(e.target.value))}
-                    />
-                  </label>
-                  <label className="holding-field">
-                    <span>Prix moy.</span>
-                    <input
-                      type="number"
-                      min="0"
-                      step="any"
-                      placeholder="0"
-                      value={avgPrice ?? ''}
-                      onChange={e => updateHolding(idx.id, 'avgPrice', e.target.value === '' ? null : parseFloat(e.target.value))}
-                    />
-                  </label>
-                </div>
+          {stocks?.length > 0 && (
+            <>
+              <div className="section-divider" />
+              <CryptoGrid cryptos={stocks} sortField="current_price" sortDir="desc" isEtf={false} hideRank={true} />
+            </>
+          )}
 
-                {invested != null && (
-                  <div className="holding-summary">
-                    <div className="holding-row">
-                      <span>Investi</span>
-                      <span>{formatCurrency(invested)} €</span>
-                    </div>
-                    <div className="holding-row">
-                      <span>Val. actuelle</span>
-                      <span>{formatCurrency(currentValue)} €</span>
-                    </div>
-                    <div className={`holding-row gain-row ${gainClass}`}>
-                      <span>Gain/Pert</span>
-                      <span>
-                        {gainTotal >= 0 ? '+' : ''}{formatCurrency(Math.abs(gainTotal))} €
-                        {gainPercent != null && ` (${gainPercent >= 0 ? '+' : ''}${gainPercent.toFixed(2)}%)`}
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+          {!stocks?.length && (
+            <div className="empty-state">Aucune action disponible</div>
+          )}
+        </>
       )}
-
-      <div className="section-divider" />
-      <CryptoGrid cryptos={stocks} sortField="current_price" sortDir="desc" isEtf={false} hideRank={true} />
 
       <div className="section-divider" />
       <div className="gold-section">

@@ -2,9 +2,21 @@ import { useState, useEffect } from 'react';
 import { fetchSpaceXPrice } from '../core/api.js';
 import '../styles/spacex.css';
 
+const CACHE_KEY = 'cryptowatch_cache_spacex_price';
+
+function readCached() {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw).data;
+  } catch {
+    return null;
+  }
+}
+
 export default function SpaceXValue() {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState(readCached);
+  const [loading, setLoading] = useState(!data);
 
   useEffect(() => {
     let mounted = true;

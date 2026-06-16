@@ -315,7 +315,6 @@ export default function App() {
 
   return (
     <HashRouter>
-    <HashRouter>
       <CryptoTicker cryptos={topGainers} />
       <StocksTicker stocks={stocks} />
       <InstallPrompt />
@@ -374,7 +373,6 @@ export default function App() {
         </Routes>
       </div>
       <Analytics />
-    </HashRouter>
       <Analytics />
     </HashRouter>
   );

@@ -25,8 +25,12 @@ export default function App() {
     return saved || 'dark';
   });
   const [favorites, setFavorites] = useState(() => {
-    const saved = localStorage.getItem('favorites');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('favorites');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
   });
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(() => {
@@ -41,15 +45,23 @@ export default function App() {
     return false;
   });
   const [previousPrices, setPreviousPrices] = useState(() => {
-    const saved = localStorage.getItem('previousPrices');
-    return saved ? JSON.parse(saved) : {};
+    try {
+      const saved = localStorage.getItem('previousPrices');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
   });
   const [priceSnapshotDate, setPriceSnapshotDate] = useState(() => {
     return localStorage.getItem('priceSnapshotDate') || '';
   });
   const [lastAlertPrices, setLastAlertPrices] = useState(() => {
-    const saved = localStorage.getItem('lastAlertPrices');
-    return saved ? JSON.parse(saved) : {};
+    try {
+      const saved = localStorage.getItem('lastAlertPrices');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
   });
   const [notificationMessage, setNotificationMessage] = useState(null);
 

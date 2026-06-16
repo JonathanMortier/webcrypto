@@ -8,6 +8,9 @@ const plugins = [
   VitePWA({
     registerType: 'autoUpdate',
     includeAssets: ['favicon.ico', 'images/icons/pwa-192x192.svg'],
+    workbox: {
+      navigateFallback: '/index.html',
+    },
     manifest: {
       name: 'CryptoWatch',
       short_name: 'CryptoWatch',

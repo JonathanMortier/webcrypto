@@ -32,14 +32,12 @@ function withCache(key, ttlMs, fetchFn) {
       const data = await fetchFn(...args);
       setToLocalStorage(key, data);
       return data;
-    } catch (err) {
-      if (err.status === 429 || err.message?.includes('429')) {
-        if (cached) {
-          console.warn('Rate limited, using cached data');
-          return cached.data;
-        }
+    } catch {
+      if (cached) {
+        console.warn(`Fetch failed for ${key}, using stale cached data`);
+        return cached.data;
       }
-      throw err;
+      throw new Error(`Impossible de récupérer les données (${key})`);
     }
   };
 }

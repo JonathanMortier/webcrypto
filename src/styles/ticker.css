@@ -7,7 +7,7 @@
   overflow: hidden;
   background: rgba(11, 92, 54, 0.8);
   border-bottom: 1px solid rgba(0, 255, 136, 0.5);
-  padding: 12px 0;
+  padding: calc(12px + env(safe-area-inset-top, 0px)) 0;
 }
 
 .ticker-wrapper:hover .ticker {

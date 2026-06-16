@@ -87,11 +87,14 @@
   background: transparent;
   border: 1px solid var(--card-border);
   border-radius: 15px;
-  padding: 4px 10px;
-  font-size: 0.75rem;
+  padding: 8px 12px;
+  font-size: 0.8rem;
   color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.2s;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
 }
 
 .timeframe-btn:hover {
@@ -176,11 +179,13 @@
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 5px;
+  padding: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: transform 0.2s;
+  min-width: 44px;
+  min-height: 44px;
 }
 
 .favorite-btn:hover {

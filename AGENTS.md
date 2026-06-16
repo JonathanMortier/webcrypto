@@ -5,7 +5,9 @@
 | Command | Description |
 |---------|-------------|
 | `npm run dev` | Dev server (hot reload) on http://localhost:5173 |
+| `npm run dev` | Dev server (hot reload) on http://localhost:5173 |
 | `npm run build` | Production build |
+| `npm start` | Production server (Express + Yahoo proxy) on http://localhost:3000 |
 | `npm start` | Production server (Express + Yahoo proxy) on http://localhost:3000 |
 | `npm run test` | Run all tests (no watch mode) |
 | `npm run test:watch` | Run tests in watch mode |

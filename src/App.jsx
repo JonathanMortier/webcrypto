@@ -1,8 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route } from 'react-router-dom';
 import { fetchCryptoData, fetchXStocks, fetchFearAndGreed, filterStablecoins, getTopGainers, calculateMarketStats } from './core/api.js';
 import { REFRESH_INTERVAL, ALERT_THRESHOLD } from './core/constants.js';
 import { Header, CryptoGrid, CryptoTicker, StocksTicker, MarketIndicators, Loading, Error, InstallPrompt } from './components/index.js';
+import { BoursePage } from './pages/index.js';
+import { Analytics } from '@vercel/analytics/react';
 import { BoursePage } from './pages/index.js';
 import { Analytics } from '@vercel/analytics/react';
 import './styles/index.css';
@@ -181,6 +184,7 @@ export default function App() {
       setCryptos(withRank);
       setTopGainers(gainers);
       setStocks(sortedStocks);
+      setStocks(sortedStocks);
       setLastUpdate(new Date());
       setCountdown(REFRESH_INTERVAL);
       
@@ -314,6 +318,7 @@ export default function App() {
 
   return (
     <HashRouter>
+    <HashRouter>
       <CryptoTicker cryptos={topGainers} />
       <StocksTicker stocks={stocks} />
       <InstallPrompt />
@@ -371,6 +376,8 @@ export default function App() {
           <Route path="/bourse" element={<BoursePage />} />
         </Routes>
       </div>
+      <Analytics />
+    </HashRouter>
       <Analytics />
     </HashRouter>
   );

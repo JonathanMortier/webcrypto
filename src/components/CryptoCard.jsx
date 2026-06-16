@@ -11,20 +11,8 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite, hideRan
   const [chartData, setChartData] = useState([]);
   const [chartLoading, setChartLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
   
   const debounceRef = useRef(null);
-
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth <= 580);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  const toggleChart = useCallback(() => {
-    setShowChart(prev => !prev);
-  }, []);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= 580);
@@ -41,8 +29,6 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite, hideRan
   const isPositive = change >= 0;
   const changeClass = isPositive ? 'positive' : 'negative';
   const changeSign = isPositive ? '+' : '';
-
-  const ath = coin.ath || 0;
 
   const ath = coin.ath || 0;
 
@@ -98,9 +84,6 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite, hideRan
       className={`crypto-card ${isMobile ? 'mobile' : ''}`}
       onMouseEnter={!isMobile ? handleMouseEnter : undefined}
       onMouseLeave={!isMobile ? handleMouseLeave : undefined}
-      className={`crypto-card ${isMobile ? 'mobile' : ''}`}
-      onMouseEnter={!isMobile ? handleMouseEnter : undefined}
-      onMouseLeave={!isMobile ? handleMouseLeave : undefined}
     >
 <a 
           href={`https://www.coingecko.com/en/coins/${coin.id}`}
@@ -117,7 +100,6 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite, hideRan
           </div>
           <button 
             className={`favorite-btn ${isFavorite ? 'active' : ''}`}
-            onClick={(e) => { e.preventDefault(); onToggleFavorite?.(coin.id); }}
             onClick={(e) => { e.preventDefault(); onToggleFavorite?.(coin.id); }}
             title={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
           >
@@ -145,24 +127,8 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite, hideRan
               {ath > 0 ? `$${formatPrice(ath)}` : 'N/A'}
             </div>
           </div>
-          <div className="stat">
-            <div className="stat-label">All-Time-High</div>
-            <div className="stat-value">
-              {ath > 0 ? `$${formatPrice(ath)}` : 'N/A'}
-            </div>
-          </div>
         </div>
       </a>
-
-      {isMobile && (
-        <button 
-          type="button"
-          className="chart-toggle-btn"
-          onClick={toggleChart}
-        >
-          {showChart ? 'Masquer le graphique' : 'Afficher le graphique'}
-        </button>
-      )}
 
       {isMobile && (
         <button 

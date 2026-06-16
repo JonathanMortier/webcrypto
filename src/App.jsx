@@ -1,11 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
-import { HashRouter, Routes, Route } from 'react-router-dom';
 import { fetchCryptoData, fetchXStocks, fetchFearAndGreed, filterStablecoins, getTopGainers, calculateMarketStats } from './core/api.js';
 import { REFRESH_INTERVAL, ALERT_THRESHOLD } from './core/constants.js';
 import { Header, CryptoGrid, CryptoTicker, StocksTicker, MarketIndicators, Loading, Error, InstallPrompt } from './components/index.js';
-import { BoursePage } from './pages/index.js';
-import { Analytics } from '@vercel/analytics/react';
 import { BoursePage } from './pages/index.js';
 import { Analytics } from '@vercel/analytics/react';
 import './styles/index.css';

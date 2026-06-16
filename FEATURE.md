@@ -7,8 +7,8 @@
 - [x] **Watchlist** - Sauvegarder des cryptos favorites en local
 
 ## 🔔 Alertes
-- **Alertes de prix** - Seuil haussier/baissier atteint
-- **Notifications navigateur** - Alertes même hors onglet
+- [x] **Alertes de prix** - Seuil haussier/baissier atteint (configurable dans `constants.js`)
+- [x] **Notifications navigateur** - Alertes même hors onglet
 
 ## 📱 Expérience utilisateur
 - [x] **Mode sombre/clair** - Toggle theme

@@ -1,0 +1,46 @@
+.gold-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+.gold-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.gold-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.04) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.gold-card .index-price {
+  color: #ffd700;
+}
+
+.gold-card.positive {
+  border-color: rgba(255, 215, 0, 0.3);
+}
+
+.gold-card.negative {
+  border-color: rgba(255, 68, 68, 0.3);
+}
+
+.gold-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin: 0 auto 8px;
+}
+
+.gold-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}

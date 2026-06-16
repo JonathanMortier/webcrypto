@@ -11,7 +11,21 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Filler);
 
+function getCSSVar(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
 export default function PriceChart({ prices, isPositive }) {
+  const positiveColor = getCSSVar('--positive') || '#00ff88';
+  const negativeColor = getCSSVar('--negative') || '#ff4444';
+  const textMuted = getCSSVar('--text-muted') || '#666';
+  const gridColor = getCSSVar('--card-border') || 'rgba(255, 255, 255, 0.05)';
+
+  const lineColor = isPositive ? positiveColor : negativeColor;
+  const fillColor = isPositive
+    ? positiveColor.replace('1)', '0.1)')
+    : negativeColor.replace('1)', '0.1)');
+
   const data = useMemo(() => {
     if (!prices || !Array.isArray(prices) || prices.length === 0) {
       return { labels: [], datasets: [] };
@@ -40,10 +54,8 @@ export default function PriceChart({ prices, isPositive }) {
       datasets: [
         {
           data: priceValues,
-          borderColor: isPositive ? '#00ff88' : '#ff4444',
-          backgroundColor: isPositive 
-            ? 'rgba(0, 255, 136, 0.1)' 
-            : 'rgba(255, 68, 68, 0.1)',
+          borderColor: lineColor,
+          backgroundColor: fillColor,
           borderWidth: 2,
           pointRadius: 0,
           pointHoverRadius: 0,
@@ -52,7 +64,7 @@ export default function PriceChart({ prices, isPositive }) {
         },
       ],
     };
-  }, [prices, isPositive]);
+  }, [prices, isPositive, lineColor, fillColor]);
 
   const options = {
     responsive: true,
@@ -66,16 +78,16 @@ export default function PriceChart({ prices, isPositive }) {
         display: true,
         grid: { display: false },
         ticks: {
-          color: '#666',
+          color: textMuted,
           font: { size: 10 },
           maxTicksLimit: 6,
         },
       },
       y: {
         display: true,
-        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+        grid: { color: gridColor },
         ticks: {
-          color: '#666',
+          color: textMuted,
           font: { size: 10 },
           callback: (value) => `$${value.toLocaleString()}`,
         },

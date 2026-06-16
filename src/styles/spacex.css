@@ -1,0 +1,46 @@
+.spacex-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+.spacex-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.spacex-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(0, 150, 255, 0.04) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.spacex-card .index-price {
+  color: #0096ff;
+}
+
+.spacex-card.positive {
+  border-color: rgba(0, 150, 255, 0.3);
+}
+
+.spacex-card.negative {
+  border-color: rgba(255, 68, 68, 0.3);
+}
+
+.spacex-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin: 0 auto 8px;
+}
+
+.spacex-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}

@@ -7,7 +7,7 @@
   overflow: hidden;
   background: rgba(19, 62, 143, 0.8);
   border-top: 1px solid rgba(100, 149, 237, 0.6);
-  padding: 12px 0;
+  padding: 12px 0 calc(12px + env(safe-area-inset-bottom, 0px));
 }
 
 .stocks-ticker-wrapper:hover .ticker {

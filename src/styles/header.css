@@ -15,6 +15,12 @@
   background-clip: text;
 }
 
+[data-theme="light"] .header h1 {
+  background: linear-gradient(90deg, #f7931a, #0066cc);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
 .header .subtitle {
   color: var(--text-secondary);
   margin-top: 10px;
@@ -51,7 +57,7 @@
 .header .favorites-filter-btn {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
-  padding: 8px 12px;
+  padding: 10px 14px;
   border-radius: 8px;
   cursor: pointer;
   display: flex;
@@ -59,6 +65,7 @@
   gap: 6px;
   color: var(--text-secondary);
   transition: all 0.2s;
+  min-height: 44px;
 }
 
 .header .favorites-filter-btn:hover {
@@ -89,13 +96,14 @@
 .header .notifications-btn {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
-  padding: 8px 10px;
+  padding: 10px 12px;
   border-radius: 8px;
   cursor: pointer;
   color: var(--text-secondary);
   transition: all 0.2s;
   display: flex;
   align-items: center;
+  min-height: 44px;
 }
 
 .header .notifications-btn:hover {
@@ -112,11 +120,15 @@
 .header .theme-toggle-btn {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
-  padding: 8px 10px;
+  padding: 10px 12px;
   border-radius: 8px;
   cursor: pointer;
   font-size: 1.2rem;
   transition: transform 0.2s, background 0.2s;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .header .theme-toggle-btn:hover {
@@ -215,10 +227,10 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   gap: 5px;
-  padding: 6px;
+  padding: 8px;
   border-radius: 8px;
   transition: background 0.2s;
 }
@@ -305,5 +317,50 @@
   .nav-menu {
     top: 10px;
     left: 10px;
+  }
+}
+
+/* ---------- Notification Toast ---------- */
+
+.notification-toast {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  max-width: 500px;
+  margin: 0 auto 20px;
+  padding: 12px 16px;
+  background: rgba(255, 107, 107, 0.15);
+  border: 1px solid rgba(255, 107, 107, 0.4);
+  border-radius: 10px;
+  color: #ff6b6b;
+  font-size: 0.9rem;
+  animation: toastSlideIn 0.3s ease-out;
+}
+
+.notification-toast-close {
+  background: none;
+  border: none;
+  color: #ff6b6b;
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.notification-toast-close:hover {
+  opacity: 1;
+}
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

@@ -1,0 +1,16 @@
+.weather-widget {
+  cursor: default;
+}
+
+.weather-value {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.weather-icon {
+  display: block;
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}

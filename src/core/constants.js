@@ -1,8 +1,10 @@
 export const STABLECOINS = [
   'usdt', 'usdc', 'dai', 'busd', 'ust', 'tusd', 'usdp', 'usdd',
   'frax', 'lusd', 'usds', 'usde', 'usd1', 'pyusd', 'usdg', 'usdf', 'buidl',
-  'figr_heloc', 'usyc', 'usdy'
+  'figr_heloc', 'usyc', 'usdy', 'rlusd'
 ];
+
+export const COINGECKO_BASE = '/api/coingecko';
 
 export const XSTOCK_IDS = [
   'apple-xstock',
@@ -14,18 +16,19 @@ export const XSTOCK_IDS = [
   'tesla-xstock'
 ];
 
-export const API_URL = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=true&price_change_percentage=24h';
+export const API_URL = `${COINGECKO_BASE}/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=true&price_change_percentage=24h`;
 
 export const XSTOCKS_API_URL = (ids) => 
-  `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${ids}&sparkline=true&price_change_percentage=24h`;
+  `${COINGECKO_BASE}/api/v3/coins/markets?vs_currency=usd&ids=${ids}&sparkline=true&price_change_percentage=24h`;
 
 export const REFRESH_INTERVAL = 60;
 
 export const CACHE_TTL = 120;
 
-export const KEY_AVANTAGE = 'R0HKPO7I2TZ618CO';
+export const ALERT_THRESHOLD = 5;
 
-export const KEY_FINNHUB = 'd83j201r01qkm5c8b1qgd83j201r01qkm5c8b1r0';
+export const WEATHER_API_KEY = import.meta.env.VITE_WEATHER_API_KEY || '';
+export const WEATHER_BASE_URL = 'https://api.weatherapi.com/v1';
 
 export const INDICES = [
   { id: 'sp500', name: 'S&P 500', symbol: 'PSPH.PA', isin: 'FR0011871136' },

@@ -7,6 +7,7 @@
   position: relative;
   overflow: hidden;
   text-align: center;
+  text-align: center;
 }
 
 .crypto-card:hover {
@@ -87,11 +88,14 @@
   background: transparent;
   border: 1px solid var(--card-border);
   border-radius: 15px;
-  padding: 4px 10px;
-  font-size: 0.75rem;
+  padding: 8px 12px;
+  font-size: 0.8rem;
   color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.2s;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
 }
 
 .timeframe-btn:hover {
@@ -130,8 +134,14 @@
 .crypto-header {
   display: flex;
   align-items: flex-start;
+  align-items: flex-start;
   gap: 15px;
   margin-bottom: 15px;
+  position: relative;
+}
+
+.crypto-info {
+  text-align: left;
   position: relative;
 }
 
@@ -144,6 +154,18 @@
   height: 48px;
   border-radius: 50%;
   flex-shrink: 0;
+}
+
+.crypto-rank {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+  background: rgba(99, 102, 241, 0.12);
+  padding: 1px 8px;
+  border-radius: 10px;
+  margin-bottom: 3px;
+  letter-spacing: 0.3px;
 }
 
 .crypto-name {
@@ -161,14 +183,19 @@
   position: absolute;
   top: 0;
   right: 0;
+  position: absolute;
+  top: 0;
+  right: 0;
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 5px;
+  padding: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: transform 0.2s;
+  min-width: 44px;
+  min-height: 44px;
 }
 
 .favorite-btn:hover {
@@ -201,6 +228,7 @@
 
 .crypto-stats {
   display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 10px;
   margin-top: 15px;
@@ -239,6 +267,13 @@
 .chart-toggle-btn:hover {
   background: var(--accent-primary);
   color: white;
+}
+
+.crypto-card.mobile .crypto-rank {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
 }
 
 @media (max-width: 480px) {

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import { fetchCryptoData, fetchXStocks, fetchFearAndGreed, filterStablecoins, getTopGainers, calculateMarketStats } from './core/api.js';
-import { REFRESH_INTERVAL } from './core/constants.js';
+import { REFRESH_INTERVAL, ALERT_THRESHOLD } from './core/constants.js';
 import { Header, CryptoGrid, CryptoTicker, StocksTicker, MarketIndicators, Loading, Error, InstallPrompt } from './components/index.js';
 import { BoursePage } from './pages/index.js';
 import { Analytics } from '@vercel/analytics/react';
@@ -25,18 +25,45 @@ export default function App() {
     return saved || 'dark';
   });
   const [favorites, setFavorites] = useState(() => {
-    const saved = localStorage.getItem('favorites');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('favorites');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
   });
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(() => {
     const saved = localStorage.getItem('notificationsEnabled');
-    return saved === 'true';
+    if (saved === 'true') {
+      if (typeof Notification !== 'undefined' && Notification.permission !== 'granted') {
+        localStorage.setItem('notificationsEnabled', 'false');
+        return false;
+      }
+      return true;
+    }
+    return false;
   });
   const [previousPrices, setPreviousPrices] = useState(() => {
-    const saved = localStorage.getItem('previousPrices');
-    return saved ? JSON.parse(saved) : {};
+    try {
+      const saved = localStorage.getItem('previousPrices');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
   });
+  const [priceSnapshotDate, setPriceSnapshotDate] = useState(() => {
+    return localStorage.getItem('priceSnapshotDate') || '';
+  });
+  const [lastAlertPrices, setLastAlertPrices] = useState(() => {
+    try {
+      const saved = localStorage.getItem('lastAlertPrices');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+  const [notificationMessage, setNotificationMessage] = useState(null);
 
   const handleSort = (field) => {
     if (sortField === field) {
@@ -53,16 +80,23 @@ export default function App() {
   const notificationsRef = useRef(notificationsEnabled);
   const favoritesRef = useRef(favorites);
   const previousPricesRef = useRef(previousPrices);
+  const priceSnapshotDateRef = useRef(priceSnapshotDate);
+  const lastAlertPricesRef = useRef(lastAlertPrices);
 
   notificationsRef.current = notificationsEnabled;
   favoritesRef.current = favorites;
   previousPricesRef.current = previousPrices;
+  priceSnapshotDateRef.current = priceSnapshotDate;
+  lastAlertPricesRef.current = lastAlertPrices;
 
   const checkPriceAlerts = useCallback((newCryptos) => {
     if (!notificationsRef.current) return;
     
     const favoriteCryptos = newCryptos.filter(c => favoritesRef.current.includes(c.id));
     const newPrices = {};
+    const alertedIds = [];
+    const alertsUp = [];
+    const alertsDown = [];
     
     favoriteCryptos.forEach(crypto => {
       const prevPrice = previousPricesRef.current[crypto.id];
@@ -71,21 +105,61 @@ export default function App() {
       if (prevPrice && prevPrice > 0) {
         const changePercent = ((crypto.current_price - prevPrice) / prevPrice) * 100;
         
-        if (changePercent >= 5) {
-          new Notification(`🚀 ${crypto.symbol.toUpperCase()} +${changePercent.toFixed(1)}%`, {
-            body: `Prix: $${crypto.current_price.toLocaleString()}`,
-            icon: '/favicon.ico'
-          });
-        } else if (changePercent <= -5) {
-          new Notification(`📉 ${crypto.symbol.toUpperCase()} ${changePercent.toFixed(1)}%`, {
-            body: `Prix: $${crypto.current_price.toLocaleString()}`,
-            icon: '/favicon.ico'
-          });
+        if (Math.abs(changePercent) < ALERT_THRESHOLD) return;
+
+        const lastAlerted = lastAlertPricesRef.current[crypto.id];
+        if (lastAlerted) {
+          const alertChange = Math.abs((crypto.current_price - lastAlerted) / lastAlerted) * 100;
+          if (alertChange < ALERT_THRESHOLD) return;
+        }
+
+        const sign = changePercent >= 0 ? '+' : '';
+        const line = `${crypto.symbol.toUpperCase()}: ${sign}${changePercent.toFixed(1)}% ($${crypto.current_price.toLocaleString()})`;
+        alertedIds.push({ id: crypto.id, price: crypto.current_price });
+
+        if (changePercent >= ALERT_THRESHOLD) {
+          alertsUp.push(line);
+        } else {
+          alertsDown.push(line);
         }
       }
     });
+
+    if (alertedIds.length > 0) {
+      const lines = [];
+      if (alertsUp.length > 0) {
+        lines.push('🚀 Hausse', ...alertsUp);
+      }
+      if (alertsDown.length > 0) {
+        lines.push('📉 Baisse', ...alertsDown);
+      }
+
+      const title = alertedIds.length === 1
+        ? lines[1]
+        : `🔔 ${alertedIds.length} alerte${alertedIds.length > 1 ? 's' : ''} de prix`;
+      const body = alertedIds.length === 1
+        ? lines[0]
+        : lines.join('\n');
+
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.ready.then(reg => {
+          reg.showNotification(title, { body, icon: '/favicon.ico' });
+        });
+      } else {
+        new Notification(title, { body, icon: '/favicon.ico' });
+      }
+
+      const newAlerted = { ...lastAlertPricesRef.current };
+      alertedIds.forEach(({ id, price }) => { newAlerted[id] = price; });
+      setLastAlertPrices(newAlerted);
+    }
     
-    setPreviousPrices(newPrices);
+    const today = new Date().toDateString();
+    if (!priceSnapshotDateRef.current || priceSnapshotDateRef.current !== today) {
+      setPreviousPrices(newPrices);
+      setPriceSnapshotDate(today);
+      setLastAlertPrices({});
+    }
   }, []);
 
   const loadData = useCallback(async () => {
@@ -99,12 +173,14 @@ export default function App() {
       ]);
       
       const filtered = filterStablecoins(cryptoData);
-      const gainers = getTopGainers(filtered);
+      const withRank = filtered.map((coin, index) => ({ ...coin, display_rank: index + 1 }));
+      const gainers = getTopGainers(withRank);
 
       const sortedStocks = [...xstockData].sort((a, b) => (b.price_change_percentage_24h ?? 0) - (a.price_change_percentage_24h ?? 0));
 
-      setCryptos(filtered);
+      setCryptos(withRank);
       setTopGainers(gainers);
+      setStocks(sortedStocks);
       setStocks(sortedStocks);
       setLastUpdate(new Date());
       setCountdown(REFRESH_INTERVAL);
@@ -155,7 +231,19 @@ export default function App() {
 
   useEffect(() => {
     localStorage.setItem('notificationsEnabled', notificationsEnabled);
-}, [notificationsEnabled]);
+  }, [notificationsEnabled]);
+
+  useEffect(() => {
+    localStorage.setItem('previousPrices', JSON.stringify(previousPrices));
+  }, [previousPrices]);
+
+  useEffect(() => {
+    localStorage.setItem('priceSnapshotDate', priceSnapshotDate);
+  }, [priceSnapshotDate]);
+
+  useEffect(() => {
+    localStorage.setItem('lastAlertPrices', JSON.stringify(lastAlertPrices));
+  }, [lastAlertPrices]);
 
   const toggleFavorite = useCallback((coinId) => {
     setFavorites(prev => {
@@ -175,9 +263,15 @@ export default function App() {
       const permission = await Notification.requestPermission();
       if (permission === 'granted') {
         setNotificationsEnabled(true);
+        setNotificationMessage(null);
+      } else if (permission === 'denied') {
+        setNotificationMessage('Notifications refusées par le navigateur. Modifiez les paramètres de votre navigateur pour les réactiver.');
+      } else {
+        setNotificationMessage('Permission de notification non accordée. Réessayez ou vérifiez les paramètres de votre navigateur.');
       }
     } else {
       setNotificationsEnabled(false);
+      setNotificationMessage(null);
     }
   }, [notificationsEnabled]);
 
@@ -242,6 +336,12 @@ export default function App() {
             onToggleNotifications={toggleNotifications}
           />
 
+        {notificationMessage && (
+          <div className="notification-toast">
+            <span>{notificationMessage}</span>
+            <button className="notification-toast-close" onClick={() => setNotificationMessage(null)}>×</button>
+          </div>
+        )}
         <Routes>
           <Route path="/" element={
             <>
@@ -256,7 +356,7 @@ export default function App() {
               )}
 
               {isLoading && <Loading />}
-              {error && <Error message={error} />}
+              {error && <Error message={error} onRetry={loadData} />}
               {!isLoading && !error && (
                 <CryptoGrid 
                   cryptos={filteredCryptos} 
@@ -272,6 +372,7 @@ export default function App() {
           <Route path="/bourse" element={<BoursePage />} />
         </Routes>
       </div>
+      <Analytics />
       <Analytics />
     </HashRouter>
   );

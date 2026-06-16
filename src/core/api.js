@@ -1,4 +1,4 @@
-import { API_URL, XSTOCKS_API_URL, XSTOCK_IDS, STABLECOINS, CACHE_TTL, INDICES } from './constants.js';
+import { API_URL, XSTOCKS_API_URL, XSTOCK_IDS, STABLECOINS, CACHE_TTL, INDICES, COINGECKO_BASE } from './constants.js';
 
 const CACHE_PREFIX = 'cryptowatch_cache_';
 
@@ -32,14 +32,12 @@ function withCache(key, ttlMs, fetchFn) {
       const data = await fetchFn(...args);
       setToLocalStorage(key, data);
       return data;
-    } catch (err) {
-      if (err.status === 429 || err.message?.includes('429')) {
-        if (cached) {
-          console.warn('Rate limited, using cached data');
-          return cached.data;
-        }
+    } catch {
+      if (cached) {
+        console.warn(`Fetch failed for ${key}, using stale cached data`);
+        return cached.data;
       }
-      throw err;
+      throw new Error(`Impossible de récupérer les données (${key})`);
     }
   };
 }
@@ -172,11 +170,30 @@ const fetchIndicesRaw = async () => {
 
 export const fetchIndicesData = withCache('indices_v3', 600_000, fetchIndicesRaw);
 
+export const fetchGoldPrice = withCache(
+  'gold_price',
+  300_000,
+  async () => {
+    const response = await fetch('https://aurumrates.com/api/chart?symbol=GC=F&range=5d&interval=1d');
+    if (!response.ok) throw new Error('Erreur lors de la récupération du cours de l\'or');
+    const json = await response.json();
+    if (json.regularMarketPrice == null) throw new Error('Format de réponse inattendu');
+    const price = json.regularMarketPrice;
+    const closes = json.closes ?? [];
+    const prevClose = closes.length > 1 ? closes[closes.length - 2] : price;
+    return {
+      price,
+      change: price - prevClose,
+      changePercent: prevClose > 0 ? ((price - prevClose) / prevClose) * 100 : 0,
+    };
+  }
+);
+
 export const fetchEtfData = withCache(
   'etf_markets',
   CACHE_TTL * 1000,
   async () => {
-    const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&category=crypto-etf&order=market_cap_desc&per_page=50&page=1&sparkline=true&price_change_percentage=24h');
+    const response = await fetch(`${COINGECKO_BASE}/api/v3/coins/markets?vs_currency=usd&category=crypto-etf&order=market_cap_desc&per_page=50&page=1&sparkline=true&price_change_percentage=24h`);
     if (!response.ok) {
       throw new Error('Erreur lors de la récupération des ETFs');
     }
@@ -184,8 +201,30 @@ export const fetchEtfData = withCache(
   }
 );
 
+export const fetchSpaceXPrice = withCache(
+  'spacex_price',
+  300_000,
+  async () => {
+    const url = '/api/yahoo/v8/finance/spark?symbols=SPCX&range=1d&interval=1d';
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Erreur lors de la récupération du cours SpaceX');
+    const json = await res.json();
+    const data = json.SPCX;
+    if (!data?.close?.length || data.chartPreviousClose == null) {
+      throw new Error('Format de réponse SpaceX inattendu');
+    }
+    const price = data.close[data.close.length - 1];
+    const prevClose = data.chartPreviousClose;
+    return {
+      price,
+      change: price - prevClose,
+      changePercent: prevClose > 0 ? ((price - prevClose) / prevClose) * 100 : 0,
+    };
+  }
+);
+
 export async function fetchCoinHistory(coinId, days = 7) {
-  const response = await fetch(`https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=${days}`);
+  const response = await fetch(`${COINGECKO_BASE}/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=${days}`);
   if (!response.ok) {
     throw new Error('Erreur lors de la récupération de l\'historique');
   }

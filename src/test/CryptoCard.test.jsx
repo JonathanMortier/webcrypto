@@ -46,13 +46,13 @@ describe('CryptoCard', () => {
 
   it('should render price change with positive sign', () => {
     render(withRouter(<CryptoCard coin={mockCoin} />));
-    expect(screen.getByText('+5.50% (24h)')).toBeInTheDocument();
+    expect(screen.getByText('+5.50%')).toBeInTheDocument();
   });
 
   it('should render negative change correctly', () => {
     const negativeCoin = { ...mockCoin, price_change_percentage_24h: -3.2 };
     render(withRouter(<CryptoCard coin={negativeCoin} />));
-    expect(screen.getByText('-3.20% (24h)')).toBeInTheDocument();
+    expect(screen.getByText('-3.20%')).toBeInTheDocument();
   });
 
   it('should render market cap', () => {
@@ -79,7 +79,7 @@ describe('CryptoCard', () => {
   it('should handle null price_change_percentage_24h', () => {
     const coinWithoutChange = { ...mockCoin, price_change_percentage_24h: null };
     render(withRouter(<CryptoCard coin={coinWithoutChange} />));
-    expect(screen.getByText('+0.00% (24h)')).toBeInTheDocument();
+    expect(screen.getByText('+0.00%')).toBeInTheDocument();
   });
 
   it('should handle missing sparkline data', async () => {

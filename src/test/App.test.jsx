@@ -140,10 +140,10 @@ describe('App - Dashboard integration', () => {
   it('should render market indicators section', async () => {
     render(<App />);
     await waitFor(() => {
-      expect(screen.getAllByText('Market Cap').length).toBeGreaterThanOrEqual(1);
+      expect(screen.getByText('BTC Dom.')).toBeInTheDocument();
     }, { timeout: 3000 });
-    expect(screen.getAllByText('Volume 24h').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Change 24h').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText(/^Market Cap/)).toBeInTheDocument();
+    expect(screen.getByText('Fear & Greed')).toBeInTheDocument();
   });
 
   it('should render price formatted correctly', async () => {

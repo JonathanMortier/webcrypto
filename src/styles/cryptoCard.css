@@ -19,6 +19,7 @@
   text-decoration: none;
   color: inherit;
   display: block;
+  position: relative;
 }
 
 .crypto-chart {
@@ -271,9 +272,23 @@
 
 .crypto-card.mobile .crypto-rank {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 0;
+  left: 0;
   z-index: 2;
+}
+
+.crypto-card.mobile .crypto-header {
+  justify-content: center;
+  padding-top: 22px;
+}
+
+.crypto-card.mobile .crypto-info {
+  position: static;
+  text-align: center;
+}
+
+.crypto-card.mobile .crypto-card-link {
+  text-align: center;
 }
 
 @media (max-width: 480px) {

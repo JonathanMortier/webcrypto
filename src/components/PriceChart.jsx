@@ -15,7 +15,9 @@ function getCSSVar(name) {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 }
 
-export default function PriceChart({ prices, isPositive }) {
+const END_LABEL = 'Maintenant';
+
+export default function PriceChart({ prices, isPositive, timeframe = '7d' }) {
   const positiveColor = getCSSVar('--positive') || '#00ff88';
   const negativeColor = getCSSVar('--negative') || '#ff4444';
   const textMuted = getCSSVar('--text-muted') || '#666';
@@ -31,21 +33,41 @@ export default function PriceChart({ prices, isPositive }) {
       return { labels: [], datasets: [] };
     }
 
-    let priceValues;
     const firstItem = prices[0];
-    
-    if (typeof firstItem === 'number') {
-      priceValues = prices;
-    } else if (Array.isArray(firstItem)) {
-      priceValues = prices.map(([, price]) => price);
-    } else {
-      return { labels: [], datasets: [] };
+    const hasTimestamps = Array.isArray(firstItem);
+    const priceValues = hasTimestamps ? prices.map(([, price]) => price) : prices;
+    const timestamps = hasTimestamps ? prices.map(([ts]) => ts) : null;
+    const len = priceValues.length;
+
+    const labelIndices = new Set();
+    const numLabels = Math.min(5, len);
+    for (let k = 0; k < numLabels; k++) {
+      labelIndices.add(Math.round((k / (numLabels - 1)) * (len - 1)));
     }
 
     const labels = priceValues.map((_, i) => {
-      const percentage = (i / priceValues.length) * 100;
-      if (percentage === 0) return '7j';
-      if (percentage === 100) return 'Maintenant';
+      if (!labelIndices.has(i)) return '';
+
+      if (timestamps) {
+        const d = new Date(timestamps[i]);
+        if (timeframe === '1h' || timeframe === '24h') {
+          if (i === len - 1) return END_LABEL;
+          return d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+        }
+        if (timeframe === '7d') {
+          return d.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric' });
+        }
+        if (timeframe === '30d') {
+          return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+        }
+        if (timeframe === '1y') {
+          return d.toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' });
+        }
+      }
+
+      const startLabels = { '1h': '-1h', '24h': '-24h', '7d': '-7j', '30d': '-30j', '1y': '-1an' };
+      if (i === 0) return startLabels[timeframe] || '-7j';
+      if (i === len - 1) return END_LABEL;
       return '';
     });
 
@@ -64,7 +86,7 @@ export default function PriceChart({ prices, isPositive }) {
         },
       ],
     };
-  }, [prices, isPositive, lineColor, fillColor]);
+  }, [prices, isPositive, lineColor, fillColor, timeframe]);
 
   const options = {
     responsive: true,
@@ -89,6 +111,7 @@ export default function PriceChart({ prices, isPositive }) {
         ticks: {
           color: textMuted,
           font: { size: 10 },
+          maxTicksLimit: 6,
           callback: (value) => `$${value.toLocaleString()}`,
         },
       },

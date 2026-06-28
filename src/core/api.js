@@ -230,3 +230,11 @@ export async function fetchCoinHistory(coinId, days = 7) {
   }
   return response.json();
 }
+
+export async function fetchCoinDetail(coinId) {
+  const response = await fetch(`${COINGECKO_BASE}/api/v3/coins/${coinId}?localization=false&tickers=false&community_data=true&developer_data=false&sparkline=true`);
+  if (!response.ok) {
+    throw new Error(`Impossible de récupérer les détails (${coinId})`);
+  }
+  return response.json();
+}

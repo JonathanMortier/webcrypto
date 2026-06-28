@@ -22,6 +22,25 @@
   position: relative;
 }
 
+.coingecko-link {
+  position: absolute;
+  top: 0;
+  right: 48px;
+  color: var(--text-secondary);
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  transition: color 0.2s;
+  z-index: 3;
+}
+
+.coingecko-link:hover {
+  color: var(--accent-primary);
+}
+
 .crypto-chart {
   margin-top: 15px;
   padding-top: 15px;

@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect, lazy, Suspense } from 'react';
+import { Link } from 'react-router-dom';
 import { formatPrice } from '../core/utils.js';
 import { getImageUrl } from '../core/imageCache.js';
 import { fetchCoinHistory } from '../core/api.js';
@@ -85,12 +86,7 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite, hideRan
       onMouseEnter={!isMobile ? handleMouseEnter : undefined}
       onMouseLeave={!isMobile ? handleMouseLeave : undefined}
     >
-<a 
-          href={`https://www.coingecko.com/en/coins/${coin.id}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="crypto-card-link"
-      >
+      <Link to={`/coin/${coin.id}`} className="crypto-card-link">
         <div className="crypto-header">
           <img src={imageUrl} alt={coin.name} className="crypto-icon" loading="lazy" />
           <div className="crypto-info">
@@ -128,6 +124,21 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite, hideRan
             </div>
           </div>
         </div>
+      </Link>
+
+      <a 
+        href={`https://www.coingecko.com/en/coins/${coin.id}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="coingecko-link"
+        title="Voir sur CoinGecko"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+          <polyline points="15 3 21 3 21 9" />
+          <line x1="10" y1="14" x2="21" y2="3" />
+        </svg>
       </a>
 
       {isMobile && (

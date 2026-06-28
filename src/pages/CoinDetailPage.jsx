@@ -196,7 +196,7 @@ export default function CoinDetailPage() {
               <div className="chart-loading">Chargement...</div>
             ) : chartData.length > 0 ? (
               <Suspense fallback={<div className="chart-loading">Chargement...</div>}>
-                <PriceChart prices={chartData} isPositive={isPositive} />
+                <PriceChart prices={chartData} isPositive={isPositive} timeframe={timeframe} />
               </Suspense>
             ) : (
               <div className="chart-loading">Graphique indisponible</div>

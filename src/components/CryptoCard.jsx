@@ -173,11 +173,11 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite, hideRan
               <div className="chart-loading">Chargement...</div>
             ) : chartData.length > 0 ? (
               <Suspense fallback={<div className="chart-loading">Chargement...</div>}>
-                <PriceChart prices={chartData} isPositive={isPositive} />
+                <PriceChart prices={chartData} isPositive={isPositive} timeframe={timeframe} />
               </Suspense>
             ) : sparklineData.length > 0 ? (
               <Suspense fallback={<div className="chart-loading">Chargement...</div>}>
-                <PriceChart prices={sparklineData} isPositive={isPositive} />
+                <PriceChart prices={sparklineData} isPositive={isPositive} timeframe={timeframe} />
               </Suspense>
             ) : (
               <div className="chart-loading">Graphique indisponible</div>

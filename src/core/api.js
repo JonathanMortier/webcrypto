@@ -24,7 +24,7 @@ function setToLocalStorage(key, data) {
 function withCache(key, ttlMs, fetchFn) {
   return async (...args) => {
     const cached = getFromLocalStorage(key);
-    if (cached && (Date.now() - cached.timestamp) < ttlMs) {
+    if (cached && Date.now() - cached.timestamp < ttlMs) {
       return cached.data;
     }
 
@@ -42,40 +42,30 @@ function withCache(key, ttlMs, fetchFn) {
   };
 }
 
-export const fetchCryptoData = withCache(
-  'crypto_markets',
-  CACHE_TTL * 1000,
-  async () => {
-    const response = await fetch(API_URL);
-    if (!response.ok) {
-      throw new Error('Erreur lors de la récupération des données');
-    }
-    return response.json();
+export const fetchCryptoData = withCache('crypto_markets', CACHE_TTL * 1000, async () => {
+  const response = await fetch(API_URL);
+  if (!response.ok) {
+    throw new Error('Erreur lors de la récupération des données');
   }
-);
+  return response.json();
+});
 
-export const fetchXStocks = withCache(
-  'xstocks',
-  CACHE_TTL * 1000,
-  async () => {
-    const ids = XSTOCK_IDS.join(',');
-    const response = await fetch(XSTOCKS_API_URL(ids));
-    if (!response.ok) {
-      throw new Error('Erreur lors de la récupération des données');
-    }
-    return response.json();
+export const fetchXStocks = withCache('xstocks', CACHE_TTL * 1000, async () => {
+  const ids = XSTOCK_IDS.join(',');
+  const response = await fetch(XSTOCKS_API_URL(ids));
+  if (!response.ok) {
+    throw new Error('Erreur lors de la récupération des données');
   }
-);
-
-
+  return response.json();
+});
 
 export function filterStablecoins(cryptos) {
-  return cryptos.filter(coin => !STABLECOINS.includes(coin.symbol.toLowerCase()));
+  return cryptos.filter((coin) => !STABLECOINS.includes(coin.symbol.toLowerCase()));
 }
 
 export function getTopGainers(cryptos, limit = 10) {
   return cryptos
-    .filter(coin => (coin.price_change_percentage_24h ?? 0) > 0)
+    .filter((coin) => (coin.price_change_percentage_24h ?? 0) > 0)
     .sort((a, b) => (b.price_change_percentage_24h ?? 0) - (a.price_change_percentage_24h ?? 0))
     .slice(0, limit);
 }
@@ -103,31 +93,29 @@ export function calculateMarketStats(cryptos) {
   const totalMarketCap = cryptos.reduce((sum, c) => sum + (c.market_cap || 0), 0);
   const totalVolume = cryptos.reduce((sum, c) => sum + (c.total_volume || 0), 0);
 
-  const btc = cryptos.find(c => c.symbol === 'btc');
-  const eth = cryptos.find(c => c.symbol === 'eth');
+  const btc = cryptos.find((c) => c.symbol === 'btc');
+  const eth = cryptos.find((c) => c.symbol === 'eth');
 
-  const btcDominance = btc && totalMarketCap > 0 
-    ? ((btc.market_cap / totalMarketCap) * 100).toFixed(1) 
-    : '0';
-  
-  const ethDominance = eth && totalMarketCap > 0 
-    ? ((eth.market_cap / totalMarketCap) * 100).toFixed(1) 
-    : '0';
+  const btcDominance = btc && totalMarketCap > 0 ? ((btc.market_cap / totalMarketCap) * 100).toFixed(1) : '0';
 
-  const marketCapChange = totalMarketCap > 0 
-    ? cryptos.reduce((sum, c) => {
-        const change = c.price_change_percentage_24h || 0;
-        const weight = (c.market_cap || 0) / totalMarketCap;
-        return sum + (change * weight);
-      }, 0).toFixed(2)
-    : '0';
+  const ethDominance = eth && totalMarketCap > 0 ? ((eth.market_cap / totalMarketCap) * 100).toFixed(1) : '0';
+
+  const marketCapChange =
+    totalMarketCap > 0
+      ? cryptos
+          .reduce((sum, c) => {
+            const change = c.price_change_percentage_24h || 0;
+            const weight = (c.market_cap || 0) / totalMarketCap;
+            return sum + change * weight;
+          }, 0)
+          .toFixed(2)
+      : '0';
 
   const btcChange = btc?.price_change_percentage_24h || 0;
-  const altcoinsOutperforming = cryptos.filter(c => 
-    c.symbol !== 'btc' && 
-    (c.price_change_percentage_24h || 0) > btcChange
+  const altcoinsOutperforming = cryptos.filter(
+    (c) => c.symbol !== 'btc' && (c.price_change_percentage_24h || 0) > btcChange,
   ).length;
-  
+
   const altcoinSeason = Math.round((altcoinsOutperforming / Math.max(cryptos.length - 1, 1)) * 100);
 
   return {
@@ -141,7 +129,7 @@ export function calculateMarketStats(cryptos) {
 }
 
 const fetchIndicesRaw = async () => {
-  const symbols = INDICES.map(i => i.symbol).join(',');
+  const symbols = INDICES.map((i) => i.symbol).join(',');
   const url = `/api/yahoo/v8/finance/spark?symbols=${symbols}&range=1d&interval=1d`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Yahoo HTTP ${res.status}`);
@@ -162,7 +150,7 @@ const fetchIndicesRaw = async () => {
     }
   }
 
-  if (!results.some(r => r.price != null)) {
+  if (!results.some((r) => r.price != null)) {
     throw new Error('All index calls failed');
   }
   return results;
@@ -170,69 +158,61 @@ const fetchIndicesRaw = async () => {
 
 export const fetchIndicesData = withCache('indices_v3', 600_000, fetchIndicesRaw);
 
-export const fetchGoldPrice = withCache(
-  'gold_price',
-  300_000,
-  async () => {
-    const response = await fetch('https://aurumrates.com/api/chart?symbol=GC=F&range=5d&interval=1d');
-    if (!response.ok) throw new Error('Erreur lors de la récupération du cours de l\'or');
-    const json = await response.json();
-    if (json.regularMarketPrice == null) throw new Error('Format de réponse inattendu');
-    const price = json.regularMarketPrice;
-    const closes = json.closes ?? [];
-    const prevClose = closes.length > 1 ? closes[closes.length - 2] : price;
-    return {
-      price,
-      change: price - prevClose,
-      changePercent: prevClose > 0 ? ((price - prevClose) / prevClose) * 100 : 0,
-    };
-  }
-);
+export const fetchGoldPrice = withCache('gold_price', 300_000, async () => {
+  const response = await fetch('https://aurumrates.com/api/chart?symbol=GC=F&range=5d&interval=1d');
+  if (!response.ok) throw new Error("Erreur lors de la récupération du cours de l'or");
+  const json = await response.json();
+  if (json.regularMarketPrice == null) throw new Error('Format de réponse inattendu');
+  const price = json.regularMarketPrice;
+  const closes = json.closes ?? [];
+  const prevClose = closes.length > 1 ? closes[closes.length - 2] : price;
+  return {
+    price,
+    change: price - prevClose,
+    changePercent: prevClose > 0 ? ((price - prevClose) / prevClose) * 100 : 0,
+  };
+});
 
-export const fetchEtfData = withCache(
-  'etf_markets',
-  CACHE_TTL * 1000,
-  async () => {
-    const response = await fetch(`${COINGECKO_BASE}/api/v3/coins/markets?vs_currency=usd&category=crypto-etf&order=market_cap_desc&per_page=50&page=1&sparkline=true&price_change_percentage=24h`);
-    if (!response.ok) {
-      throw new Error('Erreur lors de la récupération des ETFs');
-    }
-    return response.json();
+export const fetchEtfData = withCache('etf_markets', CACHE_TTL * 1000, async () => {
+  const response = await fetch(
+    `${COINGECKO_BASE}/api/v3/coins/markets?vs_currency=usd&category=crypto-etf&order=market_cap_desc&per_page=50&page=1&sparkline=true&price_change_percentage=24h`,
+  );
+  if (!response.ok) {
+    throw new Error('Erreur lors de la récupération des ETFs');
   }
-);
+  return response.json();
+});
 
-export const fetchSpaceXPrice = withCache(
-  'spacex_price',
-  300_000,
-  async () => {
-    const url = '/api/yahoo/v8/finance/spark?symbols=SPCX&range=1d&interval=1d';
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('Erreur lors de la récupération du cours SpaceX');
-    const json = await res.json();
-    const data = json.SPCX;
-    if (!data?.close?.length || data.chartPreviousClose == null) {
-      throw new Error('Format de réponse SpaceX inattendu');
-    }
-    const price = data.close[data.close.length - 1];
-    const prevClose = data.chartPreviousClose;
-    return {
-      price,
-      change: price - prevClose,
-      changePercent: prevClose > 0 ? ((price - prevClose) / prevClose) * 100 : 0,
-    };
+export const fetchSpaceXPrice = withCache('spacex_price', 300_000, async () => {
+  const url = '/api/yahoo/v8/finance/spark?symbols=SPCX&range=1d&interval=1d';
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('Erreur lors de la récupération du cours SpaceX');
+  const json = await res.json();
+  const data = json.SPCX;
+  if (!data?.close?.length || data.chartPreviousClose == null) {
+    throw new Error('Format de réponse SpaceX inattendu');
   }
-);
+  const price = data.close[data.close.length - 1];
+  const prevClose = data.chartPreviousClose;
+  return {
+    price,
+    change: price - prevClose,
+    changePercent: prevClose > 0 ? ((price - prevClose) / prevClose) * 100 : 0,
+  };
+});
 
 export async function fetchCoinHistory(coinId, days = 7) {
   const response = await fetch(`${COINGECKO_BASE}/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=${days}`);
   if (!response.ok) {
-    throw new Error('Erreur lors de la récupération de l\'historique');
+    throw new Error("Erreur lors de la récupération de l'historique");
   }
   return response.json();
 }
 
 export async function fetchCoinDetail(coinId) {
-  const response = await fetch(`${COINGECKO_BASE}/api/v3/coins/${coinId}?localization=false&tickers=false&community_data=true&developer_data=false&sparkline=true`);
+  const response = await fetch(
+    `${COINGECKO_BASE}/api/v3/coins/${coinId}?localization=false&tickers=false&community_data=true&developer_data=false&sparkline=true`,
+  );
   if (!response.ok) {
     throw new Error(`Impossible de récupérer les détails (${coinId})`);
   }

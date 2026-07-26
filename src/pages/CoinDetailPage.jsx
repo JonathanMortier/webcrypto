@@ -57,7 +57,15 @@ export default function CoinDetailPage() {
   } else if (error) {
     body = <Error message={error} onRetry={() => window.location.reload()} />;
   } else if (coin) {
-    body = <CoinDetailContent coin={coin} timeframe={timeframe} setTimeframe={setTimeframe} chartData={chartData} chartLoading={chartLoading} />;
+    body = (
+      <CoinDetailContent
+        coin={coin}
+        timeframe={timeframe}
+        setTimeframe={setTimeframe}
+        chartData={chartData}
+        chartLoading={chartLoading}
+      />
+    );
   } else {
     body = null;
   }

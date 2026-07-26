@@ -2,16 +2,18 @@
 
 ## Key Commands
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Dev server (hot reload) on http://localhost:5173 |
-| `npm run dev` | Dev server (hot reload) on http://localhost:5173 |
-| `npm run build` | Production build |
-| `npm start` | Production server (Express + Yahoo proxy) on http://localhost:3000 |
-| `npm start` | Production server (Express + Yahoo proxy) on http://localhost:3000 |
-| `npm run test` | Run all tests (no watch mode) |
-| `npm run test:watch` | Run tests in watch mode |
-| `npx vitest run src/test/<file>` | Run a single test file |
+| Command                          | Description                                                        |
+| -------------------------------- | ------------------------------------------------------------------ |
+| `npm run dev`                    | Dev server (hot reload) on http://localhost:5173                   |
+| `npm run build`                  | Production build                                                   |
+| `npm start`                      | Production server (Express + Yahoo proxy) on http://localhost:3000 |
+| `npm run test`                   | Run all tests (no watch mode)                                      |
+| `npm run test:watch`             | Run tests in watch mode                                            |
+| `npx vitest run src/test/<file>` | Run a single test file                                             |
+| `npm run lint`                   | Lint JS/JSX with ESLint                                            |
+| `npm run lint:fix`               | Lint + auto-fix                                                    |
+| `npm run format`                 | Format all files with Prettier                                     |
+| `npm run format:check`           | Check formatting without modifying                                 |
 
 ## Tech Stack
 
@@ -84,60 +86,60 @@ src/
 
 ## All Components
 
-| Component | Source | Description |
-|-----------|--------|-------------|
-| `Header` | `Header.jsx` | Search, theme toggle, notif toggle, refresh button, last-update time |
-| `CryptoGrid` | `CryptoGrid.jsx` | Responsive grid of CryptoCard, handles sort/filter |
-| `CryptoCard` | `CryptoCard.jsx` | Single coin: price, 24h change, chart toggle, favorite star |
-| `CryptoTicker` | `CryptoTicker.jsx` | Fixed top marquee of top 10 gainers |
-| `StocksTicker` | `StocksTicker.jsx` | Fixed bottom marquee of 7 stocks |
-| `FearGreedIndex` | `FearGreedIndex.jsx` | Floating toggle, shows F&G value bar |
-| `MarketIndicators` | `MarketIndicators.jsx` | Total market cap, volume, BTC/ETH dominance, altcoin season |
-| `InstallPrompt` | `InstallPrompt.jsx` | PWA install button (beforeinstallprompt event) |
-| `NavMenu` | `NavMenu.jsx` | Hamburger nav: `/` (CryptoWatch) and `/bourse` (Bourse) |
-| `PriceChart` | `PriceChart.jsx` | Chart.js line chart with timeframe buttons |
-| `WeatherWidget` | `WeatherWidget.jsx` | City + temp + icon in market indicators |
-| `Loading` | `Status.jsx` | "Chargement des données..." spinner |
-| `Error` | `Status.jsx` | Error message + "Réessayer" button |
-| `BoursePage` | `pages/BoursePage.jsx` | Indices, portfolio holdings, x-stocks, gold |
+| Component          | Source                 | Description                                                          |
+| ------------------ | ---------------------- | -------------------------------------------------------------------- |
+| `Header`           | `Header.jsx`           | Search, theme toggle, notif toggle, refresh button, last-update time |
+| `CryptoGrid`       | `CryptoGrid.jsx`       | Responsive grid of CryptoCard, handles sort/filter                   |
+| `CryptoCard`       | `CryptoCard.jsx`       | Single coin: price, 24h change, chart toggle, favorite star          |
+| `CryptoTicker`     | `CryptoTicker.jsx`     | Fixed top marquee of top 10 gainers                                  |
+| `StocksTicker`     | `StocksTicker.jsx`     | Fixed bottom marquee of 7 stocks                                     |
+| `FearGreedIndex`   | `FearGreedIndex.jsx`   | Floating toggle, shows F&G value bar                                 |
+| `MarketIndicators` | `MarketIndicators.jsx` | Total market cap, volume, BTC/ETH dominance, altcoin season          |
+| `InstallPrompt`    | `InstallPrompt.jsx`    | PWA install button (beforeinstallprompt event)                       |
+| `NavMenu`          | `NavMenu.jsx`          | Hamburger nav: `/` (CryptoWatch) and `/bourse` (Bourse)              |
+| `PriceChart`       | `PriceChart.jsx`       | Chart.js line chart with timeframe buttons                           |
+| `WeatherWidget`    | `WeatherWidget.jsx`    | City + temp + icon in market indicators                              |
+| `Loading`          | `Status.jsx`           | "Chargement des données..." spinner                                  |
+| `Error`            | `Status.jsx`           | Error message + "Réessayer" button                                   |
+| `BoursePage`       | `pages/BoursePage.jsx` | Indices, portfolio holdings, x-stocks, gold                          |
 
 ## All localStorage Keys
 
-| Key | Type | Description |
-|-----|------|-------------|
-| `theme` | `'dark'` / `'light'` | UI theme preference |
-| `favorites` | `JSON.stringify(Array)` | Array of favorited coin IDs |
-| `notificationsEnabled` | `'true'` / `'false'` | Notification toggle state |
-| `previousPrices` | `JSON.stringify(Object)` | Daily price snapshot `{ coinId: price }` |
-| `priceSnapshotDate` | `Date.toDateString()` | Date of last snapshot (resets daily) |
-| `lastAlertPrices` | `JSON.stringify(Object)` | Prices at last alert `{ coinId: price }` |
-| `cryptowatch_cache_*` | cached API data | Various API response caches with timestamps |
-| `indices_holdings` | `JSON.stringify(Object)` | Portfolio units/average prices per index |
-| `cryptowatch_weather_*` | cached weather data | Location + weather data with timestamps |
+| Key                     | Type                     | Description                                 |
+| ----------------------- | ------------------------ | ------------------------------------------- |
+| `theme`                 | `'dark'` / `'light'`     | UI theme preference                         |
+| `favorites`             | `JSON.stringify(Array)`  | Array of favorited coin IDs                 |
+| `notificationsEnabled`  | `'true'` / `'false'`     | Notification toggle state                   |
+| `previousPrices`        | `JSON.stringify(Object)` | Daily price snapshot `{ coinId: price }`    |
+| `priceSnapshotDate`     | `Date.toDateString()`    | Date of last snapshot (resets daily)        |
+| `lastAlertPrices`       | `JSON.stringify(Object)` | Prices at last alert `{ coinId: price }`    |
+| `cryptowatch_cache_*`   | cached API data          | Various API response caches with timestamps |
+| `indices_holdings`      | `JSON.stringify(Object)` | Portfolio units/average prices per index    |
+| `cryptowatch_weather_*` | cached weather data      | Location + weather data with timestamps     |
 
 ## All State in App.jsx
 
-| State | Init | Persisted | Description |
-|-------|------|-----------|-------------|
-| `cryptos` | `[]` | No | Filtered crypto list with display_rank |
-| `topGainers` | `[]` | No | Top 10 gainers for ticker |
-| `stocks` | `[]` | No | x-stocks sorted by 24h change |
-| `fearGreed` | `null` | No | F&G index data point |
-| `isLoading` | `false` | No | Loading flag |
-| `error` | `null` | No | Error message |
-| `lastUpdate` | `null` | No | Last refresh timestamp |
-| `countdown` | `REFRESH_INTERVAL` | No | Seconds until next auto-refresh |
-| `searchQuery` | `''` | No | Search/filter text |
-| `sortField` | `'market_cap'` | No | Sort column |
-| `sortDir` | `'desc'` | No | Sort direction |
-| `theme` | localStorage | Yes | Dark/light theme |
-| `favorites` | localStorage | Yes | Coin IDs |
-| `showFavoritesOnly` | `false` | No | Filter toggle |
-| `notificationsEnabled` | localStorage | Yes | Notif toggle |
-| `previousPrices` | localStorage | Yes | Daily price snapshot |
-| `priceSnapshotDate` | localStorage | Yes | Snapshot date string |
-| `lastAlertPrices` | localStorage | Yes | Prices at last alert |
-| `notificationMessage` | `null` | No | Toast message for notif feedback |
+| State                  | Init               | Persisted | Description                            |
+| ---------------------- | ------------------ | --------- | -------------------------------------- |
+| `cryptos`              | `[]`               | No        | Filtered crypto list with display_rank |
+| `topGainers`           | `[]`               | No        | Top 10 gainers for ticker              |
+| `stocks`               | `[]`               | No        | x-stocks sorted by 24h change          |
+| `fearGreed`            | `null`             | No        | F&G index data point                   |
+| `isLoading`            | `false`            | No        | Loading flag                           |
+| `error`                | `null`             | No        | Error message                          |
+| `lastUpdate`           | `null`             | No        | Last refresh timestamp                 |
+| `countdown`            | `REFRESH_INTERVAL` | No        | Seconds until next auto-refresh        |
+| `searchQuery`          | `''`               | No        | Search/filter text                     |
+| `sortField`            | `'market_cap'`     | No        | Sort column                            |
+| `sortDir`              | `'desc'`           | No        | Sort direction                         |
+| `theme`                | localStorage       | Yes       | Dark/light theme                       |
+| `favorites`            | localStorage       | Yes       | Coin IDs                               |
+| `showFavoritesOnly`    | `false`            | No        | Filter toggle                          |
+| `notificationsEnabled` | localStorage       | Yes       | Notif toggle                           |
+| `previousPrices`       | localStorage       | Yes       | Daily price snapshot                   |
+| `priceSnapshotDate`    | localStorage       | Yes       | Snapshot date string                   |
+| `lastAlertPrices`      | localStorage       | Yes       | Prices at last alert                   |
+| `notificationMessage`  | `null`             | No        | Toast message for notif feedback       |
 
 Refs: `countdownRef`, `intervalRef`, `notificationsRef`, `favoritesRef`, `previousPricesRef`, `priceSnapshotDateRef`, `lastAlertPricesRef`
 
@@ -146,6 +148,7 @@ Refs: `countdownRef`, `intervalRef`, `notificationsRef`, `favoritesRef`, `previo
 **Trigger:** Called from `loadData()` every 60s (`App.jsx:121`)
 
 **Flow:**
+
 1. `checkPriceAlerts(filtered)` filters to favorites only
 2. Compares current price vs `previousPrices` (daily snapshot)
 3. Skips re-alerts via `lastAlertPrices` (same crypto must move another 5% from last alert price)
@@ -153,6 +156,7 @@ Refs: `countdownRef`, `intervalRef`, `notificationsRef`, `favoritesRef`, `previo
 5. On new day: resets snapshot and clears `lastAlertPrices`
 
 **Key points:**
+
 - Only fires for **favorite** cryptos
 - Threshold: `ALERT_THRESHOLD` from `constants.js` (default 5%)
 - Single grouped notification (+ multiple lines) instead of per-coin
@@ -161,28 +165,28 @@ Refs: `countdownRef`, `intervalRef`, `notificationsRef`, `favoritesRef`, `previo
 
 ## Keyboard Shortcuts (App.jsx)
 
-| Key | Action |
-|-----|--------|
-| `R` | Refresh data |
+| Key | Action             |
+| --- | ------------------ |
+| `R` | Refresh data       |
 | `F` | Focus search input |
-| `T` | Toggle theme |
+| `T` | Toggle theme       |
 
 All skipped when `e.target.tagName === 'INPUT'`.
 
 ## API Functions (src/core/api.js)
 
-| Function | Cache TTL | Fetches |
-|----------|-----------|---------|
-| `fetchCryptoData()` | 120s | Top 50 crypto markets |
-| `fetchXStocks()` | 120s | 7 x-stocks (AAPL, MSFT, etc.) |
-| `fetchFearAndGreed()` | none | Fear & Greed Index |
-| `fetchIndicesData()` | 10min | S&P 500, Nasdaq 100, Euro Stoxx 600, MSCI World |
-| `fetchGoldPrice()` | 5min | Gold price (GC=F) |
-| `fetchEtfData()` | 120s | Crypto ETFs |
-| `fetchCoinHistory(id, days)` | none | Historical price chart data |
-| `filterStablecoins(data)` | pure | Removes stablecoins by symbol |
-| `getTopGainers(data, n=10)` | pure | Top N by positive 24h change |
-| `calculateMarketStats(data)` | pure | Total cap, volume, dominance |
+| Function                     | Cache TTL | Fetches                                         |
+| ---------------------------- | --------- | ----------------------------------------------- |
+| `fetchCryptoData()`          | 120s      | Top 50 crypto markets                           |
+| `fetchXStocks()`             | 120s      | 7 x-stocks (AAPL, MSFT, etc.)                   |
+| `fetchFearAndGreed()`        | none      | Fear & Greed Index                              |
+| `fetchIndicesData()`         | 10min     | S&P 500, Nasdaq 100, Euro Stoxx 600, MSCI World |
+| `fetchGoldPrice()`           | 5min      | Gold price (GC=F)                               |
+| `fetchEtfData()`             | 120s      | Crypto ETFs                                     |
+| `fetchCoinHistory(id, days)` | none      | Historical price chart data                     |
+| `filterStablecoins(data)`    | pure      | Removes stablecoins by symbol                   |
+| `getTopGainers(data, n=10)`  | pure      | Top N by positive 24h change                    |
+| `calculateMarketStats(data)` | pure      | Total cap, volume, dominance                    |
 
 Uses `withCache(key, ttlMs, fetchFn)` decorator for localStorage caching.
 
@@ -224,7 +228,8 @@ Uses `withCache(key, ttlMs, fetchFn)` decorator for localStorage caching.
 ## Important Constraints
 
 - **API rate limiting**: CoinGecko free tier is strict. Cache TTL = 120s. Do not remove.
-- **No lint/typecheck scripts** - but verify tests pass before commits.
+- **Lint & format**: Run `npm run lint` and `npm run format:check` before commits.
+- **Pre-commit hooks**: husky + lint-staged auto-fix on commit.
 - **Images are local**: weekly refresh via `scripts/refreshImages.py`.
 - **Notifications only work when page/tab is open** (no push server).
 
@@ -235,6 +240,6 @@ Uses `withCache(key, ttlMs, fetchFn)` decorator for localStorage caching.
 - `fetchCryptoData`, `fetchXStocks`, `fetchFearAndGreed` are mocked in App tests
 - `getImageUrl` is mocked to return the raw URL
 
-## FEATURE.md
+## OpenSpec
 
-Contains planned features. Check before implementing new functionality.
+Feature specs live in `openspec/specs/`. Each spec defines requirements with GIVEN/WHEN/THEN scenarios. Check before implementing new functionality.

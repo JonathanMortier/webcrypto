@@ -18,18 +18,14 @@ export default function FearGreedIndex({ fearGreedData, isLoading, onRefresh, th
   if (!isExpanded) {
     return (
       <div className="fear-greed-container">
-        <button 
+        <button
           className="theme-toggle-btn"
           onClick={onThemeToggle}
           title={theme === 'dark' ? 'Mode clair' : 'Mode sombre'}
         >
           {theme === 'dark' ? '☀️' : '🌙'}
         </button>
-        <button 
-          className="fear-greed-toggle"
-          onClick={handleToggle}
-          aria-label="Toggle Fear & Greed Index"
-        >
+        <button className="fear-greed-toggle" onClick={handleToggle} aria-label="Toggle Fear & Greed Index">
           F&G
         </button>
       </div>
@@ -40,30 +36,21 @@ export default function FearGreedIndex({ fearGreedData, isLoading, onRefresh, th
 
   return (
     <div className="fear-greed-container">
-      <button 
-        className="fear-greed-toggle"
-        onClick={handleToggle}
-        aria-label="Toggle Fear & Greed Index"
-      >
+      <button className="fear-greed-toggle" onClick={handleToggle} aria-label="Toggle Fear & Greed Index">
         ✕
       </button>
 
       <div className="fear-greed-content">
         <div className="fear-greed-header">
           <span className="fear-greed-title">Fear & Greed</span>
-          <button 
+          <button
             className="theme-toggle-btn"
             onClick={onThemeToggle}
             title={theme === 'dark' ? 'Mode clair' : 'Mode sombre'}
           >
             {theme === 'dark' ? '☀️' : '🌙'}
           </button>
-          <button 
-            className="fear-greed-refresh"
-            onClick={onRefresh}
-            disabled={isLoading}
-            aria-label="Refresh"
-          >
+          <button className="fear-greed-refresh" onClick={onRefresh} disabled={isLoading} aria-label="Refresh">
             ↻
           </button>
         </div>
@@ -80,18 +67,15 @@ export default function FearGreedIndex({ fearGreedData, isLoading, onRefresh, th
               <span className="fear-greed-number">{fearGreedData.value}</span>
               <span className="fear-greed-icon">{classification.icon}</span>
             </div>
-            <div 
-              className="fear-greed-classification"
-              style={{ color: classification.color }}
-            >
+            <div className="fear-greed-classification" style={{ color: classification.color }}>
               {classification.text}
             </div>
             <div className="fear-greed-bar">
-              <div 
+              <div
                 className="fear-greed-bar-fill"
-                style={{ 
+                style={{
                   width: `${fearGreedData.value}%`,
-                  backgroundColor: classification.color
+                  backgroundColor: classification.color,
                 }}
               ></div>
             </div>

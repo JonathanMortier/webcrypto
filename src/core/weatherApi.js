@@ -32,7 +32,7 @@ function getCurrentPosition() {
     navigator.geolocation.getCurrentPosition(
       (pos) => resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
       (err) => reject(err),
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 300_000 }
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 300_000 },
     );
   });
 }
@@ -47,7 +47,7 @@ async function fetchLocationByIP() {
 
 export async function detectLocation() {
   const cached = getFromLocalStorage(LOCATION_CACHE_KEY);
-  if (cached && (Date.now() - cached.timestamp) < 86_400_000) {
+  if (cached && Date.now() - cached.timestamp < 86_400_000) {
     return cached.data;
   }
 
@@ -73,14 +73,12 @@ export async function fetchWeather(lat, lon) {
 
   const cacheKey = `weather_${lat.toFixed(2)}_${lon.toFixed(2)}`;
   const cached = getFromLocalStorage(CACHE_PREFIX + cacheKey);
-  if (cached && (Date.now() - cached.timestamp) < WEATHER_CACHE_TTL) {
+  if (cached && Date.now() - cached.timestamp < WEATHER_CACHE_TTL) {
     return cached.data;
   }
 
   try {
-    const res = await fetch(
-      `${WEATHER_BASE_URL}/current.json?key=${WEATHER_API_KEY}&q=${lat},${lon}&aqi=no`
-    );
+    const res = await fetch(`${WEATHER_BASE_URL}/current.json?key=${WEATHER_API_KEY}&q=${lat},${lon}&aqi=no`);
     if (!res.ok) throw new Error(`WeatherAPI HTTP ${res.status}`);
     const data = await res.json();
     const result = {

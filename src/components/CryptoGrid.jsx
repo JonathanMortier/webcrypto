@@ -1,10 +1,18 @@
 import { useMemo } from 'react';
 import CryptoCard from './CryptoCard.jsx';
 
-export default function CryptoGrid({ cryptos, sortField, sortDir, favorites = [], showFavoritesOnly = false, onToggleFavorite, hideRank }) {
+export default function CryptoGrid({
+  cryptos,
+  sortField,
+  sortDir,
+  favorites = [],
+  showFavoritesOnly = false,
+  onToggleFavorite,
+  hideRank,
+}) {
   const filteredCryptos = useMemo(() => {
     if (showFavoritesOnly) {
-      return cryptos.filter(c => favorites.includes(c.id));
+      return cryptos.filter((c) => favorites.includes(c.id));
     }
     return cryptos;
   }, [cryptos, showFavoritesOnly, favorites]);
@@ -37,10 +45,10 @@ export default function CryptoGrid({ cryptos, sortField, sortDir, favorites = []
 
   return (
     <div className="crypto-grid">
-      {sortedCryptos.map(coin => (
-        <CryptoCard 
-          key={coin.id} 
-          coin={coin} 
+      {sortedCryptos.map((coin) => (
+        <CryptoCard
+          key={coin.id}
+          coin={coin}
           isFavorite={favorites.includes(coin.id)}
           onToggleFavorite={onToggleFavorite}
           hideRank={hideRank}

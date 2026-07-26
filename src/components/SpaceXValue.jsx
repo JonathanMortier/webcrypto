@@ -22,12 +22,23 @@ export default function SpaceXValue() {
     let mounted = true;
     const fetch = () => {
       fetchSpaceXPrice()
-        .then(d => { if (mounted) { setData(d); setLoading(false); } })
-        .catch(e => { console.warn('SpaceX fetch error:', e); if (mounted) setLoading(false); });
+        .then((d) => {
+          if (mounted) {
+            setData(d);
+            setLoading(false);
+          }
+        })
+        .catch((e) => {
+          console.warn('SpaceX fetch error:', e);
+          if (mounted) setLoading(false);
+        });
     };
     fetch();
     const interval = setInterval(fetch, 300_000);
-    return () => { mounted = false; clearInterval(interval); };
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
   }, []);
 
   const gainClass = data?.change >= 0 ? 'positive' : 'negative';
@@ -39,13 +50,12 @@ export default function SpaceXValue() {
       </div>
       <div className="index-name">SpaceX</div>
       <div className="index-isin">SPCX • Nasdaq</div>
-      <div className="index-price">
-        {loading ? '--' : data ? `$${data.price.toFixed(2)}` : 'N/A'}
-      </div>
+      <div className="index-price">{loading ? '--' : data ? `$${data.price.toFixed(2)}` : 'N/A'}</div>
       {data?.change != null && (
         <div className="index-change">
           <span className={gainClass}>
-            {data.change >= 0 ? '+' : ''}{data.change.toFixed(2)} ({data.changePercent.toFixed(2)}%)
+            {data.change >= 0 ? '+' : ''}
+            {data.change.toFixed(2)} ({data.changePercent.toFixed(2)}%)
           </span>
         </div>
       )}

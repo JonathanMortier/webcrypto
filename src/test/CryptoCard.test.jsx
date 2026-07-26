@@ -68,12 +68,15 @@ describe('CryptoCard', () => {
   it('should show chart on mouse enter after delay', async () => {
     render(withRouter(<CryptoCard coin={mockCoin} />));
     const card = screen.getByText('Bitcoin').closest('.crypto-card');
-    
+
     fireEvent.mouseEnter(card);
-    
-    await waitFor(() => {
-      expect(screen.queryByText('Graphique indisponible')).toBeNull();
-    }, { timeout: 350 });
+
+    await waitFor(
+      () => {
+        expect(screen.queryByText('Graphique indisponible')).toBeNull();
+      },
+      { timeout: 350 },
+    );
   });
 
   it('should handle null price_change_percentage_24h', () => {
@@ -87,9 +90,12 @@ describe('CryptoCard', () => {
     render(withRouter(<CryptoCard coin={coinWithoutSparkline} />));
     const card = screen.getByText('Bitcoin').closest('.crypto-card');
     fireEvent.mouseEnter(card);
-    
-    await waitFor(() => {
-      expect(screen.getByText('Graphique indisponible')).toBeInTheDocument();
-    }, { timeout: 350 });
+
+    await waitFor(
+      () => {
+        expect(screen.getByText('Graphique indisponible')).toBeInTheDocument();
+      },
+      { timeout: 350 },
+    );
   });
 });

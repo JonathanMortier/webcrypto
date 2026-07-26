@@ -34,20 +34,25 @@ export default function BoursePage() {
 
   useEffect(() => {
     fetchIndicesData()
-      .then(data => setIndices(data))
-      .catch(e => console.warn('Indices error:', e));
+      .then((data) => setIndices(data))
+      .catch((e) => console.warn('Indices error:', e));
 
     fetchXStocks()
-      .then(data => {
-        const sorted = [...data].sort((a, b) => (b.price_change_percentage_24h ?? 0) - (a.price_change_percentage_24h ?? 0));
+      .then((data) => {
+        const sorted = [...data].sort(
+          (a, b) => (b.price_change_percentage_24h ?? 0) - (a.price_change_percentage_24h ?? 0),
+        );
         setStocks(sorted);
         setLoading(false);
       })
-      .catch(e => { setError(e.message); setLoading(false); });
+      .catch((e) => {
+        setError(e.message);
+        setLoading(false);
+      });
   }, []);
 
   const updateHolding = (id, field, value) => {
-    setHoldings(prev => {
+    setHoldings((prev) => {
       const next = { ...prev, [id]: { ...prev[id], [field]: value } };
       saveHoldings(next);
       return next;
@@ -56,11 +61,15 @@ export default function BoursePage() {
 
   return (
     <>
-      {loading ? <Loading /> : error ? <Error message={error} /> : (
+      {loading ? (
+        <Loading />
+      ) : error ? (
+        <Error message={error} />
+      ) : (
         <>
           {indices && (
             <div className="indices-grid">
-              {indices.map(idx => {
+              {indices.map((idx) => {
                 const holding = holdings[idx.id] || {};
                 const units = holding.units;
                 const avgPrice = holding.avgPrice;
@@ -75,13 +84,12 @@ export default function BoursePage() {
                   <div key={idx.id} className={`index-card ${gainClass}`}>
                     <div className="index-name">{idx.name}</div>
                     <div className="index-isin">{idx.isin}</div>
-                    <div className="index-price">
-                      {currPrice != null ? `${currPrice.toFixed(2)} €` : 'N/A'}
-                    </div>
+                    <div className="index-price">{currPrice != null ? `${currPrice.toFixed(2)} €` : 'N/A'}</div>
                     {idx.change != null && (
                       <div className="index-change">
                         <span className={idx.change >= 0 ? 'positive' : 'negative'}>
-                          {idx.change >= 0 ? '+' : ''}{idx.change.toFixed(2)} ({idx.changePercent.toFixed(2)}%)
+                          {idx.change >= 0 ? '+' : ''}
+                          {idx.change.toFixed(2)} ({idx.changePercent.toFixed(2)}%)
                         </span>
                       </div>
                     )}
@@ -95,7 +103,9 @@ export default function BoursePage() {
                           step="any"
                           placeholder="0"
                           value={units ?? ''}
-                          onChange={e => updateHolding(idx.id, 'units', e.target.value === '' ? null : parseFloat(e.target.value))}
+                          onChange={(e) =>
+                            updateHolding(idx.id, 'units', e.target.value === '' ? null : parseFloat(e.target.value))
+                          }
                         />
                       </label>
                       <label className="holding-field">
@@ -106,7 +116,9 @@ export default function BoursePage() {
                           step="any"
                           placeholder="0"
                           value={avgPrice ?? ''}
-                          onChange={e => updateHolding(idx.id, 'avgPrice', e.target.value === '' ? null : parseFloat(e.target.value))}
+                          onChange={(e) =>
+                            updateHolding(idx.id, 'avgPrice', e.target.value === '' ? null : parseFloat(e.target.value))
+                          }
                         />
                       </label>
                     </div>
@@ -124,7 +136,8 @@ export default function BoursePage() {
                         <div className={`holding-row gain-row ${gainClass}`}>
                           <span>Gain/Pert</span>
                           <span>
-                            {gainTotal >= 0 ? '+' : ''}{formatCurrency(Math.abs(gainTotal))} €
+                            {gainTotal >= 0 ? '+' : ''}
+                            {formatCurrency(Math.abs(gainTotal))} €
                             {gainPercent != null && ` (${gainPercent >= 0 ? '+' : ''}${gainPercent.toFixed(2)}%)`}
                           </span>
                         </div>
@@ -143,9 +156,7 @@ export default function BoursePage() {
             </>
           )}
 
-          {!stocks?.length && (
-            <div className="empty-state">Aucune action disponible</div>
-          )}
+          {!stocks?.length && <div className="empty-state">Aucune action disponible</div>}
         </>
       )}
 

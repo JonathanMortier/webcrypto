@@ -1,13 +1,6 @@
 import { useMemo } from 'react';
 import { Line } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Filler,
-} from 'chart.js';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Filler } from 'chart.js';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Filler);
 
@@ -24,9 +17,7 @@ export default function PriceChart({ prices, isPositive, timeframe = '7d' }) {
   const gridColor = getCSSVar('--card-border') || 'rgba(255, 255, 255, 0.05)';
 
   const lineColor = isPositive ? positiveColor : negativeColor;
-  const fillColor = isPositive
-    ? positiveColor.replace('1)', '0.1)')
-    : negativeColor.replace('1)', '0.1)');
+  const fillColor = isPositive ? positiveColor.replace('1)', '0.1)') : negativeColor.replace('1)', '0.1)');
 
   const data = useMemo(() => {
     if (!prices || !Array.isArray(prices) || prices.length === 0) {

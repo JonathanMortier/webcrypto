@@ -2,7 +2,9 @@
   background: var(--card-bg);
   border-radius: 15px;
   padding: 16px;
-  transition: transform 0.3s, background 0.3s;
+  transition:
+    transform 0.3s,
+    background 0.3s;
   border: 1px solid var(--card-border);
   position: relative;
 }
@@ -253,11 +255,11 @@
   border-color: var(--accent-primary);
 }
 
-[data-theme="light"] .crypto-card-link {
+[data-theme='light'] .crypto-card-link {
   color: inherit;
 }
 
-[data-theme="light"] .timeframe-btn {
+[data-theme='light'] .timeframe-btn {
   background: rgba(255, 255, 255, 0.8);
 }
 

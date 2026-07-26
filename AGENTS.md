@@ -10,6 +10,8 @@
 | `npm run test`                   | Run all tests (no watch mode)                                      |
 | `npm run test:watch`             | Run tests in watch mode                                            |
 | `npx vitest run src/test/<file>` | Run a single test file                                             |
+| `npm run test:e2e`               | Run Playwright E2E tests                                           |
+| `npm run test:e2e:ui`            | Playwright interactive UI mode                                     |
 | `npm run lint`                   | Lint JS/JSX with ESLint                                            |
 | `npm run lint:fix`               | Lint + auto-fix                                                    |
 | `npm run format`                 | Format all files with Prettier                                     |
@@ -236,6 +238,7 @@ Uses `withCache(key, ttlMs, fetchFn)` decorator for localStorage caching.
 ## Testing
 
 - Vitest + jsdom + @testing-library/react
+- Playwright + Chromium for E2E tests (`e2e/` directory)
 - `Notification` is globally stubbed in test setup
 - `fetchCryptoData`, `fetchXStocks`, `fetchFearAndGreed` are mocked in App tests
 - `getImageUrl` is mocked to return the raw URL

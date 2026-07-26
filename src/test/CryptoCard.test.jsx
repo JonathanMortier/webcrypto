@@ -98,4 +98,65 @@ describe('CryptoCard', () => {
       { timeout: 350 },
     );
   });
+
+  it('should render no rank-evolution badge when rankHistory is empty', () => {
+    render(withRouter(<CryptoCard coin={mockCoin} rankHistory={{}} />));
+    const rank = screen.getByText('#1');
+    expect(rank.querySelector('.rank-evolution')).toBeNull();
+  });
+
+  it('should render ▲ badge when rank improved', () => {
+    const coin = { ...mockCoin, display_rank: 5 };
+    const rankHistory = { bitcoin: 10 };
+    render(withRouter(<CryptoCard coin={coin} rankHistory={rankHistory} />));
+    const badge = screen.getByText('▲5');
+    expect(badge).toBeInTheDocument();
+    expect(badge).toHaveClass('rank-up');
+  });
+
+  it('should render ▼ badge when rank dropped', () => {
+    const coin = { ...mockCoin, display_rank: 10 };
+    const rankHistory = { bitcoin: 5 };
+    render(withRouter(<CryptoCard coin={coin} rankHistory={rankHistory} />));
+    const badge = screen.getByText('▼5');
+    expect(badge).toBeInTheDocument();
+    expect(badge).toHaveClass('rank-down');
+  });
+
+  it('should render — badge when rank unchanged', () => {
+    const coin = { ...mockCoin, display_rank: 5 };
+    const rankHistory = { bitcoin: 5 };
+    render(withRouter(<CryptoCard coin={coin} rankHistory={rankHistory} />));
+    const badge = screen.getByText('—');
+    expect(badge).toBeInTheDocument();
+    expect(badge).toHaveClass('rank-stable');
+  });
+
+  it('should apply rank-up class when rank improved', () => {
+    const coin = { ...mockCoin, display_rank: 3 };
+    const rankHistory = { bitcoin: 7 };
+    render(withRouter(<CryptoCard coin={coin} rankHistory={rankHistory} />));
+    const badge = screen.getByText('▲4');
+    expect(badge).toHaveClass('rank-up');
+    expect(badge).not.toHaveClass('rank-down');
+  });
+
+  it('should apply rank-down class when rank dropped', () => {
+    const coin = { ...mockCoin, display_rank: 8 };
+    const rankHistory = { bitcoin: 2 };
+    render(withRouter(<CryptoCard coin={coin} rankHistory={rankHistory} />));
+    const badge = screen.getByText('▼6');
+    expect(badge).toHaveClass('rank-down');
+    expect(badge).not.toHaveClass('rank-up');
+  });
+
+  it('should apply rank-stable class when rank unchanged', () => {
+    const coin = { ...mockCoin, display_rank: 1 };
+    const rankHistory = { bitcoin: 1 };
+    render(withRouter(<CryptoCard coin={coin} rankHistory={rankHistory} />));
+    const badge = screen.getByText('—');
+    expect(badge).toHaveClass('rank-stable');
+    expect(badge).not.toHaveClass('rank-up');
+    expect(badge).not.toHaveClass('rank-down');
+  });
 });

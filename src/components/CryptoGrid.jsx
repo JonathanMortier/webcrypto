@@ -9,6 +9,7 @@ export default function CryptoGrid({
   showFavoritesOnly = false,
   onToggleFavorite,
   hideRank,
+  rankHistory = {},
 }) {
   const filteredCryptos = useMemo(() => {
     if (showFavoritesOnly) {
@@ -52,6 +53,7 @@ export default function CryptoGrid({
           isFavorite={favorites.includes(coin.id)}
           onToggleFavorite={onToggleFavorite}
           hideRank={hideRank}
+          rankHistory={rankHistory}
         />
       ))}
     </div>

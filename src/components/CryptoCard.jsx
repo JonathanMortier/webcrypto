@@ -6,7 +6,7 @@ import { fetchCoinHistory } from '../core/api.js';
 
 const PriceChart = lazy(() => import('./PriceChart.jsx'));
 
-export default function CryptoCard({ coin, isFavorite, onToggleFavorite, hideRank }) {
+export default function CryptoCard({ coin, isFavorite, onToggleFavorite, hideRank, rankHistory = {} }) {
   const [showChart, setShowChart] = useState(false);
   const [timeframe, setTimeframe] = useState('7d');
   const [chartData, setChartData] = useState([]);
@@ -35,6 +35,10 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite, hideRan
 
   const sparklineData = coin.sparkline_in_7d?.price || [];
   const imageUrl = getImageUrl(coin.id, coin.image);
+
+  const previousRank = rankHistory[coin.id];
+  const validPreviousRank = typeof previousRank === 'number' && Number.isFinite(previousRank) && previousRank > 0;
+  const rankEvolution = validPreviousRank && coin.display_rank != null ? previousRank - coin.display_rank : null;
 
   const handleMouseEnter = useCallback(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -116,7 +120,18 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite, hideRan
       </div>
 
       <Link to={`/coin/${coin.id}`} className="crypto-card-link">
-        {!hideRank && coin.display_rank && <span className="crypto-rank">#{coin.display_rank}</span>}
+        {!hideRank && coin.display_rank && (
+          <span className="crypto-rank">
+            #{coin.display_rank}
+            {rankEvolution !== null && rankEvolution !== 0 && (
+              <span className={`rank-evolution ${rankEvolution > 0 ? 'rank-up' : 'rank-down'}`}>
+                {rankEvolution > 0 ? '▲' : '▼'}
+                {Math.abs(rankEvolution)}
+              </span>
+            )}
+            {rankEvolution === 0 && <span className="rank-evolution rank-stable">—</span>}
+          </span>
+        )}
         <img
           src={imageUrl}
           alt={coin.name}

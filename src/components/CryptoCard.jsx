@@ -114,7 +114,7 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite, hideRan
         {!hideRank && coin.display_rank && (
           <span className="crypto-rank">#{coin.display_rank}</span>
         )}
-        <img src={imageUrl} alt={coin.name} className="crypto-icon" loading="lazy" />
+        <img src={imageUrl} alt={coin.name} className="crypto-icon" loading="lazy" onError={(e) => { if (e.target.src !== coin.image) e.target.src = coin.image; }} />
         <div className="crypto-info">
           <div className="crypto-name">{coin.name}</div>
           <div className="crypto-symbol">{coin.symbol}</div>

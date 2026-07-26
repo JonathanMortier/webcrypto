@@ -37,7 +37,9 @@
   color: var(--text-secondary);
   padding: 10px;
   border-radius: 10px;
-  transition: color 0.2s, background 0.2s;
+  transition:
+    color 0.2s,
+    background 0.2s;
   display: flex;
   align-items: center;
   min-height: 44px;
@@ -292,7 +294,9 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-  transition: border-color 0.2s, transform 0.2s;
+  transition:
+    border-color 0.2s,
+    transform 0.2s;
 }
 
 .coin-detail-stat:hover {

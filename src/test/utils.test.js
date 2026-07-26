@@ -1,11 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-  formatPrice,
-  formatLargeNumber,
-  getChangeClass,
-  getChangeSign,
-  formatTime,
-} from '../core/utils.js';
+import { formatPrice, formatLargeNumber, getChangeClass, getChangeSign, formatTime } from '../core/utils.js';
 
 describe('formatPrice', () => {
   it('should format price >= 1 with 2 decimal places', () => {

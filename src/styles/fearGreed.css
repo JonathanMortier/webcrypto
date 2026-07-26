@@ -33,23 +33,23 @@
   transition: all 0.2s ease;
 }
 
-[data-theme="light"] .theme-toggle-btn {
+[data-theme='light'] .theme-toggle-btn {
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(0, 0, 0, 0.2);
   color: #333;
 }
 
-[data-theme="light"] .fear-greed-toggle {
+[data-theme='light'] .fear-greed-toggle {
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(0, 0, 0, 0.2);
   color: #333;
 }
 
-[data-theme="light"] .theme-toggle-btn:hover {
+[data-theme='light'] .theme-toggle-btn:hover {
   background: rgba(200, 200, 200, 0.95);
 }
 
-[data-theme="light"] .fear-greed-toggle:hover {
+[data-theme='light'] .fear-greed-toggle:hover {
   background: rgba(200, 200, 200, 0.95);
 }
 
@@ -132,7 +132,12 @@
 }
 
 .skeleton {
-  background: linear-gradient(90deg, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.1) 75%);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.1) 25%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0.1) 75%
+  );
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
   border-radius: 4px;
@@ -151,8 +156,12 @@
 }
 
 @keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .fear-greed-value {
@@ -191,7 +200,9 @@
 .fear-greed-bar-fill {
   height: 100%;
   border-radius: 3px;
-  transition: width 0.5s ease, background-color 0.3s ease;
+  transition:
+    width 0.5s ease,
+    background-color 0.3s ease;
 }
 
 .fear-greed-error {

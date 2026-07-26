@@ -1,8 +1,24 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
-import { fetchCryptoData, fetchXStocks, fetchFearAndGreed, filterStablecoins, getTopGainers, calculateMarketStats } from './core/api.js';
+import {
+  fetchCryptoData,
+  fetchXStocks,
+  fetchFearAndGreed,
+  filterStablecoins,
+  getTopGainers,
+  calculateMarketStats,
+} from './core/api.js';
 import { REFRESH_INTERVAL, ALERT_THRESHOLD } from './core/constants.js';
-import { Header, CryptoGrid, CryptoTicker, StocksTicker, MarketIndicators, Loading, Error, InstallPrompt } from './components/index.js';
+import {
+  Header,
+  CryptoGrid,
+  CryptoTicker,
+  StocksTicker,
+  MarketIndicators,
+  Loading,
+  Error,
+  InstallPrompt,
+} from './components/index.js';
 import { BoursePage, CoinDetailPage } from './pages/index.js';
 import { Analytics } from '@vercel/analytics/react';
 import './styles/index.css';
@@ -73,7 +89,7 @@ export default function App() {
       setSortDir('desc');
     }
   };
-  
+
   const countdownRef = useRef(null);
   const intervalRef = useRef(null);
 
@@ -91,20 +107,20 @@ export default function App() {
 
   const checkPriceAlerts = useCallback((newCryptos) => {
     if (!notificationsRef.current) return;
-    
-    const favoriteCryptos = newCryptos.filter(c => favoritesRef.current.includes(c.id));
+
+    const favoriteCryptos = newCryptos.filter((c) => favoritesRef.current.includes(c.id));
     const newPrices = {};
     const alertedIds = [];
     const alertsUp = [];
     const alertsDown = [];
-    
-    favoriteCryptos.forEach(crypto => {
+
+    favoriteCryptos.forEach((crypto) => {
       const prevPrice = previousPricesRef.current[crypto.id];
       newPrices[crypto.id] = crypto.current_price;
-      
+
       if (prevPrice && prevPrice > 0) {
         const changePercent = ((crypto.current_price - prevPrice) / prevPrice) * 100;
-        
+
         if (Math.abs(changePercent) < ALERT_THRESHOLD) return;
 
         const lastAlerted = lastAlertPricesRef.current[crypto.id];
@@ -134,15 +150,14 @@ export default function App() {
         lines.push('📉 Baisse', ...alertsDown);
       }
 
-      const title = alertedIds.length === 1
-        ? lines[1]
-        : `🔔 ${alertedIds.length} alerte${alertedIds.length > 1 ? 's' : ''} de prix`;
-      const body = alertedIds.length === 1
-        ? lines[0]
-        : lines.join('\n');
+      const title =
+        alertedIds.length === 1
+          ? lines[1]
+          : `🔔 ${alertedIds.length} alerte${alertedIds.length > 1 ? 's' : ''} de prix`;
+      const body = alertedIds.length === 1 ? lines[0] : lines.join('\n');
 
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.ready.then(reg => {
+        navigator.serviceWorker.ready.then((reg) => {
           reg.showNotification(title, { body, icon: '/favicon.ico' });
         });
       } else {
@@ -150,10 +165,12 @@ export default function App() {
       }
 
       const newAlerted = { ...lastAlertPricesRef.current };
-      alertedIds.forEach(({ id, price }) => { newAlerted[id] = price; });
+      alertedIds.forEach(({ id, price }) => {
+        newAlerted[id] = price;
+      });
       setLastAlertPrices(newAlerted);
     }
-    
+
     const today = new Date().toDateString();
     if (!priceSnapshotDateRef.current || priceSnapshotDateRef.current !== today) {
       setPreviousPrices(newPrices);
@@ -167,16 +184,15 @@ export default function App() {
     setError(null);
 
     try {
-      const [cryptoData, xstockData] = await Promise.all([
-        fetchCryptoData(),
-        fetchXStocks()
-      ]);
-      
+      const [cryptoData, xstockData] = await Promise.all([fetchCryptoData(), fetchXStocks()]);
+
       const filtered = filterStablecoins(cryptoData);
       const withRank = filtered.map((coin, index) => ({ ...coin, display_rank: index + 1 }));
       const gainers = getTopGainers(withRank);
 
-      const sortedStocks = [...xstockData].sort((a, b) => (b.price_change_percentage_24h ?? 0) - (a.price_change_percentage_24h ?? 0));
+      const sortedStocks = [...xstockData].sort(
+        (a, b) => (b.price_change_percentage_24h ?? 0) - (a.price_change_percentage_24h ?? 0),
+      );
 
       setCryptos(withRank);
       setTopGainers(gainers);
@@ -184,7 +200,7 @@ export default function App() {
       setStocks(sortedStocks);
       setLastUpdate(new Date());
       setCountdown(REFRESH_INTERVAL);
-      
+
       checkPriceAlerts(filtered);
     } catch (err) {
       setError(err.message);
@@ -209,9 +225,9 @@ export default function App() {
 
   const startCountdown = useCallback(() => {
     if (countdownRef.current) clearInterval(countdownRef.current);
-    
+
     countdownRef.current = setInterval(() => {
-      setCountdown(prev => {
+      setCountdown((prev) => {
         if (prev <= 1) {
           return REFRESH_INTERVAL;
         }
@@ -246,16 +262,16 @@ export default function App() {
   }, [lastAlertPrices]);
 
   const toggleFavorite = useCallback((coinId) => {
-    setFavorites(prev => {
+    setFavorites((prev) => {
       if (prev.includes(coinId)) {
-        return prev.filter(id => id !== coinId);
+        return prev.filter((id) => id !== coinId);
       }
       return [...prev, coinId];
     });
   }, []);
 
   const toggleTheme = useCallback(() => {
-    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
   }, []);
 
   const toggleNotifications = useCallback(async () => {
@@ -265,9 +281,13 @@ export default function App() {
         setNotificationsEnabled(true);
         setNotificationMessage(null);
       } else if (permission === 'denied') {
-        setNotificationMessage('Notifications refusées par le navigateur. Modifiez les paramètres de votre navigateur pour les réactiver.');
+        setNotificationMessage(
+          'Notifications refusées par le navigateur. Modifiez les paramètres de votre navigateur pour les réactiver.',
+        );
       } else {
-        setNotificationMessage('Permission de notification non accordée. Réessayez ou vérifiez les paramètres de votre navigateur.');
+        setNotificationMessage(
+          'Permission de notification non accordée. Réessayez ou vérifiez les paramètres de votre navigateur.',
+        );
       }
     } else {
       setNotificationsEnabled(false);
@@ -292,14 +312,18 @@ export default function App() {
 
   const marketStats = calculateMarketStats(cryptos);
 
-  const filteredCryptos = searchQuery 
-    ? cryptos.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()) || c.symbol.toLowerCase().includes(searchQuery.toLowerCase()))
+  const filteredCryptos = searchQuery
+    ? cryptos.filter(
+        (c) =>
+          c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          c.symbol.toLowerCase().includes(searchQuery.toLowerCase()),
+      )
     : cryptos;
 
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.target.tagName === 'INPUT') return;
-      
+
       if (e.key.toLowerCase() === 'r') {
         loadData();
       } else if (e.key.toLowerCase() === 'f') {
@@ -318,57 +342,62 @@ export default function App() {
       <CryptoTicker cryptos={topGainers} />
       <StocksTicker stocks={stocks} />
       <InstallPrompt />
-      
+
       <div className="app">
-<Header 
-            onRefresh={loadData} 
-            lastUpdate={lastUpdate}
-            isLoading={isLoading}
-            countdown={countdown}
-            theme={theme}
-            onThemeToggle={toggleTheme}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            favoritesCount={favorites.length}
-            showFavoritesOnly={showFavoritesOnly}
-            onToggleFavoritesFilter={() => setShowFavoritesOnly(prev => !prev)}
-            notificationsEnabled={notificationsEnabled}
-            onToggleNotifications={toggleNotifications}
-          />
+        <Header
+          onRefresh={loadData}
+          lastUpdate={lastUpdate}
+          isLoading={isLoading}
+          countdown={countdown}
+          theme={theme}
+          onThemeToggle={toggleTheme}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          favoritesCount={favorites.length}
+          showFavoritesOnly={showFavoritesOnly}
+          onToggleFavoritesFilter={() => setShowFavoritesOnly((prev) => !prev)}
+          notificationsEnabled={notificationsEnabled}
+          onToggleNotifications={toggleNotifications}
+        />
 
         {notificationMessage && (
           <div className="notification-toast">
             <span>{notificationMessage}</span>
-            <button className="notification-toast-close" onClick={() => setNotificationMessage(null)}>×</button>
+            <button className="notification-toast-close" onClick={() => setNotificationMessage(null)}>
+              ×
+            </button>
           </div>
         )}
         <Routes>
-          <Route path="/" element={
-            <>
-              {!isLoading && !error && (
-                <MarketIndicators 
-                  marketStats={marketStats}
-                  fearGreed={fearGreed}
-                  onSort={handleSort}
-                  sortField={sortField}
-                  sortDir={sortDir}
-                />
-              )}
+          <Route
+            path="/"
+            element={
+              <>
+                {!isLoading && !error && (
+                  <MarketIndicators
+                    marketStats={marketStats}
+                    fearGreed={fearGreed}
+                    onSort={handleSort}
+                    sortField={sortField}
+                    sortDir={sortDir}
+                  />
+                )}
 
-              {isLoading && <Loading />}
-              {error && <Error message={error} onRetry={loadData} />}
-              {!isLoading && !error && (
-                <CryptoGrid 
-                  cryptos={filteredCryptos} 
-                  sortField={sortField} 
-                  sortDir={sortDir}
-                  favorites={favorites}
-                  showFavoritesOnly={showFavoritesOnly}
-                  onToggleFavorite={toggleFavorite}
-                />
-              )}
-            </>
-          } />
+                {isLoading && <Loading />}
+                {error && <Error message={error} onRetry={loadData} />}
+                {!isLoading && !error && (
+                  <CryptoGrid
+                    cryptos={filteredCryptos}
+                    sortField={sortField}
+                    sortDir={sortDir}
+                    favorites={favorites}
+                    showFavoritesOnly={showFavoritesOnly}
+                    onToggleFavorite={toggleFavorite}
+                  />
+                )}
+              </>
+            }
+          />
           <Route path="/bourse" element={<BoursePage />} />
           <Route path="/coin/:coinId" element={<CoinDetailPage />} />
         </Routes>

@@ -43,7 +43,8 @@ export default function MarketIndicators({ marketStats, fearGreed, onSort, sortF
       <div className="indicator clickable" onClick={() => onSort?.('change')}>
         <span className="indicator-label">Change 24h{getSortIndicator('change')}</span>
         <span className={`indicator-value ${parseFloat(marketCapChange) >= 0 ? 'positive' : 'negative'}`}>
-          {parseFloat(marketCapChange) >= 0 ? '+' : ''}{marketCapChange}%
+          {parseFloat(marketCapChange) >= 0 ? '+' : ''}
+          {marketCapChange}%
         </span>
       </div>
 

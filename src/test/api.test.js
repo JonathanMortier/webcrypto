@@ -1,10 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import {
-  filterStablecoins,
-  getTopGainers,
-  calculateMarketStats,
-  fetchFearAndGreed,
-} from '../core/api.js';
+import { filterStablecoins, getTopGainers, calculateMarketStats, fetchFearAndGreed } from '../core/api.js';
 
 global.fetch = vi.fn();
 
@@ -20,7 +15,7 @@ describe('filterStablecoins', () => {
   it('should filter out stablecoins', () => {
     const result = filterStablecoins(cryptos);
     expect(result.length).toBe(3);
-    expect(result.map(c => c.symbol)).toEqual(['btc', 'eth', 'sol']);
+    expect(result.map((c) => c.symbol)).toEqual(['btc', 'eth', 'sol']);
   });
 
   it('should return all cryptos when no stablecoins', () => {
@@ -78,8 +73,18 @@ describe('calculateMarketStats', () => {
 
   it('should calculate market cap and volume', () => {
     const cryptos = [
-      { symbol: 'btc', market_cap: 1000000000000, total_volume: 50000000000, price_change_percentage_24h: 2 },
-      { symbol: 'eth', market_cap: 400000000000, total_volume: 20000000000, price_change_percentage_24h: 3 },
+      {
+        symbol: 'btc',
+        market_cap: 1000000000000,
+        total_volume: 50000000000,
+        price_change_percentage_24h: 2,
+      },
+      {
+        symbol: 'eth',
+        market_cap: 400000000000,
+        total_volume: 20000000000,
+        price_change_percentage_24h: 3,
+      },
     ];
     const result = calculateMarketStats(cryptos);
     expect(result.totalMarketCap).toBe(1400000000000);

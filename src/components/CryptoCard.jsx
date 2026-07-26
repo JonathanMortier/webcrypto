@@ -23,7 +23,7 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite, hideRan
   }, []);
 
   const toggleChart = useCallback(() => {
-    setShowChart(prev => !prev);
+    setShowChart((prev) => !prev);
   }, []);
 
   const change = coin.price_change_percentage_24h ?? 0;
@@ -89,9 +89,14 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite, hideRan
           onClick={() => onToggleFavorite?.(coin.id)}
           title={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
         >
-          <svg width="18" height="18" viewBox="0 0 24 24"
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
             fill={isFavorite ? '#ffd700' : 'none'}
-            stroke={isFavorite ? '#ffd700' : '#888'} strokeWidth="2">
+            stroke={isFavorite ? '#ffd700' : '#888'}
+            strokeWidth="2"
+          >
             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
           </svg>
         </button>
@@ -111,10 +116,16 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite, hideRan
       </div>
 
       <Link to={`/coin/${coin.id}`} className="crypto-card-link">
-        {!hideRank && coin.display_rank && (
-          <span className="crypto-rank">#{coin.display_rank}</span>
-        )}
-        <img src={imageUrl} alt={coin.name} className="crypto-icon" loading="lazy" onError={(e) => { if (e.target.src !== coin.image) e.target.src = coin.image; }} />
+        {!hideRank && coin.display_rank && <span className="crypto-rank">#{coin.display_rank}</span>}
+        <img
+          src={imageUrl}
+          alt={coin.name}
+          className="crypto-icon"
+          loading="lazy"
+          onError={(e) => {
+            if (e.target.src !== coin.image) e.target.src = coin.image;
+          }}
+        />
         <div className="crypto-info">
           <div className="crypto-name">{coin.name}</div>
           <div className="crypto-symbol">{coin.symbol}</div>
@@ -122,7 +133,8 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite, hideRan
         <div className="crypto-main-row">
           <span className="crypto-price">${formatPrice(coin.current_price)}</span>
           <span className={`crypto-change ${changeClass}`}>
-            {changeSign}{change.toFixed(2)}%
+            {changeSign}
+            {change.toFixed(2)}%
           </span>
         </div>
         <div className="crypto-stats">
@@ -136,9 +148,7 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite, hideRan
           </div>
           <div className="stat">
             <div className="stat-label">ATH</div>
-            <div className="stat-value">
-              {ath > 0 ? `$${formatPrice(ath)}` : 'N/A'}
-            </div>
+            <div className="stat-value">{ath > 0 ? `$${formatPrice(ath)}` : 'N/A'}</div>
           </div>
         </div>
       </Link>

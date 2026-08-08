@@ -23,32 +23,32 @@ const plugins = [
         {
           src: 'images/icons/pwa-192x192.svg',
           sizes: '192x192',
-          type: 'image/svg+xml'
+          type: 'image/svg+xml',
         },
         {
           src: 'images/icons/pwa-192x192.png',
           sizes: '192x192',
-          type: 'image/png'
+          type: 'image/png',
         },
         {
           src: 'images/icons/pwa-512x512.svg',
           sizes: '512x512',
-          type: 'image/svg+xml'
-        },
-        {
-          src: 'images/icons/pwa-512x512.png',
-          sizes: '512x512',
-          type: 'image/png'
+          type: 'image/svg+xml',
         },
         {
           src: 'images/icons/pwa-512x512.png',
           sizes: '512x512',
           type: 'image/png',
-          purpose: 'any maskable'
-        }
-      ]
-    }
-  })
+        },
+        {
+          src: 'images/icons/pwa-512x512.png',
+          sizes: '512x512',
+          type: 'image/png',
+          purpose: 'any maskable',
+        },
+      ],
+    },
+  }),
 ];
 
 if (process.env.ANALYZE) {
@@ -65,25 +65,28 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/yahoo/, ''),
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
-        }
+          'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+        },
       },
       '/api/coingecko': {
         target: 'https://api.coingecko.com',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/coingecko/, ''),
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
-        }
-      }
-    }
+          'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+        },
+      },
+    },
   },
   build: {
-    minify: 'esbuild'
+    minify: 'esbuild',
   },
   test: {
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.js'],
+    exclude: ['e2e/**', 'node_modules/**'],
   },
 });

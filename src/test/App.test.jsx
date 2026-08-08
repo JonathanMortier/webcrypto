@@ -254,3 +254,98 @@ describe('App - Dashboard integration', () => {
     expect(links.length).toBeGreaterThan(0);
   });
 });
+
+describe('App - Rank snapshot logic', () => {
+  it('should save rankHistory to localStorage when no previous snapshot exists', async () => {
+    render(<App />);
+    await waitFor(
+      () => {
+        expect(screen.getByText('Bitcoin')).toBeInTheDocument();
+      },
+      { timeout: 3000 },
+    );
+
+    const stored = JSON.parse(localStorage.getItem('rankHistory'));
+    expect(stored).toBeDefined();
+    expect(stored.bitcoin).toBeDefined();
+    expect(typeof stored.bitcoin).toBe('number');
+
+    const snapshotDate = localStorage.getItem('rankSnapshotDate');
+    expect(snapshotDate).toBeTruthy();
+  });
+
+  it('should NOT overwrite existing snapshot within 10 days', async () => {
+    const today = new Date().toDateString();
+    const existingRanks = { bitcoin: 99, ethereum: 98 };
+    localStorage.setItem('rankHistory', JSON.stringify(existingRanks));
+    localStorage.setItem('rankSnapshotDate', today);
+
+    render(<App />);
+    await waitFor(
+      () => {
+        expect(screen.getByText('Bitcoin')).toBeInTheDocument();
+      },
+      { timeout: 3000 },
+    );
+
+    const stored = JSON.parse(localStorage.getItem('rankHistory'));
+    expect(stored).toEqual(existingRanks);
+  });
+
+  it('should clear rankHistory when snapshot is older than 10 days', async () => {
+    const oldDate = new Date();
+    oldDate.setDate(oldDate.getDate() - 11);
+    const existingRanks = { bitcoin: 1, ethereum: 2 };
+    localStorage.setItem('rankHistory', JSON.stringify(existingRanks));
+    localStorage.setItem('rankSnapshotDate', oldDate.toDateString());
+
+    render(<App />);
+    await waitFor(
+      () => {
+        expect(screen.getByText('Bitcoin')).toBeInTheDocument();
+      },
+      { timeout: 3000 },
+    );
+
+    const stored = JSON.parse(localStorage.getItem('rankHistory'));
+    expect(stored).toEqual({});
+
+    const snapshotDate = localStorage.getItem('rankSnapshotDate');
+    expect(snapshotDate).toBe('');
+  });
+
+  it('should save new snapshot after clearing stale one on next load', async () => {
+    const oldDate = new Date();
+    oldDate.setDate(oldDate.getDate() - 11);
+    const existingRanks = { bitcoin: 1, ethereum: 2 };
+    localStorage.setItem('rankHistory', JSON.stringify(existingRanks));
+    localStorage.setItem('rankSnapshotDate', oldDate.toDateString());
+
+    const { unmount } = render(<App />);
+    await waitFor(
+      () => {
+        expect(screen.getByText('Bitcoin')).toBeInTheDocument();
+      },
+      { timeout: 3000 },
+    );
+
+    unmount();
+
+    const { unmount: unmount2 } = render(<App />);
+    await waitFor(
+      () => {
+        expect(screen.getByText('Bitcoin')).toBeInTheDocument();
+      },
+      { timeout: 3000 },
+    );
+
+    const stored = JSON.parse(localStorage.getItem('rankHistory'));
+    expect(stored).not.toEqual(existingRanks);
+    expect(stored.bitcoin).toBeDefined();
+
+    const snapshotDate = localStorage.getItem('rankSnapshotDate');
+    expect(snapshotDate).toBe(new Date().toDateString());
+
+    unmount2();
+  });
+});

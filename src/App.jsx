@@ -79,6 +79,22 @@ export default function App() {
       return {};
     }
   });
+  const [rankHistory, setRankHistory] = useState(() => {
+    try {
+      const saved = localStorage.getItem('rankHistory');
+      if (!saved) return {};
+      const parsed = JSON.parse(saved);
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        return parsed;
+      }
+      return {};
+    } catch {
+      return {};
+    }
+  });
+  const [rankSnapshotDate, setRankSnapshotDate] = useState(() => {
+    return localStorage.getItem('rankSnapshotDate') || '';
+  });
   const [notificationMessage, setNotificationMessage] = useState(null);
 
   const handleSort = (field) => {
@@ -98,12 +114,16 @@ export default function App() {
   const previousPricesRef = useRef(previousPrices);
   const priceSnapshotDateRef = useRef(priceSnapshotDate);
   const lastAlertPricesRef = useRef(lastAlertPrices);
+  const rankHistoryRef = useRef(rankHistory);
+  const rankSnapshotDateRef = useRef(rankSnapshotDate);
 
   notificationsRef.current = notificationsEnabled;
   favoritesRef.current = favorites;
   previousPricesRef.current = previousPrices;
   priceSnapshotDateRef.current = priceSnapshotDate;
   lastAlertPricesRef.current = lastAlertPrices;
+  rankHistoryRef.current = rankHistory;
+  rankSnapshotDateRef.current = rankSnapshotDate;
 
   const checkPriceAlerts = useCallback((newCryptos) => {
     if (!notificationsRef.current) return;
@@ -197,9 +217,26 @@ export default function App() {
       setCryptos(withRank);
       setTopGainers(gainers);
       setStocks(sortedStocks);
-      setStocks(sortedStocks);
       setLastUpdate(new Date());
       setCountdown(REFRESH_INTERVAL);
+
+      const today = new Date().toDateString();
+      const snapshotDate = rankSnapshotDateRef.current;
+      const snapshotAge = snapshotDate
+        ? (Date.now() - new Date(snapshotDate).getTime()) / (1000 * 60 * 60 * 24)
+        : Infinity;
+
+      if (snapshotDate && snapshotAge > 10) {
+        setRankHistory({});
+        setRankSnapshotDate('');
+      } else if (!snapshotDate || snapshotDate !== today) {
+        const newRanks = {};
+        withRank.forEach((coin) => {
+          newRanks[coin.id] = coin.display_rank;
+        });
+        setRankHistory(newRanks);
+        setRankSnapshotDate(today);
+      }
 
       checkPriceAlerts(filtered);
     } catch (err) {
@@ -260,6 +297,14 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('lastAlertPrices', JSON.stringify(lastAlertPrices));
   }, [lastAlertPrices]);
+
+  useEffect(() => {
+    localStorage.setItem('rankHistory', JSON.stringify(rankHistory));
+  }, [rankHistory]);
+
+  useEffect(() => {
+    localStorage.setItem('rankSnapshotDate', rankSnapshotDate);
+  }, [rankSnapshotDate]);
 
   const toggleFavorite = useCallback((coinId) => {
     setFavorites((prev) => {
@@ -393,6 +438,7 @@ export default function App() {
                     favorites={favorites}
                     showFavoritesOnly={showFavoritesOnly}
                     onToggleFavorite={toggleFavorite}
+                    rankHistory={rankHistory}
                   />
                 )}
               </>
@@ -402,7 +448,6 @@ export default function App() {
           <Route path="/coin/:coinId" element={<CoinDetailPage />} />
         </Routes>
       </div>
-      <Analytics />
       <Analytics />
     </HashRouter>
   );

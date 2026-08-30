@@ -1,43 +1,43 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent, within } from '@testing-library/react';
 import BoursePage from '../pages/BoursePage.jsx';
 
 const mockIndices = [
   {
     id: 'sp500',
     name: 'S&P 500',
-    symbol: 'PSPH.PA',
-    isin: 'FR0011871136',
+    symbol: '^GSPC',
+    currency: '$',
     price: 5500,
     change: 25,
     changePercent: 0.46,
   },
   {
     id: 'nasdaq',
-    name: 'Nasdaq 100',
-    symbol: 'SXRV.DE',
-    isin: 'IE00B53SZB19',
+    name: 'Nasdaq',
+    symbol: '^IXIC',
+    currency: '$',
     price: 18000,
     change: -50,
     changePercent: -0.28,
   },
   {
-    id: 'eurostoxx',
-    name: 'Euro Stoxx 600',
-    symbol: 'ETSZ.DE',
-    isin: 'FR0011550193',
-    price: 520,
-    change: 3.5,
-    changePercent: 0.68,
+    id: 'cac40',
+    name: 'CAC 40',
+    symbol: '^FCHI',
+    currency: '€',
+    price: 8401.18,
+    change: 81.31,
+    changePercent: 0.98,
   },
   {
-    id: 'msci-world',
-    name: 'MSCI World',
-    symbol: 'EUNL.DE',
-    isin: 'IE00B4L5Y983',
-    price: 350,
-    change: 2.1,
-    changePercent: 0.6,
+    id: 'nikkei',
+    name: 'Nikkei 225',
+    symbol: '^N225',
+    currency: '¥',
+    price: 66405.56,
+    change: 273.58,
+    changePercent: 0.41,
   },
 ];
 
@@ -64,21 +64,53 @@ const mockStocks = [
   },
 ];
 
-const { mockFetchIndicesData, mockFetchXStocks, mockFetchGoldPrice } = vi.hoisted(() => ({
-  mockFetchIndicesData: vi.fn(),
-  mockFetchXStocks: vi.fn(),
-  mockFetchGoldPrice: vi.fn(),
-}));
+const mockEtfs = [
+  {
+    id: 'sp500-etf',
+    name: 'ETF S&P 500',
+    symbol: 'PSPH.PA',
+    isin: 'FR0011871136',
+    currency: '€',
+    price: 550,
+    change: 2.5,
+    changePercent: 0.46,
+  },
+  {
+    id: 'msci-world-etf',
+    name: 'ETF MSCI World',
+    symbol: 'EUNL.DE',
+    isin: 'IE00B4L5Y983',
+    currency: '€',
+    price: 350,
+    change: 2.1,
+    changePercent: 0.6,
+  },
+];
+
+const { mockFetchIndicesData, mockFetchIndicesEtfData, mockFetchIndexHistory, mockFetchXStocks, mockFetchGoldPrice } =
+  vi.hoisted(() => ({
+    mockFetchIndicesData: vi.fn(),
+    mockFetchIndicesEtfData: vi.fn(),
+    mockFetchIndexHistory: vi.fn(),
+    mockFetchXStocks: vi.fn(),
+    mockFetchGoldPrice: vi.fn(),
+  }));
 
 vi.mock('../core/api.js', async (importOriginal) => {
   const original = await importOriginal();
   return {
     ...original,
     fetchIndicesData: mockFetchIndicesData,
+    fetchIndicesEtfData: mockFetchIndicesEtfData,
+    fetchIndexHistory: mockFetchIndexHistory,
     fetchXStocks: mockFetchXStocks,
     fetchGoldPrice: mockFetchGoldPrice,
   };
 });
+
+vi.mock('../components/IndexChart.jsx', () => ({
+  default: ({ symbol }) => <div data-testid="index-chart">{symbol}</div>,
+}));
 
 vi.mock('../components/CryptoCard.jsx', () => ({
   default: ({ coin }) => <div data-testid="crypto-card">{coin.name}</div>,
@@ -94,6 +126,11 @@ vi.mock('../core/imageCache.js', async (importOriginal) => {
 
 beforeEach(() => {
   mockFetchIndicesData.mockResolvedValue(mockIndices);
+  mockFetchIndicesEtfData.mockResolvedValue(mockEtfs);
+  mockFetchIndexHistory.mockResolvedValue([
+    [1700000000000, 5000],
+    [1700001000000, 5500],
+  ]);
   mockFetchXStocks.mockResolvedValue(mockStocks);
   mockFetchGoldPrice.mockRejectedValue(new Error('mock'));
 });
@@ -117,34 +154,22 @@ describe('BoursePage', () => {
       },
       { timeout: 3000 },
     );
-    expect(screen.getByText('Nasdaq 100')).toBeInTheDocument();
-    expect(screen.getByText('Euro Stoxx 600')).toBeInTheDocument();
-    expect(screen.getByText('MSCI World')).toBeInTheDocument();
+    expect(screen.getByText('Nasdaq')).toBeInTheDocument();
+    expect(screen.getByText('CAC 40')).toBeInTheDocument();
+    expect(screen.getByText('Nikkei 225')).toBeInTheDocument();
   });
 
-  it('should render index prices in euros', async () => {
+  it('should render index prices with the correct currency', async () => {
     render(<BoursePage />);
     await waitFor(
       () => {
-        expect(screen.getAllByText(/€/).length).toBeGreaterThanOrEqual(4);
+        expect(screen.getAllByText(/5500\.00 \$$/).length).toBeGreaterThan(0);
       },
       { timeout: 3000 },
     );
-    expect(screen.getByText('5500.00 €')).toBeInTheDocument();
-    expect(screen.getByText('18000.00 €')).toBeInTheDocument();
-    expect(screen.getByText('520.00 €')).toBeInTheDocument();
-    expect(screen.getByText('350.00 €')).toBeInTheDocument();
-  });
-
-  it('should render index ISIN codes', async () => {
-    render(<BoursePage />);
-    await waitFor(
-      () => {
-        expect(screen.getByText('FR0011871136')).toBeInTheDocument();
-      },
-      { timeout: 3000 },
-    );
-    expect(screen.getByText('IE00B53SZB19')).toBeInTheDocument();
+    expect(screen.getByText('18000.00 $')).toBeInTheDocument();
+    expect(screen.getByText('8401.18 €')).toBeInTheDocument();
+    expect(screen.getByText('66405.56 ¥')).toBeInTheDocument();
   });
 
   it('should render index change with positive/negative signs', async () => {
@@ -156,6 +181,33 @@ describe('BoursePage', () => {
       { timeout: 3000 },
     );
     expect(screen.getByText('-50.00 (-0.28%)')).toBeInTheDocument();
+  });
+
+  it('should render index ETFs with ISIN and euro prices', async () => {
+    render(<BoursePage />);
+    await waitFor(
+      () => {
+        expect(screen.getByText('ETF S&P 500')).toBeInTheDocument();
+      },
+      { timeout: 3000 },
+    );
+    expect(screen.getByText('ETF MSCI World')).toBeInTheDocument();
+    expect(screen.getByText('FR0011871136')).toBeInTheDocument();
+    expect(screen.getByText('550.00 €')).toBeInTheDocument();
+  });
+
+  it('should render a chart for real indices instead of portfolio fields', async () => {
+    render(<BoursePage />);
+    await waitFor(
+      () => {
+        expect(screen.getByText('S&P 500')).toBeInTheDocument();
+      },
+      { timeout: 3000 },
+    );
+    const charts = screen.getAllByTestId('index-chart');
+    expect(charts.length).toBe(4);
+    expect(charts[0]).toHaveTextContent('^GSPC');
+    expect(screen.getAllByText('Units').length).toBe(2);
   });
 
   it('should render stock grid after loading', async () => {
@@ -308,6 +360,167 @@ describe('BoursePage', () => {
       const logo = document.querySelector('.spacex-icon img');
       expect(logo).toBeInTheDocument();
       expect(logo).toHaveAttribute('src', '/images/spacex-logo.svg');
+    });
+  });
+
+  describe('Portfolio holdings', () => {
+    beforeEach(() => {
+      localStorage.removeItem('indices_holdings');
+    });
+
+    it('should compute gain/perte when units and avg price are entered', async () => {
+      render(<BoursePage />);
+      await waitFor(
+        () => {
+          expect(screen.getByText('ETF S&P 500')).toBeInTheDocument();
+        },
+        { timeout: 3000 },
+      );
+
+      const card = screen.getByText('ETF S&P 500').closest('.index-card');
+      const inputs = within(card).getAllByRole('spinbutton');
+
+      fireEvent.change(inputs[0], { target: { value: '1' } });
+      fireEvent.change(inputs[1], { target: { value: '500' } });
+
+      await waitFor(() => {
+        expect(screen.getByText('+50,00 € (+10.00%)')).toBeInTheDocument();
+      });
+      expect(screen.getByText('Val. actuelle')).toBeInTheDocument();
+      expect(card.querySelector('.gain-row').classList.contains('positive')).toBe(true);
+    });
+
+    it('should store holdings in localStorage', async () => {
+      render(<BoursePage />);
+      await waitFor(
+        () => {
+          expect(screen.getByText('ETF S&P 500')).toBeInTheDocument();
+        },
+        { timeout: 3000 },
+      );
+
+      const card = screen.getByText('ETF S&P 500').closest('.index-card');
+      const inputs = within(card).getAllByRole('spinbutton');
+
+      fireEvent.change(inputs[0], { target: { value: '3.5' } });
+      fireEvent.change(inputs[1], { target: { value: '410' } });
+
+      await waitFor(() => {
+        expect(screen.getByText('+490,00 € (+34.15%)')).toBeInTheDocument();
+      });
+      const saved = JSON.parse(localStorage.getItem('indices_holdings'));
+      expect(saved['sp500-etf']).toEqual({ units: 3.5, avgPrice: 410 });
+    });
+
+    it('should mark the gain row negative when the position is losing', async () => {
+      render(<BoursePage />);
+      await waitFor(
+        () => {
+          expect(screen.getByText('ETF S&P 500')).toBeInTheDocument();
+        },
+        { timeout: 3000 },
+      );
+
+      const card = screen.getByText('ETF S&P 500').closest('.index-card');
+      const inputs = within(card).getAllByRole('spinbutton');
+
+      fireEvent.change(inputs[0], { target: { value: '1' } });
+      fireEvent.change(inputs[1], { target: { value: '600' } });
+
+      await waitFor(() => {
+        expect(screen.getByText('50,00 € (-8.33%)')).toBeInTheDocument();
+      });
+      expect(card.querySelector('.gain-row').classList.contains('negative')).toBe(true);
+    });
+
+    it('should restore holdings from localStorage on remount', async () => {
+      const { unmount } = render(<BoursePage />);
+      await waitFor(
+        () => {
+          expect(screen.getByText('ETF S&P 500')).toBeInTheDocument();
+        },
+        { timeout: 3000 },
+      );
+
+      const card = screen.getByText('ETF S&P 500').closest('.index-card');
+      const inputs = within(card).getAllByRole('spinbutton');
+      fireEvent.change(inputs[0], { target: { value: '1' } });
+      fireEvent.change(inputs[1], { target: { value: '500' } });
+      await waitFor(() => {
+        expect(screen.getByText('+50,00 € (+10.00%)')).toBeInTheDocument();
+      });
+
+      unmount();
+
+      render(<BoursePage />);
+      await waitFor(
+        () => {
+          expect(screen.getByText('ETF S&P 500')).toBeInTheDocument();
+        },
+        { timeout: 3000 },
+      );
+      const restoredCard = screen.getByText('ETF S&P 500').closest('.index-card');
+      const restoredInputs = within(restoredCard).getAllByRole('spinbutton');
+      expect(restoredInputs[0]).toHaveValue(1);
+      expect(restoredInputs[1]).toHaveValue(500);
+      expect(screen.getByText('+50,00 € (+10.00%)')).toBeInTheDocument();
+    });
+
+    it('should hide the holding summary when units is cleared', async () => {
+      render(<BoursePage />);
+      await waitFor(
+        () => {
+          expect(screen.getByText('ETF S&P 500')).toBeInTheDocument();
+        },
+        { timeout: 3000 },
+      );
+
+      const card = screen.getByText('ETF S&P 500').closest('.index-card');
+      const inputs = within(card).getAllByRole('spinbutton');
+      fireEvent.change(inputs[0], { target: { value: '1' } });
+      fireEvent.change(inputs[1], { target: { value: '500' } });
+      await waitFor(() => {
+        expect(screen.getByText('+50,00 € (+10.00%)')).toBeInTheDocument();
+      });
+
+      fireEvent.change(inputs[0], { target: { value: '' } });
+
+      await waitFor(() => {
+        expect(screen.queryByText('Gain/Pert')).not.toBeInTheDocument();
+      });
+      const saved = JSON.parse(localStorage.getItem('indices_holdings'));
+      expect(saved['sp500-etf'].units).toBeNull();
+      expect(saved['sp500-etf'].avgPrice).toBe(500);
+    });
+  });
+
+  describe('Resilience', () => {
+    it('should keep rendering when saved holdings JSON is corrupted', async () => {
+      localStorage.setItem('indices_holdings', 'not-json');
+      render(<BoursePage />);
+      await waitFor(
+        () => {
+          expect(screen.getByText('S&P 500')).toBeInTheDocument();
+        },
+        { timeout: 3000 },
+      );
+      expect(screen.getAllByText('Units').length).toBe(2);
+    });
+
+    it('should warn but keep rendering when indices and ETF fetches fail', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      mockFetchIndicesData.mockRejectedValue(new Error('indices down'));
+      mockFetchIndicesEtfData.mockRejectedValue(new Error('etf down'));
+      render(<BoursePage />);
+      await waitFor(
+        () => {
+          expect(screen.getByText('Apple')).toBeInTheDocument();
+        },
+        { timeout: 3000 },
+      );
+      expect(warnSpy).toHaveBeenCalledWith('Indices error:', expect.any(Error));
+      expect(warnSpy).toHaveBeenCalledWith('Indices ETF error:', expect.any(Error));
+      warnSpy.mockRestore();
     });
   });
 });

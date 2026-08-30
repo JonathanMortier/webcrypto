@@ -65,6 +65,20 @@ describe('CryptoCard', () => {
     expect(screen.getByText('$50.00B')).toBeInTheDocument();
   });
 
+  it('should render category badges', () => {
+    const coin = { ...mockCoin, categories: ['Cryptocurrency', 'Smart Contract Platform'] };
+    render(withRouter(<CryptoCard coin={coin} />));
+    expect(screen.getByText('Cryptocurrency')).toBeInTheDocument();
+    expect(screen.getByText('Smart Contract Platform')).toBeInTheDocument();
+  });
+
+  it('should render no category badges when categories are empty', () => {
+    const coin = { ...mockCoin, categories: [] };
+    render(withRouter(<CryptoCard coin={coin} />));
+    expect(screen.queryByText('Cryptocurrency')).toBeNull();
+    expect(document.querySelector('.crypto-categories')).toBeNull();
+  });
+
   it('should show chart on mouse enter after delay', async () => {
     render(withRouter(<CryptoCard coin={mockCoin} />));
     const card = screen.getByText('Bitcoin').closest('.crypto-card');

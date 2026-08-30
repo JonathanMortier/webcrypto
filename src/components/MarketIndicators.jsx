@@ -1,7 +1,16 @@
 import { formatLargeNumber } from '../core/utils.js';
 import WeatherWidget from './WeatherWidget.jsx';
 
-export default function MarketIndicators({ marketStats, fearGreed, onSort, sortField, sortDir }) {
+export default function MarketIndicators({
+  marketStats,
+  fearGreed,
+  onSort,
+  sortField,
+  sortDir,
+  categories = [],
+  selectedCategoryId = '',
+  onCategoryChange,
+}) {
   if (!marketStats) return null;
 
   const { totalMarketCap, totalVolume, btcDominance, ethDominance, marketCapChange, altcoinSeason } = marketStats;
@@ -30,6 +39,22 @@ export default function MarketIndicators({ marketStats, fearGreed, onSort, sortF
 
   return (
     <div className="market-indicators">
+      <div className="indicator category-filter">
+        <span className="indicator-label">Catégorie</span>
+        <select
+          className="category-select"
+          value={selectedCategoryId}
+          onChange={(e) => onCategoryChange?.(e.target.value)}
+          aria-label="Filtrer par catégorie"
+        >
+          <option value="">Toutes</option>
+          {categories.map((cat) => (
+            <option key={cat.id} value={cat.id}>
+              {cat.name}
+            </option>
+          ))}
+        </select>
+      </div>
       <div className="indicator clickable" onClick={() => onSort?.('market_cap')}>
         <span className="indicator-label">Market Cap{getSortIndicator('market_cap')}</span>
         <span className="indicator-value">${formatLargeNumber(totalMarketCap)}</span>

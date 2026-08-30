@@ -138,6 +138,25 @@
   text-transform: uppercase;
 }
 
+/* ---- Category badges ---- */
+.crypto-categories {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  margin-top: -2px;
+}
+
+.crypto-cat-tag {
+  font-size: 0.62rem;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: rgba(99, 102, 241, 0.08);
+  color: var(--text-secondary);
+  border: 1px solid var(--card-border);
+  white-space: nowrap;
+}
+
 /* ---- Price + Change row ---- */
 .crypto-main-row {
   display: flex;

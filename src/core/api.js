@@ -1,4 +1,19 @@
-import { API_URL, XSTOCKS_API_URL, XSTOCK_IDS, STABLECOINS, CACHE_TTL, INDICES, COINGECKO_BASE } from './constants.js';
+import {
+  API_URL,
+  XSTOCKS_API_URL,
+  XSTOCK_IDS,
+  STABLECOINS,
+  CACHE_TTL,
+  CATEGORY_CACHE_TTL,
+  CATEGORIES_URL,
+  CATEGORY_MARKETS_URL,
+  CATEGORY_IDS,
+  STABLECOINS_CATEGORY,
+  INDICES,
+  INDICES_ETF,
+  COINGECKO_BASE,
+} from './constants.js';
+import cryptoCategoriesMap from './cryptoCategories.json';
 
 const CACHE_PREFIX = 'cryptowatch_cache_';
 
@@ -59,8 +74,54 @@ export const fetchXStocks = withCache('xstocks', CACHE_TTL * 1000, async () => {
   return response.json();
 });
 
+export const fetchCategories = withCache('categories_v2', CATEGORY_CACHE_TTL * 1000, async () => {
+  const response = await fetch(CATEGORIES_URL);
+  if (!response.ok) {
+    throw new Error('Erreur lors de la récupération des catégories');
+  }
+  const data = await response.json();
+  if (!Array.isArray(data)) return [];
+
+  const apiCategories = new Map(data.filter((cat) => cat && cat.id && cat.name).map((cat) => [cat.id, cat.name]));
+
+  return CATEGORY_IDS.filter((cat) => apiCategories.has(cat.id)).map((cat) => ({
+    id: cat.id,
+    name: cat.name,
+  }));
+});
+
+export function fetchCryptoDataByCategory(categoryId) {
+  return withCache(`crypto_markets_cat_${categoryId}`, CACHE_TTL * 1000, async () => {
+    const response = await fetch(CATEGORY_MARKETS_URL(categoryId));
+    if (!response.ok) {
+      throw new Error('Erreur lors de la récupération des cryptos de la catégorie');
+    }
+    return response.json();
+  })();
+}
+
+export const fetchStablecoins = withCache('crypto_markets_stablecoins', CACHE_TTL * 1000, async () => {
+  const response = await fetch(CATEGORY_MARKETS_URL(STABLECOINS_CATEGORY));
+  if (!response.ok) {
+    throw new Error('Erreur lors de la récupération des stablecoins');
+  }
+  return response.json();
+});
+
 export function filterStablecoins(cryptos) {
   return cryptos.filter((coin) => !STABLECOINS.includes(coin.symbol.toLowerCase()));
+}
+
+export function enrichWithCategories(cryptos, categoriesMap = cryptoCategoriesMap) {
+  return cryptos.map((coin) => ({
+    ...coin,
+    categories: categoriesMap[coin.id] || [],
+  }));
+}
+
+export function filterByCategory(cryptos, categoryName) {
+  if (!categoryName) return cryptos;
+  return cryptos.filter((coin) => (coin.categories || []).includes(categoryName));
 }
 
 export function getTopGainers(cryptos, limit = 10) {
@@ -128,15 +189,15 @@ export function calculateMarketStats(cryptos) {
   };
 }
 
-const fetchIndicesRaw = async () => {
-  const symbols = INDICES.map((i) => i.symbol).join(',');
+const fetchIndicesFor = async (list) => {
+  const symbols = list.map((i) => i.symbol).join(',');
   const url = `/api/yahoo/v8/finance/spark?symbols=${symbols}&range=1d&interval=1d`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Yahoo HTTP ${res.status}`);
   const json = await res.json();
 
   const results = [];
-  for (const index of INDICES) {
+  for (const index of list) {
     const data = json[index.symbol];
     if (data?.close?.length > 0 && data.chartPreviousClose != null) {
       const price = data.close[data.close.length - 1];
@@ -156,7 +217,29 @@ const fetchIndicesRaw = async () => {
   return results;
 };
 
-export const fetchIndicesData = withCache('indices_v3', 600_000, fetchIndicesRaw);
+export const fetchIndicesData = withCache('indices_v3', 600_000, () => fetchIndicesFor(INDICES));
+
+export const fetchIndicesEtfData = withCache('indices_etf_v1', 600_000, () => fetchIndicesFor(INDICES_ETF));
+
+const fetchIndexHistoryRaw = async (symbol) => {
+  const url = `/api/yahoo/v8/finance/chart/${encodeURIComponent(symbol)}?range=3mo&interval=1d`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Yahoo HTTP ${res.status}`);
+  const json = await res.json();
+  const result = json?.chart?.result?.[0];
+  if (!result) throw new Error('Format de réponse inattendu');
+  const timestamps = result.timestamp || [];
+  const closes = result.indicators?.quote?.[0]?.close || [];
+  const points = [];
+  for (let i = 0; i < timestamps.length; i++) {
+    const price = closes[i];
+    if (price != null && !isNaN(price)) points.push([timestamps[i] * 1000, price]);
+  }
+  return points;
+};
+
+export const fetchIndexHistory = (symbol) =>
+  withCache(`index_history_${symbol.replace(/[^a-zA-Z0-9]/g, '_')}`, 600_000, () => fetchIndexHistoryRaw(symbol))();
 
 export const fetchGoldPrice = withCache('gold_price', 300_000, async () => {
   const response = await fetch('https://aurumrates.com/api/chart?symbol=GC=F&range=5d&interval=1d');

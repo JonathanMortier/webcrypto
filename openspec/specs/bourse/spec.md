@@ -8,17 +8,45 @@ Track stock market indices, portfolio holdings, x-stocks, and gold price.
 
 ### Requirement: Index tracking
 
-The system SHALL display S&P 500, Nasdaq 100, Euro Stoxx 600, and MSCI World indices.
+The system SHALL display major global indices (S&P 500, Nasdaq, Dow Jones, CAC 40, DAX, Euro Stoxx 50, FTSE 100, Nikkei 225), each with its own currency.
 
 #### Scenario: Load indices data
 
 - GIVEN the Bourse page is displayed
 - WHEN data is fetched via fetchIndicesData
-- THEN each index card shows current value and 24h change
+- THEN each index card shows current value, its currency, and 24h change
+
+#### Scenario: Per-index currency
+
+- GIVEN an index is displayed
+- WHEN its card is rendered
+- THEN the price and portfolio values use the index currency ($, €, £, or ¥)
+
+#### Scenario: Real indices show an evolution chart
+
+- GIVEN a real index card (no ISIN) is displayed
+- WHEN its history is fetched via fetchIndexHistory
+- THEN a 3-month line chart is shown instead of portfolio fields
 
 #### Scenario: Cache indices data
 
 - GIVEN indices data was recently fetched
+- WHEN the page is reloaded within 10 minutes
+- THEN cached data is used
+
+### Requirement: Index ETF tracking
+
+The system SHALL also display EU-listed index ETFs (ETF S&P 500, ETF Nasdaq 100, ETF Euro Stoxx 600, ETF MSCI World) with their ISIN.
+
+#### Scenario: Load index ETFs
+
+- GIVEN the Bourse page is displayed
+- WHEN data is fetched via fetchIndicesEtfData
+- THEN each ETF card shows its ISIN, current value in euros, and 24h change
+
+#### Scenario: Cache index ETFs
+
+- GIVEN index ETF data was recently fetched
 - WHEN the page is reloaded within 10 minutes
 - THEN cached data is used
 

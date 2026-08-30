@@ -10,7 +10,7 @@ function getCSSVar(name) {
 
 const END_LABEL = 'Maintenant';
 
-export default function PriceChart({ prices, isPositive, timeframe = '7d' }) {
+export default function PriceChart({ prices, isPositive, timeframe = '7d', currency = '$' }) {
   const positiveColor = getCSSVar('--positive') || '#00ff88';
   const negativeColor = getCSSVar('--negative') || '#ff4444';
   const textMuted = getCSSVar('--text-muted') || '#666';
@@ -48,7 +48,7 @@ export default function PriceChart({ prices, isPositive, timeframe = '7d' }) {
         if (timeframe === '7d') {
           return d.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric' });
         }
-        if (timeframe === '30d') {
+        if (timeframe === '30d' || timeframe === '3mo') {
           return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
         }
         if (timeframe === '1y') {
@@ -57,7 +57,7 @@ export default function PriceChart({ prices, isPositive, timeframe = '7d' }) {
       }
 
       const startLabels = { '1h': '-1h', '24h': '-24h', '7d': '-7j', '30d': '-30j', '1y': '-1an' };
-      if (i === 0) return startLabels[timeframe] || '-7j';
+      if (i === 0) return startLabels[timeframe] || '-3mo';
       if (i === len - 1) return END_LABEL;
       return '';
     });
@@ -103,7 +103,7 @@ export default function PriceChart({ prices, isPositive, timeframe = '7d' }) {
           color: textMuted,
           font: { size: 10 },
           maxTicksLimit: 6,
-          callback: (value) => `$${value.toLocaleString()}`,
+          callback: (value) => `${currency}${parseFloat(value).toLocaleString()}`,
         },
       },
     },

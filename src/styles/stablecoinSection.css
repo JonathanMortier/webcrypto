@@ -1,0 +1,49 @@
+.stablecoin-section {
+  margin-top: 30px;
+}
+
+.stablecoin-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 auto;
+  padding: 12px 22px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 25px;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.stablecoin-toggle:hover {
+  background: var(--card-border);
+  border-color: var(--accent-primary);
+}
+
+.stablecoin-caret {
+  display: inline-block;
+  transition: transform 0.25s;
+  font-size: 0.8rem;
+}
+
+.stablecoin-caret.open {
+  transform: rotate(90deg);
+}
+
+.stablecoin-count {
+  background: var(--accent-primary);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.stablecoin-content {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--card-border);
+}

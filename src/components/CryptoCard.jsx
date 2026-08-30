@@ -145,6 +145,15 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite, hideRan
           <div className="crypto-name">{coin.name}</div>
           <div className="crypto-symbol">{coin.symbol}</div>
         </div>
+        {coin.categories && coin.categories.length > 0 && (
+          <div className="crypto-categories">
+            {coin.categories.slice(0, 3).map((cat) => (
+              <span key={cat} className="crypto-cat-tag">
+                {cat}
+              </span>
+            ))}
+          </div>
+        )}
         <div className="crypto-main-row">
           <span className="crypto-price">${formatPrice(coin.current_price)}</span>
           <span className={`crypto-change ${changeClass}`}>

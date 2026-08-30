@@ -4,7 +4,12 @@ import {
   fetchCryptoData,
   fetchXStocks,
   fetchFearAndGreed,
+  fetchCategories,
+  fetchCryptoDataByCategory,
+  fetchStablecoins,
   filterStablecoins,
+  filterByCategory,
+  enrichWithCategories,
   getTopGainers,
   calculateMarketStats,
 } from './core/api.js';
@@ -15,6 +20,7 @@ import {
   CryptoTicker,
   StocksTicker,
   MarketIndicators,
+  StablecoinSection,
   Loading,
   Error,
   InstallPrompt,
@@ -29,6 +35,13 @@ export default function App() {
   const [stocks, setStocks] = useState([]);
   const [fearGreed, setFearGreed] = useState(null);
   const [fearGreedLoading, setFearGreedLoading] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState('');
+  const [categoryCoins, setCategoryCoins] = useState([]);
+  const [categoryLoading, setCategoryLoading] = useState(false);
+  const [categoryError, setCategoryError] = useState(null);
+  const [stablecoins, setStablecoins] = useState([]);
+  const [showStablecoins, setShowStablecoins] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [lastUpdate, setLastUpdate] = useState(null);
@@ -207,7 +220,8 @@ export default function App() {
       const [cryptoData, xstockData] = await Promise.all([fetchCryptoData(), fetchXStocks()]);
 
       const filtered = filterStablecoins(cryptoData);
-      const withRank = filtered.map((coin, index) => ({ ...coin, display_rank: index + 1 }));
+      const enriched = enrichWithCategories(filtered);
+      const withRank = enriched.map((coin, index) => ({ ...coin, display_rank: index + 1 }));
       const gainers = getTopGainers(withRank);
 
       const sortedStocks = [...xstockData].sort(
@@ -259,6 +273,32 @@ export default function App() {
       setFearGreedLoading(false);
     }
   }, []);
+
+  const loadCategories = useCallback(async () => {
+    try {
+      const data = await fetchCategories();
+      setCategories(data);
+    } catch (err) {
+      console.error('Failed to load categories:', err);
+    }
+  }, []);
+
+  const loadStablecoins = useCallback(async () => {
+    try {
+      const data = await fetchStablecoins();
+      setStablecoins(enrichWithCategories(data));
+    } catch (err) {
+      console.error('Failed to load stablecoins:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadCategories();
+  }, [loadCategories]);
+
+  useEffect(() => {
+    loadStablecoins();
+  }, [loadStablecoins]);
 
   const startCountdown = useCallback(() => {
     if (countdownRef.current) clearInterval(countdownRef.current);
@@ -357,6 +397,41 @@ export default function App() {
 
   const marketStats = calculateMarketStats(cryptos);
 
+  useEffect(() => {
+    if (!selectedCategoryId) {
+      setCategoryCoins([]);
+      setCategoryError(null);
+      return;
+    }
+    let cancelled = false;
+    setCategoryLoading(true);
+    setCategoryError(null);
+    const category = categories.find((c) => c.id === selectedCategoryId);
+    const categoryName = category?.name;
+
+    fetchCryptoDataByCategory(selectedCategoryId)
+      .then((data) => {
+        if (cancelled) return;
+        setCategoryCoins(enrichWithCategories(filterStablecoins(data)));
+      })
+      .catch(() => {
+        if (cancelled) return;
+        const fallback = categoryName ? filterByCategory(enrichWithCategories(cryptos), categoryName) : [];
+        if (fallback.length > 0) {
+          setCategoryCoins(fallback);
+        } else {
+          setCategoryError(`Impossible de charger la catégorie "${categoryName || selectedCategoryId}"`);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setCategoryLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedCategoryId, categories, cryptos]);
+
   const filteredCryptos = searchQuery
     ? cryptos.filter(
         (c) =>
@@ -364,6 +439,10 @@ export default function App() {
           c.symbol.toLowerCase().includes(searchQuery.toLowerCase()),
       )
     : cryptos;
+
+  const isCategoryView = selectedCategoryId !== '';
+
+  const gridCryptos = isCategoryView ? categoryCoins : filteredCryptos;
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -425,20 +504,34 @@ export default function App() {
                     onSort={handleSort}
                     sortField={sortField}
                     sortDir={sortDir}
+                    categories={categories}
+                    selectedCategoryId={selectedCategoryId}
+                    onCategoryChange={setSelectedCategoryId}
                   />
                 )}
 
                 {isLoading && <Loading />}
-                {error && <Error message={error} onRetry={loadData} />}
-                {!isLoading && !error && (
+                {!isCategoryView && error && <Error message={error} onRetry={loadData} />}
+                {categoryLoading && isCategoryView && <Loading />}
+                {isCategoryView && categoryError && <Error message={categoryError} onRetry={loadData} />}
+                {!isLoading && !error && !categoryLoading && !categoryError && (
                   <CryptoGrid
-                    cryptos={filteredCryptos}
+                    cryptos={gridCryptos}
                     sortField={sortField}
                     sortDir={sortDir}
                     favorites={favorites}
                     showFavoritesOnly={showFavoritesOnly}
                     onToggleFavorite={toggleFavorite}
-                    rankHistory={rankHistory}
+                    rankHistory={isCategoryView ? {} : rankHistory}
+                  />
+                )}
+                {!isLoading && !error && !isCategoryView && (
+                  <StablecoinSection
+                    stablecoins={stablecoins}
+                    show={showStablecoins}
+                    onToggle={() => setShowStablecoins((prev) => !prev)}
+                    favorites={favorites}
+                    onToggleFavorite={toggleFavorite}
                   />
                 )}
               </>

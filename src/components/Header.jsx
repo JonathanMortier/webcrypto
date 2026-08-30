@@ -34,6 +34,9 @@ export default function Header({
             onChange={(e) => onSearchChange(e.target.value)}
           />
         )}
+        <button className="refresh-btn" onClick={onRefresh} disabled={isLoading}>
+          Actualiser (R)
+        </button>
         {!isBourse && (
           <button
             className={`favorites-filter-btn ${showFavoritesOnly ? 'active' : ''}`}
@@ -72,9 +75,6 @@ export default function Header({
             </svg>
           </button>
         )}
-        <button className="refresh-btn" onClick={onRefresh} disabled={isLoading}>
-          Actualiser (R)
-        </button>
         <button
           className="theme-toggle-btn"
           onClick={onThemeToggle}

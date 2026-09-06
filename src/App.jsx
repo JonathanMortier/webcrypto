@@ -234,6 +234,7 @@ export default function App() {
       setLastUpdate(new Date());
       setCountdown(REFRESH_INTERVAL);
 
+      // Handle rank snapshot logic
       const today = new Date().toDateString();
       const snapshotDate = rankSnapshotDateRef.current;
       const snapshotAge = snapshotDate
@@ -241,9 +242,26 @@ export default function App() {
         : Infinity;
 
       if (snapshotDate && snapshotAge > 10) {
+        // Clear stale snapshot (older than 10 days)
         setRankHistory({});
         setRankSnapshotDate('');
-      } else if (!snapshotDate || snapshotDate !== today) {
+        // Save new snapshot immediately
+        const newRanks = {};
+        withRank.forEach((coin) => {
+          newRanks[coin.id] = coin.display_rank;
+        });
+        setRankHistory(newRanks);
+        setRankSnapshotDate(today);
+      } else if (!snapshotDate) {
+        // Save new snapshot if none exists
+        const newRanks = {};
+        withRank.forEach((coin) => {
+          newRanks[coin.id] = coin.display_rank;
+        });
+        setRankHistory(newRanks);
+        setRankSnapshotDate(today);
+      } else if (snapshotDate !== today) {
+        // Update snapshot if date changed
         const newRanks = {};
         withRank.forEach((coin) => {
           newRanks[coin.id] = coin.display_rank;

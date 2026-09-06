@@ -138,22 +138,6 @@ export default function App() {
   rankHistoryRef.current = rankHistory;
   rankSnapshotDateRef.current = rankSnapshotDate;
 
-  // Clear stale rank snapshot on initial load
-  useEffect(() => {
-    const snapshotDate = localStorage.getItem('rankSnapshotDate');
-    if (snapshotDate) {
-      const snapshot = new Date(snapshotDate);
-      const today = new Date();
-      const daysDifference = Math.floor((today - snapshot) / (1000 * 60 * 60 * 24));
-
-      // If snapshot is older than 10 days, clear it
-      if (daysDifference > 10) {
-        setRankHistory({});
-        setRankSnapshotDate('');
-      }
-    }
-  }, []);
-
   const checkPriceAlerts = useCallback((newCryptos) => {
     if (!notificationsRef.current) return;
 
@@ -257,7 +241,11 @@ export default function App() {
         ? (Date.now() - new Date(snapshotDate).getTime()) / (1000 * 60 * 60 * 24)
         : Infinity;
 
-      if (!snapshotDate) {
+      if (snapshotDate && snapshotAge > 10) {
+        // Clear stale snapshot (new one is created on next load)
+        setRankHistory({});
+        setRankSnapshotDate('');
+      } else if (!snapshotDate) {
         // Save new snapshot if none exists
         const newRanks = {};
         withRank.forEach((coin) => {

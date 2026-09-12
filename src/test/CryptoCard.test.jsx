@@ -121,7 +121,7 @@ describe('CryptoCard', () => {
 
   it('should render ▲ badge when rank improved', () => {
     const coin = { ...mockCoin, display_rank: 5 };
-    const rankHistory = { bitcoin: 10 };
+    const rankHistory = { '2026-08-01': { bitcoin: 10 }, '2026-09-01': { bitcoin: 5 } };
     render(withRouter(<CryptoCard coin={coin} rankHistory={rankHistory} />));
     const badge = screen.getByText('▲5');
     expect(badge).toBeInTheDocument();
@@ -130,7 +130,7 @@ describe('CryptoCard', () => {
 
   it('should render ▼ badge when rank dropped', () => {
     const coin = { ...mockCoin, display_rank: 10 };
-    const rankHistory = { bitcoin: 5 };
+    const rankHistory = { '2026-08-01': { bitcoin: 5 }, '2026-09-01': { bitcoin: 10 } };
     render(withRouter(<CryptoCard coin={coin} rankHistory={rankHistory} />));
     const badge = screen.getByText('▼5');
     expect(badge).toBeInTheDocument();
@@ -139,7 +139,7 @@ describe('CryptoCard', () => {
 
   it('should render — badge when rank unchanged', () => {
     const coin = { ...mockCoin, display_rank: 5 };
-    const rankHistory = { bitcoin: 5 };
+    const rankHistory = { '2026-08-01': { bitcoin: 5 }, '2026-09-01': { bitcoin: 5 } };
     render(withRouter(<CryptoCard coin={coin} rankHistory={rankHistory} />));
     const badge = screen.getByText('—');
     expect(badge).toBeInTheDocument();
@@ -148,7 +148,7 @@ describe('CryptoCard', () => {
 
   it('should apply rank-up class when rank improved', () => {
     const coin = { ...mockCoin, display_rank: 3 };
-    const rankHistory = { bitcoin: 7 };
+    const rankHistory = { '2026-08-01': { bitcoin: 7 }, '2026-09-01': { bitcoin: 3 } };
     render(withRouter(<CryptoCard coin={coin} rankHistory={rankHistory} />));
     const badge = screen.getByText('▲4');
     expect(badge).toHaveClass('rank-up');
@@ -157,7 +157,7 @@ describe('CryptoCard', () => {
 
   it('should apply rank-down class when rank dropped', () => {
     const coin = { ...mockCoin, display_rank: 8 };
-    const rankHistory = { bitcoin: 2 };
+    const rankHistory = { '2026-08-01': { bitcoin: 2 }, '2026-09-01': { bitcoin: 8 } };
     render(withRouter(<CryptoCard coin={coin} rankHistory={rankHistory} />));
     const badge = screen.getByText('▼6');
     expect(badge).toHaveClass('rank-down');
@@ -166,7 +166,7 @@ describe('CryptoCard', () => {
 
   it('should apply rank-stable class when rank unchanged', () => {
     const coin = { ...mockCoin, display_rank: 1 };
-    const rankHistory = { bitcoin: 1 };
+    const rankHistory = { '2026-08-01': { bitcoin: 1 }, '2026-09-01': { bitcoin: 1 } };
     render(withRouter(<CryptoCard coin={coin} rankHistory={rankHistory} />));
     const badge = screen.getByText('—');
     expect(badge).toHaveClass('rank-stable');

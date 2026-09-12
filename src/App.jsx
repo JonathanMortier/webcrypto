@@ -13,7 +13,8 @@ import {
   getTopGainers,
   calculateMarketStats,
 } from './core/api.js';
-import { REFRESH_INTERVAL, ALERT_THRESHOLD } from './core/constants.js';
+import { REFRESH_INTERVAL, ALERT_THRESHOLD, RANK_HISTORY_MAX_AGE_DAYS } from './core/constants.js';
+import { normalizeRankHistory, getDayKey, appendDailySnapshot } from './core/utils.js';
 import {
   Header,
   CryptoGrid,
@@ -98,7 +99,7 @@ export default function App() {
       if (!saved) return {};
       const parsed = JSON.parse(saved);
       if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-        return parsed;
+        return normalizeRankHistory(parsed, localStorage.getItem('rankSnapshotDate') || '');
       }
       return {};
     } catch {
@@ -234,34 +235,16 @@ export default function App() {
       setLastUpdate(new Date());
       setCountdown(REFRESH_INTERVAL);
 
-      // Handle rank snapshot logic
-      const today = new Date().toDateString();
-      const snapshotDate = rankSnapshotDateRef.current;
-      const snapshotAge = snapshotDate
-        ? (Date.now() - new Date(snapshotDate).getTime()) / (1000 * 60 * 60 * 24)
-        : Infinity;
+      // Handle rank snapshot logic (one snapshot per day, prune > 1 month)
+      const today = getDayKey();
 
-      if (snapshotDate && snapshotAge > 10) {
-        // Clear stale snapshot (new one is created on next load)
-        setRankHistory({});
-        setRankSnapshotDate('');
-      } else if (!snapshotDate) {
-        // Save new snapshot if none exists
-        const newRanks = {};
-        withRank.forEach((coin) => {
-          newRanks[coin.id] = coin.display_rank;
-        });
-        setRankHistory(newRanks);
-        setRankSnapshotDate(today);
-      } else if (snapshotDate !== today) {
-        // Update snapshot if date changed
-        const newRanks = {};
-        withRank.forEach((coin) => {
-          newRanks[coin.id] = coin.display_rank;
-        });
-        setRankHistory(newRanks);
-        setRankSnapshotDate(today);
-      }
+      const todayRanks = {};
+      withRank.forEach((coin) => {
+        todayRanks[coin.id] = coin.display_rank;
+      });
+
+      setRankHistory((prev) => appendDailySnapshot(prev, today, todayRanks, RANK_HISTORY_MAX_AGE_DAYS));
+      setRankSnapshotDate(today);
 
       checkPriceAlerts(filtered);
     } catch (err) {

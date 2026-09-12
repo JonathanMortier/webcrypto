@@ -107,17 +107,19 @@ src/
 
 ## All localStorage Keys
 
-| Key                     | Type                     | Description                                 |
-| ----------------------- | ------------------------ | ------------------------------------------- |
-| `theme`                 | `'dark'` / `'light'`     | UI theme preference                         |
-| `favorites`             | `JSON.stringify(Array)`  | Array of favorited coin IDs                 |
-| `notificationsEnabled`  | `'true'` / `'false'`     | Notification toggle state                   |
-| `previousPrices`        | `JSON.stringify(Object)` | Daily price snapshot `{ coinId: price }`    |
-| `priceSnapshotDate`     | `Date.toDateString()`    | Date of last snapshot (resets daily)        |
-| `lastAlertPrices`       | `JSON.stringify(Object)` | Prices at last alert `{ coinId: price }`    |
-| `cryptowatch_cache_*`   | cached API data          | Various API response caches with timestamps |
-| `indices_holdings`      | `JSON.stringify(Object)` | Portfolio units/average prices per index    |
-| `cryptowatch_weather_*` | cached weather data      | Location + weather data with timestamps     |
+| Key                     | Type                     | Description                                                             |
+| ----------------------- | ------------------------ | ----------------------------------------------------------------------- |
+| `theme`                 | `'dark'` / `'light'`     | UI theme preference                                                     |
+| `favorites`             | `JSON.stringify(Array)`  | Array of favorited coin IDs                                             |
+| `notificationsEnabled`  | `'true'` / `'false'`     | Notification toggle state                                               |
+| `previousPrices`        | `JSON.stringify(Object)` | Daily price snapshot `{ coinId: price }`                                |
+| `priceSnapshotDate`     | `Date.toDateString()`    | Date of last snapshot (resets daily)                                    |
+| `lastAlertPrices`       | `JSON.stringify(Object)` | Prices at last alert `{ coinId: price }`                                |
+| `rankHistory`           | `JSON.stringify(Object)` | Daily rank snapshots `{ 'YYYY-MM-DD': { coinId: rank } }` (30 days max) |
+| `rankSnapshotDate`      | `'YYYY-MM-DD'`           | Date key of last daily rank snapshot                                    |
+| `cryptowatch_cache_*`   | cached API data          | Various API response caches with timestamps                             |
+| `indices_holdings`      | `JSON.stringify(Object)` | Portfolio units/average prices per index                                |
+| `cryptowatch_weather_*` | cached weather data      | Location + weather data with timestamps                                 |
 
 ## All State in App.jsx
 
@@ -141,9 +143,11 @@ src/
 | `previousPrices`       | localStorage       | Yes       | Daily price snapshot                   |
 | `priceSnapshotDate`    | localStorage       | Yes       | Snapshot date string                   |
 | `lastAlertPrices`      | localStorage       | Yes       | Prices at last alert                   |
+| `rankHistory`          | localStorage       | Yes       | Daily rank snapshots (30 days max)     |
+| `rankSnapshotDate`     | localStorage       | Yes       | Date key of last daily rank snapshot   |
 | `notificationMessage`  | `null`             | No        | Toast message for notif feedback       |
 
-Refs: `countdownRef`, `intervalRef`, `notificationsRef`, `favoritesRef`, `previousPricesRef`, `priceSnapshotDateRef`, `lastAlertPricesRef`
+Refs: `countdownRef`, `intervalRef`, `notificationsRef`, `favoritesRef`, `previousPricesRef`, `priceSnapshotDateRef`, `lastAlertPricesRef`, `rankHistoryRef`, `rankSnapshotDateRef`
 
 ## Notification System (Price Alerts)
 

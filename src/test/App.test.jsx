@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
 import App from '../App.jsx';
+import { getDayKey } from '../core/utils.js';
 
 const mockCryptos = [
   {
@@ -390,7 +391,12 @@ describe('App - Dashboard integration', () => {
 });
 
 describe('App - Rank snapshot logic', () => {
-  it('should save rankHistory to localStorage when no previous snapshot exists', async () => {
+  const todayKey = getDayKey();
+  const dayAgo = getDayKey(new Date(Date.now() - 24 * 60 * 60 * 1000));
+  const recentDay = getDayKey(new Date(Date.now() - 29 * 24 * 60 * 60 * 1000));
+  const oldDay = getDayKey(new Date(Date.now() - 31 * 24 * 60 * 60 * 1000));
+
+  it('should save first daily snapshot when no previous snapshot exists', async () => {
     render(<App />);
     await waitFor(
       () => {
@@ -401,18 +407,17 @@ describe('App - Rank snapshot logic', () => {
 
     const stored = JSON.parse(localStorage.getItem('rankHistory'));
     expect(stored).toBeDefined();
-    expect(stored.bitcoin).toBeDefined();
-    expect(typeof stored.bitcoin).toBe('number');
+    expect(stored[todayKey]).toBeDefined();
+    expect(typeof stored[todayKey].bitcoin).toBe('number');
 
     const snapshotDate = localStorage.getItem('rankSnapshotDate');
-    expect(snapshotDate).toBeTruthy();
+    expect(snapshotDate).toBe(todayKey);
   });
 
-  it('should NOT overwrite existing snapshot within 10 days', async () => {
-    const today = new Date().toDateString();
+  it('should NOT overwrite the daily snapshot on same-day refresh', async () => {
     const existingRanks = { bitcoin: 99, ethereum: 98 };
-    localStorage.setItem('rankHistory', JSON.stringify(existingRanks));
-    localStorage.setItem('rankSnapshotDate', today);
+    localStorage.setItem('rankHistory', JSON.stringify({ [todayKey]: existingRanks }));
+    localStorage.setItem('rankSnapshotDate', todayKey);
 
     render(<App />);
     await waitFor(
@@ -423,15 +428,12 @@ describe('App - Rank snapshot logic', () => {
     );
 
     const stored = JSON.parse(localStorage.getItem('rankHistory'));
-    expect(stored).toEqual(existingRanks);
+    expect(stored[todayKey]).toEqual(existingRanks);
   });
 
-  it('should clear rankHistory when snapshot is older than 10 days', async () => {
-    const oldDate = new Date();
-    oldDate.setDate(oldDate.getDate() - 11);
-    const existingRanks = { bitcoin: 1, ethereum: 2 };
-    localStorage.setItem('rankHistory', JSON.stringify(existingRanks));
-    localStorage.setItem('rankSnapshotDate', oldDate.toDateString());
+  it('should prune snapshots older than one month', async () => {
+    localStorage.setItem('rankHistory', JSON.stringify({ [oldDay]: { bitcoin: 1 }, [todayKey]: { bitcoin: 2 } }));
+    localStorage.setItem('rankSnapshotDate', todayKey);
 
     render(<App />);
     await waitFor(
@@ -442,20 +444,15 @@ describe('App - Rank snapshot logic', () => {
     );
 
     const stored = JSON.parse(localStorage.getItem('rankHistory'));
-    expect(stored).toEqual({});
-
-    const snapshotDate = localStorage.getItem('rankSnapshotDate');
-    expect(snapshotDate).toBe('');
+    expect(stored[oldDay]).toBeUndefined();
+    expect(stored[todayKey]).toBeDefined();
   });
 
-  it('should save new snapshot after clearing stale one on next load', async () => {
-    const oldDate = new Date();
-    oldDate.setDate(oldDate.getDate() - 11);
-    const existingRanks = { bitcoin: 1, ethereum: 2 };
-    localStorage.setItem('rankHistory', JSON.stringify(existingRanks));
-    localStorage.setItem('rankSnapshotDate', oldDate.toDateString());
+  it('should keep recent snapshots within one month', async () => {
+    localStorage.setItem('rankHistory', JSON.stringify({ [recentDay]: { bitcoin: 5 }, [todayKey]: { bitcoin: 6 } }));
+    localStorage.setItem('rankSnapshotDate', todayKey);
 
-    const { unmount } = render(<App />);
+    render(<App />);
     await waitFor(
       () => {
         expect(screen.getByText('Bitcoin')).toBeInTheDocument();
@@ -463,9 +460,16 @@ describe('App - Rank snapshot logic', () => {
       { timeout: 3000 },
     );
 
-    unmount();
+    const stored = JSON.parse(localStorage.getItem('rankHistory'));
+    expect(stored[recentDay]).toBeDefined();
+    expect(stored[todayKey]).toBeDefined();
+  });
 
-    const { unmount: unmount2 } = render(<App />);
+  it('should append a new snapshot on a new day while keeping history', async () => {
+    localStorage.setItem('rankHistory', JSON.stringify({ [dayAgo]: { bitcoin: 4, ethereum: 5, solana: 6 } }));
+    localStorage.setItem('rankSnapshotDate', dayAgo);
+
+    render(<App />);
     await waitFor(
       () => {
         expect(screen.getByText('Bitcoin')).toBeInTheDocument();
@@ -476,16 +480,100 @@ describe('App - Rank snapshot logic', () => {
     await waitFor(
       () => {
         const stored = JSON.parse(localStorage.getItem('rankHistory'));
-        expect(stored.bitcoin).toBeDefined();
-        expect(stored).not.toEqual(existingRanks);
+        expect(stored[dayAgo]).toBeDefined();
+        expect(stored[todayKey]).toBeDefined();
+        expect(stored[todayKey].bitcoin).toBeDefined();
       },
       { timeout: 3000 },
     );
 
     const snapshotDate = localStorage.getItem('rankSnapshotDate');
-    expect(snapshotDate).toBe(new Date().toDateString());
+    expect(snapshotDate).toBe(todayKey);
+  });
+});
 
-    unmount2();
+describe('App - Monthly rank history (integration)', () => {
+  const dayMs = 24 * 60 * 60 * 1000;
+  const startDate = new Date('2026-01-01T12:00:00');
+
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(startDate);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  const flushPromises = async () => {
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+  };
+
+  it('should accumulate one daily snapshot per day over 35 days and prune to ~30', async () => {
+    render(<App />);
+    await waitFor(
+      () => {
+        expect(screen.getByText('Bitcoin')).toBeInTheDocument();
+      },
+      { timeout: 3000 },
+    );
+
+    expect(JSON.parse(localStorage.getItem('rankHistory'))[getDayKey(startDate)]).toBeDefined();
+
+    for (let day = 1; day < 35; day++) {
+      vi.setSystemTime(new Date(startDate.getTime() + day * dayMs));
+      fireEvent.keyDown(window, { key: 'r' });
+      await flushPromises();
+    }
+
+    const stored = JSON.parse(localStorage.getItem('rankHistory'));
+    const keys = Object.keys(stored).sort();
+    expect(keys).toHaveLength(31);
+    expect(keys[0]).toBe(getDayKey(new Date(startDate.getTime() + 4 * dayMs)));
+    expect(keys[keys.length - 1]).toBe(getDayKey(new Date(startDate.getTime() + 34 * dayMs)));
+
+    const snapshotDate = localStorage.getItem('rankSnapshotDate');
+    expect(snapshotDate).toBe(getDayKey(new Date(startDate.getTime() + 34 * dayMs)));
+  });
+
+  it('should keep the first snapshot of the day even after many same-day refreshes', async () => {
+    localStorage.setItem(
+      'rankHistory',
+      JSON.stringify({
+        [getDayKey(new Date(startDate.getTime() - dayMs))]: { bitcoin: 4, ethereum: 5, solana: 6 },
+      }),
+    );
+    localStorage.setItem('rankSnapshotDate', getDayKey(new Date(startDate.getTime() - dayMs)));
+
+    render(<App />);
+    await waitFor(
+      () => {
+        expect(screen.getByText('Bitcoin')).toBeInTheDocument();
+      },
+      { timeout: 3000 },
+    );
+
+    const firstSnap = JSON.parse(localStorage.getItem('rankHistory'))[getDayKey(startDate)];
+    expect(firstSnap).toBeDefined();
+    expect(firstSnap.bitcoin).toBeDefined();
+
+    vi.setSystemTime(new Date(startDate.getTime() + 1 * dayMs));
+    fireEvent.keyDown(window, { key: 'r' });
+    await flushPromises();
+
+    vi.setSystemTime(new Date(startDate.getTime() + 2 * dayMs));
+    fireEvent.keyDown(window, { key: 'r' });
+    await flushPromises();
+
+    const stored = JSON.parse(localStorage.getItem('rankHistory'));
+    const keys = Object.keys(stored).sort();
+    expect(keys).toHaveLength(4);
+    const todaySnap = stored[getDayKey(startDate)];
+    expect(todaySnap).toEqual(firstSnap);
   });
 });
 

@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
-import { formatPrice } from '../core/utils.js';
+import { formatPrice, getRankEvolution } from '../core/utils.js';
 import { getImageUrl } from '../core/imageCache.js';
 import { fetchCoinHistory } from '../core/api.js';
 
@@ -36,9 +36,7 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite, hideRan
   const sparklineData = coin.sparkline_in_7d?.price || [];
   const imageUrl = getImageUrl(coin.id, coin.image);
 
-  const previousRank = rankHistory[coin.id];
-  const validPreviousRank = typeof previousRank === 'number' && Number.isFinite(previousRank) && previousRank > 0;
-  const rankEvolution = validPreviousRank && coin.display_rank != null ? previousRank - coin.display_rank : null;
+  const rankEvolution = getRankEvolution(rankHistory, coin.id);
 
   const handleMouseEnter = useCallback(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);

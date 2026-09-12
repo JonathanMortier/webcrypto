@@ -7,4 +7,15 @@ export {
   getTopGainers,
   calculateMarketStats,
 } from './api.js';
-export { formatPrice, formatLargeNumber, getChangeClass, getChangeSign, formatTime } from './utils.js';
+export {
+  formatPrice,
+  formatLargeNumber,
+  getChangeClass,
+  getChangeSign,
+  formatTime,
+  getDayKey,
+  normalizeRankHistory,
+  appendDailySnapshot,
+  pruneRankHistory,
+  getRankEvolution,
+} from './utils.js';

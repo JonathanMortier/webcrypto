@@ -2,30 +2,30 @@
 
 ## Purpose
 
-Show each cryptocurrency's rank evolution compared to the previous week, using a daily rank snapshot stored in localStorage.
+Show each cryptocurrency's rank evolution over a rolling month, using one daily rank snapshot per day stored in localStorage.
 
 ## Context
 
-The app assigns a synthetic `display_rank` to each coin after stablecoin removal (`App.jsx:190`). This rank is based on market cap ordering. Currently there is no rank history.
+The app assigns a synthetic `display_rank` to each coin after stablecoin removal. This rank is based on market cap ordering. The system keeps a dated history of daily snapshots so the evolution can be computed between the current snapshot and the oldest snapshot still retained.
 
 ## Requirements
 
 ### Requirement: Daily rank snapshot
 
-The system SHALL store a daily snapshot of all crypto rankings in localStorage.
+The system SHALL store at most one rank snapshot per calendar day.
 
 #### Scenario: First visit of the day
 
 - GIVEN the user opens the app
 - WHEN `loadData()` completes and today's date differs from `rankSnapshotDate`
-- THEN the current `display_rank` of each coin (keyed by `id`) is saved to `rankHistory`
+- THEN a new snapshot `{ coinId: display_rank }` is recorded under today's date key in `rankHistory`
 - AND `rankSnapshotDate` is updated to today
 
 #### Scenario: Same day, multiple refreshes
 
-- GIVEN the user already visited the app today
+- GIVEN a snapshot already exists for today
 - WHEN `loadData()` completes
-- THEN the rank snapshot is NOT overwritten (preserves morning snapshot)
+- THEN today's snapshot is NOT overwritten (preserves first snapshot of the day)
 
 #### Scenario: localStorage empty
 
@@ -33,31 +33,53 @@ The system SHALL store a daily snapshot of all crypto rankings in localStorage.
 - WHEN the app loads
 - THEN `rankHistory` is initialized as `{}`
 
+### Requirement: Rolling one-month retention
+
+The system SHALL keep rank snapshots for up to 30 days (`RANK_HISTORY_MAX_AGE_DAYS`).
+
+#### Scenario: Prune older snapshots
+
+- GIVEN `rankHistory` contains a snapshot older than 30 days
+- WHEN `loadData()` runs
+- THEN snapshots dated before the 30-day cutoff are removed
+
+#### Scenario: Recent snapshots kept
+
+- GIVEN `rankHistory` contains snapshots within the last 30 days
+- WHEN `loadData()` runs
+- THEN recent snapshots are kept and used for evolution computation
+
+#### Scenario: Legacy single-snapshot format
+
+- GIVEN localStorage contains the old flat format `{ coinId: rank }`
+- WHEN `rankHistory` is initialized
+- THEN the data is migrated to a dated snapshot under the last known `rankSnapshotDate`
+
 ### Requirement: Rank comparison data
 
-The system SHALL compute rank evolution by comparing current rank with the snapshot from ~7 days ago.
+The system SHALL compute rank evolution by comparing the current snapshot with the oldest snapshot retained for a coin.
 
-#### Scenario: Rank improved
+#### Scenario: Rank improved over the month
 
-- GIVEN a coin's current `display_rank` is 3
-- AND its rank 7 days ago was 5
+- GIVEN a coin's current snapshot rank is 3
+- AND its oldest retained rank was 5
 - THEN the evolution is +2 (improved by 2 positions)
 
-#### Scenario: Rank dropped
+#### Scenario: Rank dropped over the month
 
-- GIVEN a coin's current `display_rank` is 7
-- AND its rank 7 days ago was 4
+- GIVEN a coin's current snapshot rank is 7
+- AND its oldest retained rank was 4
 - THEN the evolution is -3 (dropped 3 positions)
 
-#### Scenario: No previous data
+#### Scenario: No data
 
-- GIVEN a coin has no rank entry from 7 days ago
+- GIVEN a coin has fewer than two snapshots in `rankHistory`
 - WHEN evolution is computed
 - THEN evolution is `null` (no badge displayed)
 
-#### Scenario: New coin not in previous snapshot
+#### Scenario: New coin not in previous snapshots
 
-- GIVEN a coin was not in the top 50 last week
+- GIVEN a coin was not in the top 50 in any previous snapshot
 - WHEN evolution is computed
 - THEN evolution is `null`
 
@@ -67,19 +89,19 @@ The system SHALL display a rank evolution badge on each CryptoCard.
 
 #### Scenario: Rank improved
 
-- GIVEN a coin improved its rank
+- GIVEN a coin improved its rank over the month
 - WHEN the card is rendered
 - THEN a green upward arrow with the number of positions is shown (e.g. `▲2`)
 
 #### Scenario: Rank dropped
 
-- GIVEN a coin dropped in rank
+- GIVEN a coin dropped in rank over the month
 - WHEN the card is rendered
 - THEN a red downward arrow with the number of positions is shown (e.g. `▼3`)
 
 #### Scenario: Rank unchanged
 
-- GIVEN a coin's rank is the same as 7 days ago
+- GIVEN a coin's rank is the same over the month
 - WHEN the card is rendered
 - THEN a neutral indicator is shown (e.g. `—`)
 
@@ -91,60 +113,39 @@ The system SHALL display a rank evolution badge on each CryptoCard.
 
 ### Requirement: localStorage keys
 
-The system SHALL use the following new localStorage keys:
+The system SHALL use the following localStorage keys:
 
-| Key                | Type                     | Description                         |
-| ------------------ | ------------------------ | ----------------------------------- |
-| `rankHistory`      | `JSON.stringify(Object)` | `{ coinId: rank }` — daily snapshot |
-| `rankSnapshotDate` | `Date.toDateString()`    | Date of last rank snapshot          |
+| Key                | Type                     | Description                                       |
+| ------------------ | ------------------------ | ------------------------------------------------- |
+| `rankHistory`      | `JSON.stringify(Object)` | `{ dateKey: { coinId: rank } }` — daily snapshots |
+| `rankSnapshotDate` | `YYYY-MM-DD`             | Date key of the last recorded daily snapshot      |
 
-### Requirement: One week retention
-
-The system SHALL keep rank data for at least 7 days, maximum 10 days.
-
-#### Scenario: Single snapshot strategy
-
-- GIVEN only ONE snapshot is stored (`rankHistory`)
-- WHEN a new daily snapshot is saved
-- THEN the previous snapshot is overwritten
-- AND the comparison uses the single stored snapshot
-
-#### Scenario: Data older than 10 days
-
-- GIVEN `rankSnapshotDate` is more than 10 days old
-- WHEN the app loads
-- THEN the old snapshot is cleared
-- AND no evolution badge is shown until a new snapshot is stored
+`dateKey` uses the `YYYY-MM-DD` format (`getDayKey` in `utils.js`) so the keys are lexicographically sortable.
 
 ## Implementation Plan
 
-### Step 1: Add localStorage keys in App.jsx
+### Step 1: Add snapshot helpers in utils.js
 
-- Add `rankHistory` state (init from localStorage, default `{}`)
-- Add `rankSnapshotDate` state (init from localStorage, default `''`)
-- Add useEffect to persist both to localStorage
+- `getDayKey(date)` returns `YYYY-MM-DD`
+- `normalizeRankHistory(saved, fallbackDate)` migrates legacy flat snapshots
+- `appendDailySnapshot(rankHistory, dateKey, ranks, maxAgeDays, now)` records today's ranks (without overwriting an existing snapshot for the same day) then prunes old snapshots
+- `pruneRankHistory(rankHistory, maxAgeDays, now)` removes snapshots older than the cutoff
+- `getRankEvolution(rankHistory, coinId)` computes oldest minus newest retained rank
 
 ### Step 2: Save daily snapshot in loadData()
 
-- After `setCryptos(withRank)`, check if today differs from `rankSnapshotDate`
-- If different: build `{ coin.id: coin.display_rank }` from `withRank`
-- Save to `rankHistory` and update `rankSnapshotDate`
+- Build `todayRanks` from `withRank`
+- Call `appendDailySnapshot(rankHistory, today, todayRanks, RANK_HISTORY_MAX_AGE_DAYS)` and store the result
+- Persist both keys to localStorage
 
 ### Step 3: Compute evolution in CryptoCard
 
-- Pass `rankHistory` as prop from App → CryptoGrid → CryptoCard
-- In CryptoCard: compare `coin.display_rank` with `rankHistory[coin.id]`
-- Compute delta: `previousRank - currentRank` (positive = improved)
+- Receive `rankHistory` from App → CryptoGrid → CryptoCard
+- Call `getRankEvolution(rankHistory, coin.id)` and render the badge
+- `delta > 0` = improved, `delta < 0` = dropped, `delta === 0` = stable
 
-### Step 4: Add evolution badge CSS
+### Step 4: Update tests
 
-- `.rank-evolution` container
-- `.rank-up` (green, ▲)
-- `.rank-down` (red, ▼)
-- `.rank-stable` (gray, —)
-
-### Step 5: Update tests
-
-- Unit test for rank snapshot logic
-- Unit test for evolution computation
-- CryptoCard test for evolution badge rendering
+- Unit tests for `getDayKey`, `normalizeRankHistory`, `pruneRankHistory`, `getRankEvolution`
+- App test for the first daily snapshot, same-day preservation, month retention and new-day append
+- CryptoCard test for evolution badge rendering with dated snapshots

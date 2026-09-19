@@ -906,7 +906,8 @@ describe('App - Error retry', () => {
       },
       { timeout: 3000 },
     );
-    expect(screen.getByText('Bitcoin')).toBeInTheDocument();
+    // The call count increments synchronously on click; wait for the data to actually render
+    expect(await screen.findByText('Bitcoin', {}, { timeout: 3000 })).toBeInTheDocument();
   });
 });
 

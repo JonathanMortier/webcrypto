@@ -188,5 +188,10 @@
     "id": "ondo-finance",
     "symbol": "ondo",
     "image": "https://coin-images.coingecko.com/coins/images/26580/large/ONDO.png?1696525656"
+  },
+  {
+    "id": "polkadot",
+    "symbol": "dot",
+    "image": "https://coin-images.coingecko.com/coins/images/12171/large/polkadot.jpg?1766533446"
   }
 ]

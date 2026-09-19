@@ -44,6 +44,8 @@ export default function App() {
   const [stablecoins, setStablecoins] = useState([]);
   const [showStablecoins, setShowStablecoins] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const hasDataRef = useRef(false);
   const [error, setError] = useState(null);
   const [lastUpdate, setLastUpdate] = useState(null);
   const [countdown, setCountdown] = useState(REFRESH_INTERVAL);
@@ -214,7 +216,10 @@ export default function App() {
   }, []);
 
   const loadData = useCallback(async () => {
-    setIsLoading(true);
+    // Full loading state only on first load; later refreshes update data in place
+    const isInitialLoad = !hasDataRef.current;
+    if (isInitialLoad) setIsLoading(true);
+    else setIsRefreshing(true);
     setError(null);
 
     try {
@@ -229,6 +234,7 @@ export default function App() {
         (a, b) => (b.price_change_percentage_24h ?? 0) - (a.price_change_percentage_24h ?? 0),
       );
 
+      hasDataRef.current = true;
       setCryptos(withRank);
       setTopGainers(gainers);
       setStocks(sortedStocks);
@@ -248,9 +254,11 @@ export default function App() {
 
       checkPriceAlerts(filtered);
     } catch (err) {
-      setError(err.message);
+      // Keep the data already on screen if a background refresh fails
+      if (isInitialLoad) setError(err.message);
     } finally {
       setIsLoading(false);
+      setIsRefreshing(false);
     }
   }, [checkPriceAlerts]);
 
@@ -465,7 +473,7 @@ export default function App() {
         <Header
           onRefresh={loadData}
           lastUpdate={lastUpdate}
-          isLoading={isLoading}
+          isLoading={isLoading || isRefreshing}
           countdown={countdown}
           theme={theme}
           onThemeToggle={toggleTheme}

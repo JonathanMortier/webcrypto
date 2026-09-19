@@ -596,6 +596,34 @@ describe('App - Keyboard shortcuts', () => {
     );
   });
 
+  it('should update data in place on refresh without showing the loading skeleton', async () => {
+    const { container } = render(<App />);
+    await waitFor(() => expect(screen.getByText('$65,000.00')).toBeInTheDocument(), { timeout: 3000 });
+
+    mockFetchCryptoData.mockResolvedValue(
+      mockCryptos.map((c) => ({ ...c, current_price: c.id === 'bitcoin' ? 66000 : c.current_price })),
+    );
+    fireEvent.keyDown(window, { key: 'r' });
+
+    await waitFor(() => expect(screen.getByText('$66,000.00')).toBeInTheDocument(), { timeout: 3000 });
+    expect(container.querySelector('.csk-card')).not.toBeInTheDocument();
+    expect(screen.queryByText('Chargement des données...')).not.toBeInTheDocument();
+  });
+
+  it('should keep displayed data when a background refresh fails', async () => {
+    render(<App />);
+    await waitFor(() => expect(screen.getByText('Bitcoin')).toBeInTheDocument(), { timeout: 3000 });
+
+    const callsBefore = mockFetchCryptoData.mock.calls.length;
+    mockFetchCryptoData.mockRejectedValue(new Error('Erreur API'));
+    fireEvent.keyDown(window, { key: 'r' });
+
+    await waitFor(() => expect(mockFetchCryptoData.mock.calls.length).toBe(callsBefore + 1), { timeout: 3000 });
+    await act(async () => {});
+    expect(screen.getByText('Bitcoin')).toBeInTheDocument();
+    expect(screen.queryByText(/Erreur API/)).not.toBeInTheDocument();
+  });
+
   it('should toggle the theme when pressing T', async () => {
     render(<App />);
     await waitFor(

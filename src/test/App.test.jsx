@@ -443,9 +443,12 @@ describe('App - Rank snapshot logic', () => {
       { timeout: 3000 },
     );
 
-    const stored = JSON.parse(localStorage.getItem('rankHistory'));
-    expect(stored[oldDay]).toBeUndefined();
-    expect(stored[todayKey]).toBeDefined();
+    // rankHistory is persisted by an effect after the render, so wait for it
+    await waitFor(() => {
+      const stored = JSON.parse(localStorage.getItem('rankHistory'));
+      expect(stored[oldDay]).toBeUndefined();
+      expect(stored[todayKey]).toBeDefined();
+    });
   });
 
   it('should keep recent snapshots within one month', async () => {
@@ -906,7 +909,8 @@ describe('App - Error retry', () => {
       },
       { timeout: 3000 },
     );
-    expect(screen.getByText('Bitcoin')).toBeInTheDocument();
+    // The call count increments synchronously on click; wait for the data to actually render
+    expect(await screen.findByText('Bitcoin', {}, { timeout: 3000 })).toBeInTheDocument();
   });
 });
 

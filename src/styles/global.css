@@ -21,7 +21,7 @@
   --hover-bg: rgba(255, 255, 255, 0.08);
 }
 
-[data-theme="light"] {
+[data-theme='light'] {
   --bg-primary: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   --text-primary: #333;
   --text-secondary: #555;

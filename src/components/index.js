@@ -9,4 +9,6 @@ export { default as InstallPrompt } from './InstallPrompt.jsx';
 export { default as NavMenu } from './NavMenu.jsx';
 export { default as WeatherWidget } from './WeatherWidget.jsx';
 export { default as SpaceXValue } from './SpaceXValue.jsx';
+export { default as StablecoinSection } from './StablecoinSection.jsx';
+export { default as IndexChart } from './IndexChart.jsx';
 export { Loading, Error } from './Status.jsx';

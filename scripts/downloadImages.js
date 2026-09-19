@@ -9,12 +9,18 @@ const CRYPTOS_JSON_PATH = './src/core/cryptoImages.json';
 const IMAGES_DIR = './public/images/cryptos';
 const IMAGE_URLS = JSON.parse(fs.readFileSync(CRYPTOS_JSON_PATH, 'utf8'));
 
+function stripQueryString(url) {
+  const qIndex = url.indexOf('?');
+  return qIndex === -1 ? url : url.substring(0, qIndex);
+}
+
 function downloadImage(url, filepath) {
   return new Promise((resolve, reject) => {
     const file = fs.createWriteStream(filepath);
-    const protocol = url.startsWith('https') ? https : http;
+    const cleanUrl = stripQueryString(url);
+    const protocol = cleanUrl.startsWith('https') ? https : http;
     
-    protocol.get(url, (response) => {
+    protocol.get(cleanUrl, (response) => {
       if (response.statusCode === 200) {
         response.pipe(file);
         file.on('finish', () => {

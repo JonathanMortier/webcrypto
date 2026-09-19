@@ -36,6 +36,29 @@
   letter-spacing: 0.5px;
 }
 
+.category-filter {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.category-filter .category-select {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  min-height: 36px;
+  max-width: 180px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.category-filter .category-select:focus {
+  border-color: var(--accent-primary);
+}
+
 .indicator-value {
   font-size: 1.1rem;
   font-weight: bold;

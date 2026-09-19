@@ -18,14 +18,17 @@ export default function GoldPrice() {
 
   return (
     <div className={`index-card gold-card ${gainClass}`}>
-      <div className="gold-icon"><img src="/images/gold-icon.svg" alt="Gold" /></div>
+      <div className="gold-icon">
+        <img src="/images/gold-icon.svg" alt="Gold" />
+      </div>
       <div className="index-name">Gold (XAU)</div>
       <div className="index-isin">XAU/USD • troy oz</div>
       <div className="index-price">${data.price.toFixed(2)}</div>
       {data.change != null && (
         <div className="index-change">
           <span className={gainClass}>
-            {data.change >= 0 ? '+' : ''}{data.change.toFixed(2)} ({data.changePercent.toFixed(2)}%)
+            {data.change >= 0 ? '+' : ''}
+            {data.change.toFixed(2)} ({data.changePercent.toFixed(2)}%)
           </span>
         </div>
       )}

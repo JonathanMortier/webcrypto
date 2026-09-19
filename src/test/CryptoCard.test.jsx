@@ -1,10 +1,15 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import CryptoCard from '../components/CryptoCard.jsx';
 
 vi.mock('../core/imageCache.js', () => ({
   getImageUrl: vi.fn((id, image) => image || `/images/cryptos/${id}.png`),
 }));
+
+function withRouter(element) {
+  return <MemoryRouter>{element}</MemoryRouter>;
+}
 
 describe('CryptoCard', () => {
   const mockCoin = {
@@ -24,67 +29,148 @@ describe('CryptoCard', () => {
   };
 
   it('should render crypto name and symbol', () => {
-    render(<CryptoCard coin={mockCoin} />);
+    render(withRouter(<CryptoCard coin={mockCoin} />));
     expect(screen.getByText('Bitcoin')).toBeInTheDocument();
     expect(screen.getByText('btc')).toBeInTheDocument();
   });
 
   it('should render crypto price', () => {
-    render(<CryptoCard coin={mockCoin} />);
+    render(withRouter(<CryptoCard coin={mockCoin} />));
     expect(screen.getByText('$50,000.00')).toBeInTheDocument();
   });
 
   it('should render market cap rank badge', () => {
-    render(<CryptoCard coin={mockCoin} />);
+    render(withRouter(<CryptoCard coin={mockCoin} />));
     expect(screen.getByText('#1')).toBeInTheDocument();
   });
 
   it('should render price change with positive sign', () => {
-    render(<CryptoCard coin={mockCoin} />);
-    expect(screen.getByText('+5.50% (24h)')).toBeInTheDocument();
+    render(withRouter(<CryptoCard coin={mockCoin} />));
+    expect(screen.getByText('+5.50%')).toBeInTheDocument();
   });
 
   it('should render negative change correctly', () => {
     const negativeCoin = { ...mockCoin, price_change_percentage_24h: -3.2 };
-    render(<CryptoCard coin={negativeCoin} />);
-    expect(screen.getByText('-3.20% (24h)')).toBeInTheDocument();
+    render(withRouter(<CryptoCard coin={negativeCoin} />));
+    expect(screen.getByText('-3.20%')).toBeInTheDocument();
   });
 
   it('should render market cap', () => {
-    render(<CryptoCard coin={mockCoin} />);
+    render(withRouter(<CryptoCard coin={mockCoin} />));
     expect(screen.getByText('$1.00T')).toBeInTheDocument();
   });
 
   it('should render volume', () => {
-    render(<CryptoCard coin={mockCoin} />);
+    render(withRouter(<CryptoCard coin={mockCoin} />));
     expect(screen.getByText('$50.00B')).toBeInTheDocument();
   });
 
+  it('should render category badges', () => {
+    const coin = { ...mockCoin, categories: ['Cryptocurrency', 'Smart Contract Platform'] };
+    render(withRouter(<CryptoCard coin={coin} />));
+    expect(screen.getByText('Cryptocurrency')).toBeInTheDocument();
+    expect(screen.getByText('Smart Contract Platform')).toBeInTheDocument();
+  });
+
+  it('should render no category badges when categories are empty', () => {
+    const coin = { ...mockCoin, categories: [] };
+    render(withRouter(<CryptoCard coin={coin} />));
+    expect(screen.queryByText('Cryptocurrency')).toBeNull();
+    expect(document.querySelector('.crypto-categories')).toBeNull();
+  });
+
   it('should show chart on mouse enter after delay', async () => {
-    render(<CryptoCard coin={mockCoin} />);
+    render(withRouter(<CryptoCard coin={mockCoin} />));
     const card = screen.getByText('Bitcoin').closest('.crypto-card');
-    
+
     fireEvent.mouseEnter(card);
-    
-    await waitFor(() => {
-      expect(screen.queryByText('Graphique indisponible')).toBeNull();
-    }, { timeout: 350 });
+
+    await waitFor(
+      () => {
+        expect(screen.queryByText('Graphique indisponible')).toBeNull();
+      },
+      { timeout: 350 },
+    );
   });
 
   it('should handle null price_change_percentage_24h', () => {
     const coinWithoutChange = { ...mockCoin, price_change_percentage_24h: null };
-    render(<CryptoCard coin={coinWithoutChange} />);
-    expect(screen.getByText('+0.00% (24h)')).toBeInTheDocument();
+    render(withRouter(<CryptoCard coin={coinWithoutChange} />));
+    expect(screen.getByText('+0.00%')).toBeInTheDocument();
   });
 
   it('should handle missing sparkline data', async () => {
     const coinWithoutSparkline = { ...mockCoin, sparkline_in_7d: null };
-    render(<CryptoCard coin={coinWithoutSparkline} />);
+    render(withRouter(<CryptoCard coin={coinWithoutSparkline} />));
     const card = screen.getByText('Bitcoin').closest('.crypto-card');
     fireEvent.mouseEnter(card);
-    
-    await waitFor(() => {
-      expect(screen.getByText('Graphique indisponible')).toBeInTheDocument();
-    }, { timeout: 350 });
+
+    await waitFor(
+      () => {
+        expect(screen.getByText('Graphique indisponible')).toBeInTheDocument();
+      },
+      { timeout: 350 },
+    );
+  });
+
+  it('should render no rank-evolution badge when rankHistory is empty', () => {
+    render(withRouter(<CryptoCard coin={mockCoin} rankHistory={{}} />));
+    const rank = screen.getByText('#1');
+    expect(rank.querySelector('.rank-evolution')).toBeNull();
+  });
+
+  it('should render ▲ badge when rank improved', () => {
+    const coin = { ...mockCoin, display_rank: 5 };
+    const rankHistory = { '2026-08-01': { bitcoin: 10 }, '2026-09-01': { bitcoin: 5 } };
+    render(withRouter(<CryptoCard coin={coin} rankHistory={rankHistory} />));
+    const badge = screen.getByText('▲5');
+    expect(badge).toBeInTheDocument();
+    expect(badge).toHaveClass('rank-up');
+  });
+
+  it('should render ▼ badge when rank dropped', () => {
+    const coin = { ...mockCoin, display_rank: 10 };
+    const rankHistory = { '2026-08-01': { bitcoin: 5 }, '2026-09-01': { bitcoin: 10 } };
+    render(withRouter(<CryptoCard coin={coin} rankHistory={rankHistory} />));
+    const badge = screen.getByText('▼5');
+    expect(badge).toBeInTheDocument();
+    expect(badge).toHaveClass('rank-down');
+  });
+
+  it('should render — badge when rank unchanged', () => {
+    const coin = { ...mockCoin, display_rank: 5 };
+    const rankHistory = { '2026-08-01': { bitcoin: 5 }, '2026-09-01': { bitcoin: 5 } };
+    render(withRouter(<CryptoCard coin={coin} rankHistory={rankHistory} />));
+    const badge = screen.getByText('—');
+    expect(badge).toBeInTheDocument();
+    expect(badge).toHaveClass('rank-stable');
+  });
+
+  it('should apply rank-up class when rank improved', () => {
+    const coin = { ...mockCoin, display_rank: 3 };
+    const rankHistory = { '2026-08-01': { bitcoin: 7 }, '2026-09-01': { bitcoin: 3 } };
+    render(withRouter(<CryptoCard coin={coin} rankHistory={rankHistory} />));
+    const badge = screen.getByText('▲4');
+    expect(badge).toHaveClass('rank-up');
+    expect(badge).not.toHaveClass('rank-down');
+  });
+
+  it('should apply rank-down class when rank dropped', () => {
+    const coin = { ...mockCoin, display_rank: 8 };
+    const rankHistory = { '2026-08-01': { bitcoin: 2 }, '2026-09-01': { bitcoin: 8 } };
+    render(withRouter(<CryptoCard coin={coin} rankHistory={rankHistory} />));
+    const badge = screen.getByText('▼6');
+    expect(badge).toHaveClass('rank-down');
+    expect(badge).not.toHaveClass('rank-up');
+  });
+
+  it('should apply rank-stable class when rank unchanged', () => {
+    const coin = { ...mockCoin, display_rank: 1 };
+    const rankHistory = { '2026-08-01': { bitcoin: 1 }, '2026-09-01': { bitcoin: 1 } };
+    render(withRouter(<CryptoCard coin={coin} rankHistory={rankHistory} />));
+    const badge = screen.getByText('—');
+    expect(badge).toHaveClass('rank-stable');
+    expect(badge).not.toHaveClass('rank-up');
+    expect(badge).not.toHaveClass('rank-down');
   });
 });

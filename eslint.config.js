@@ -1,11 +1,12 @@
 import js from '@eslint/js';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
+import prettierConfig from 'eslint-config-prettier';
 
 export default [
   js.configs.recommended,
   {
-    ignores: ['dist', 'node_modules', 'coverage']
+    ignores: ['dist', 'node_modules', 'coverage'],
   },
   {
     files: ['**/*.js', '**/*.jsx'],
@@ -26,17 +27,17 @@ export default [
         JSON: 'readonly',
         Math: 'readonly',
         Notification: 'readonly',
-        navigator: 'readonly'
+        navigator: 'readonly',
       },
       parserOptions: {
         ecmaFeatures: {
-          jsx: true
-        }
-      }
+          jsx: true,
+        },
+      },
     },
     plugins: {
       react: reactPlugin,
-      'react-hooks': reactHooksPlugin
+      'react-hooks': reactHooksPlugin,
     },
     rules: {
       'react/jsx-uses-react': 'error',
@@ -44,12 +45,13 @@ export default [
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
       'no-unused-vars': 'warn',
-      'no-undef': 'warn'
+      'no-undef': 'warn',
     },
     settings: {
       react: {
-        version: 'detect'
-      }
-    }
-  }
+        version: 'detect',
+      },
+    },
+  },
+  prettierConfig,
 ];

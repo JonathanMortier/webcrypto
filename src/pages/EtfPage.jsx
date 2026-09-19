@@ -10,8 +10,14 @@ export default function EtfPage({ searchQuery }) {
 
   useEffect(() => {
     fetchEtfData()
-      .then(d => { setData(d); setLoading(false); })
-      .catch(e => { setError(e.message); setLoading(false); });
+      .then((d) => {
+        setData(d);
+        setLoading(false);
+      })
+      .catch((e) => {
+        setError(e.message);
+        setLoading(false);
+      });
   }, []);
 
   if (loading) return <Loading />;

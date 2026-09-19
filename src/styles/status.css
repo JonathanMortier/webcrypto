@@ -23,7 +23,9 @@
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .error .retry-btn:hover {

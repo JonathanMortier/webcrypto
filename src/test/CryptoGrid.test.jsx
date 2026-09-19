@@ -3,9 +3,7 @@ import { render, screen } from '@testing-library/react';
 import CryptoGrid from '../components/CryptoGrid.jsx';
 
 vi.mock('../components/CryptoCard.jsx', () => ({
-  default: ({ coin }) => (
-    <div data-testid="crypto-card">{coin.name}</div>
-  ),
+  default: ({ coin }) => <div data-testid="crypto-card">{coin.name}</div>,
 }));
 
 describe('CryptoGrid', () => {

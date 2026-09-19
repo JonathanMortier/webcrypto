@@ -17,7 +17,9 @@
   border-radius: 12px;
   padding: 20px;
   text-align: center;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .index-card:hover {
@@ -49,6 +51,21 @@
 .index-change {
   font-size: 0.9rem;
   margin-bottom: 14px;
+}
+
+.index-chart {
+  height: 120px;
+  width: 100%;
+}
+
+.index-chart-loading,
+.index-chart-empty {
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: var(--text-muted);
 }
 
 .index-card.positive {

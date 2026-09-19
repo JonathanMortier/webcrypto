@@ -1,12 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-  STABLECOINS,
-  XSTOCK_IDS,
-  API_URL,
-  XSTOCKS_API_URL,
-  REFRESH_INTERVAL,
-  CACHE_TTL,
-} from '../core/constants.js';
+import { STABLECOINS, XSTOCK_IDS, API_URL, XSTOCKS_API_URL, REFRESH_INTERVAL, CACHE_TTL } from '../core/constants.js';
 
 describe('STABLECOINS', () => {
   it('should be an array', () => {

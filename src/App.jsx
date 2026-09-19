@@ -22,7 +22,7 @@ import {
   StocksTicker,
   MarketIndicators,
   StablecoinSection,
-  Loading,
+  CardSkeletonGrid,
   Error,
   InstallPrompt,
 } from './components/index.js';
@@ -504,9 +504,9 @@ export default function App() {
                   />
                 )}
 
-                {isLoading && <Loading />}
+                {isLoading && <CardSkeletonGrid />}
                 {!isCategoryView && error && <Error message={error} onRetry={loadData} />}
-                {categoryLoading && isCategoryView && <Loading />}
+                {categoryLoading && isCategoryView && <CardSkeletonGrid />}
                 {isCategoryView && categoryError && <Error message={categoryError} onRetry={loadData} />}
                 {!isLoading && !error && !categoryLoading && !categoryError && (
                   <CryptoGrid

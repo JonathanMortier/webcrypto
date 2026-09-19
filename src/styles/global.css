@@ -35,6 +35,17 @@
   --hover-bg: rgba(0, 0, 0, 0.05);
 }
 
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(40% 35% at 15% 10%, rgba(0, 212, 255, 0.16), transparent 70%),
+    radial-gradient(35% 30% at 85% 80%, rgba(139, 92, 246, 0.14), transparent 70%);
+}
+
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: var(--bg-primary);

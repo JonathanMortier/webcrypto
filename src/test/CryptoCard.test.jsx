@@ -173,4 +173,93 @@ describe('CryptoCard', () => {
     expect(badge).not.toHaveClass('rank-up');
     expect(badge).not.toHaveClass('rank-down');
   });
+
+  describe('trend class', () => {
+    it('should apply positive class on the card when 24h change is positive', () => {
+      const { container } = render(withRouter(<CryptoCard coin={mockCoin} />));
+      expect(container.querySelector('.crypto-card')).toHaveClass('positive');
+    });
+
+    it('should apply negative class on the card when 24h change is negative', () => {
+      const coin = { ...mockCoin, price_change_percentage_24h: -3.2 };
+      const { container } = render(withRouter(<CryptoCard coin={coin} />));
+      const card = container.querySelector('.crypto-card');
+      expect(card).toHaveClass('negative');
+      expect(card).not.toHaveClass('positive');
+    });
+  });
+
+  describe('ATH progress bar', () => {
+    const getBar = () => screen.queryByRole('progressbar');
+    const getFill = (container) => container.querySelector('.ath-progress-fill');
+
+    it('should render the percentage of the ATH reached', () => {
+      render(withRouter(<CryptoCard coin={{ ...mockCoin, ath: 100000 }} />));
+      expect(getBar()).toHaveAttribute('aria-valuenow', '50');
+      expect(screen.getByText("50% de l'ATH")).toBeInTheDocument();
+    });
+
+    it('should size the fill according to the percentage', () => {
+      const { container } = render(withRouter(<CryptoCard coin={{ ...mockCoin, ath: 100000 }} />));
+      expect(getFill(container)).toHaveStyle({ width: '50%' });
+    });
+
+    it('should not render when ATH is missing or zero', () => {
+      const { rerender } = render(withRouter(<CryptoCard coin={mockCoin} />));
+      expect(getBar()).not.toBeInTheDocument();
+      rerender(withRouter(<CryptoCard coin={{ ...mockCoin, ath: 0 }} />));
+      expect(getBar()).not.toBeInTheDocument();
+    });
+
+    it('should cap the percentage at 100 when price exceeds ATH', () => {
+      render(withRouter(<CryptoCard coin={{ ...mockCoin, ath: 25000 }} />));
+      expect(getBar()).toHaveAttribute('aria-valuenow', '100');
+    });
+
+    it('should map proximity to ATH to a red-to-green hue', () => {
+      const hueFor = (ath) => {
+        const { container, unmount } = render(withRouter(<CryptoCard coin={{ ...mockCoin, ath }} />));
+        const hue = getFill(container).style.getPropertyValue('--ath-hue');
+        unmount();
+        return Number(hue);
+      };
+      expect(hueFor(50000)).toBe(120); // at ATH -> green
+      expect(hueFor(100000)).toBe(60); // halfway -> yellow
+      expect(hueFor(1000000)).toBe(6); // far from ATH -> red
+    });
+  });
+
+  describe('price flash on update', () => {
+    it('should not flash on first render', () => {
+      const { container } = render(withRouter(<CryptoCard coin={mockCoin} />));
+      expect(container.querySelector('.crypto-price')).not.toHaveClass('price-flash-up');
+      expect(container.querySelector('.crypto-price')).not.toHaveClass('price-flash-down');
+    });
+
+    it('should flash up when the price increases', () => {
+      const { container, rerender } = render(withRouter(<CryptoCard coin={mockCoin} />));
+      rerender(withRouter(<CryptoCard coin={{ ...mockCoin, current_price: 51000 }} />));
+      expect(container.querySelector('.crypto-price')).toHaveClass('price-flash-up');
+    });
+
+    it('should flash down when the price decreases', () => {
+      const { container, rerender } = render(withRouter(<CryptoCard coin={mockCoin} />));
+      rerender(withRouter(<CryptoCard coin={{ ...mockCoin, current_price: 49000 }} />));
+      expect(container.querySelector('.crypto-price')).toHaveClass('price-flash-down');
+    });
+
+    it('should replay the animation by remounting the price element on each change', () => {
+      const { container, rerender } = render(withRouter(<CryptoCard coin={mockCoin} />));
+      rerender(withRouter(<CryptoCard coin={{ ...mockCoin, current_price: 51000 }} />));
+      const first = container.querySelector('.crypto-price');
+      rerender(withRouter(<CryptoCard coin={{ ...mockCoin, current_price: 52000 }} />));
+      expect(container.querySelector('.crypto-price')).not.toBe(first);
+    });
+
+    it('should not flash when the price is unchanged', () => {
+      const { container, rerender } = render(withRouter(<CryptoCard coin={mockCoin} />));
+      rerender(withRouter(<CryptoCard coin={{ ...mockCoin, market_cap: 2 }} />));
+      expect(container.querySelector('.crypto-price')).not.toHaveClass('price-flash-up');
+    });
+  });
 });

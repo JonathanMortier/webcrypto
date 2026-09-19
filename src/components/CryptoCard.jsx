@@ -26,12 +26,23 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite, hideRan
     setShowChart((prev) => !prev);
   }, []);
 
+  // Track price moves during render so the price element can be re-keyed and its flash animation replayed
+  const [priceMove, setPriceMove] = useState({ price: coin.current_price, dir: null, count: 0 });
+  if (priceMove.price !== coin.current_price) {
+    setPriceMove({
+      price: coin.current_price,
+      dir: coin.current_price > priceMove.price ? 'up' : 'down',
+      count: priceMove.count + 1,
+    });
+  }
+
   const change = coin.price_change_percentage_24h ?? 0;
   const isPositive = change >= 0;
   const changeClass = isPositive ? 'positive' : 'negative';
   const changeSign = isPositive ? '+' : '';
 
   const ath = coin.ath || 0;
+  const athPct = ath > 0 ? Math.min(100, Math.max(0, Math.round((coin.current_price / ath) * 100))) : 0;
 
   const sparklineData = coin.sparkline_in_7d?.price || [];
   const imageUrl = getImageUrl(coin.id, coin.image);
@@ -81,7 +92,7 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite, hideRan
 
   return (
     <div
-      className={`crypto-card ${isMobile ? 'mobile' : ''}`}
+      className={`crypto-card ${changeClass} ${isMobile ? 'mobile' : ''}`}
       onMouseEnter={!isMobile ? handleMouseEnter : undefined}
       onMouseLeave={!isMobile ? handleMouseLeave : undefined}
     >
@@ -153,12 +164,33 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite, hideRan
           </div>
         )}
         <div className="crypto-main-row">
-          <span className="crypto-price">${formatPrice(coin.current_price)}</span>
+          <span key={priceMove.count} className={`crypto-price${priceMove.dir ? ` price-flash-${priceMove.dir}` : ''}`}>
+            ${formatPrice(coin.current_price)}
+          </span>
           <span className={`crypto-change ${changeClass}`}>
             {changeSign}
             {change.toFixed(2)}%
           </span>
         </div>
+        {ath > 0 && (
+          <div
+            className="ath-progress"
+            role="progressbar"
+            aria-label="Prix par rapport à l'ATH"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={athPct}
+            title={`${athPct}% de l'ATH`}
+          >
+            <div className="ath-progress-track">
+              <div
+                className="ath-progress-fill"
+                style={{ width: `${athPct}%`, '--ath-hue': Math.round(athPct * 1.2) }}
+              />
+            </div>
+            <span className="ath-progress-label">{athPct}% de l&apos;ATH</span>
+          </div>
+        )}
         <div className="crypto-stats">
           <div className="stat">
             <div className="stat-label">MCap</div>

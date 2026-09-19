@@ -32,6 +32,7 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite, hideRan
   const changeSign = isPositive ? '+' : '';
 
   const ath = coin.ath || 0;
+  const athPct = ath > 0 ? Math.min(100, Math.max(0, Math.round((coin.current_price / ath) * 100))) : 0;
 
   const sparklineData = coin.sparkline_in_7d?.price || [];
   const imageUrl = getImageUrl(coin.id, coin.image);
@@ -81,7 +82,7 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite, hideRan
 
   return (
     <div
-      className={`crypto-card ${isMobile ? 'mobile' : ''}`}
+      className={`crypto-card ${changeClass} ${isMobile ? 'mobile' : ''}`}
       onMouseEnter={!isMobile ? handleMouseEnter : undefined}
       onMouseLeave={!isMobile ? handleMouseLeave : undefined}
     >
@@ -159,6 +160,25 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite, hideRan
             {change.toFixed(2)}%
           </span>
         </div>
+        {ath > 0 && (
+          <div
+            className="ath-progress"
+            role="progressbar"
+            aria-label="Prix par rapport à l'ATH"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={athPct}
+            title={`${athPct}% de l'ATH`}
+          >
+            <div className="ath-progress-track">
+              <div
+                className="ath-progress-fill"
+                style={{ width: `${athPct}%`, '--ath-hue': Math.round(athPct * 1.2) }}
+              />
+            </div>
+            <span className="ath-progress-label">{athPct}% de l&apos;ATH</span>
+          </div>
+        )}
         <div className="crypto-stats">
           <div className="stat">
             <div className="stat-label">MCap</div>

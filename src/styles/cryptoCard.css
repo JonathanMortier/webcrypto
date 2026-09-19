@@ -1,17 +1,35 @@
 .crypto-card {
-  background: var(--card-bg);
-  border-radius: 15px;
+  --trend-rgb: 0, 255, 136;
+  background: radial-gradient(120% 80% at 50% 0%, rgba(var(--trend-rgb), 0.12) 0%, transparent 60%), var(--card-bg);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
   padding: 16px;
   transition:
     transform 0.3s,
-    background 0.3s;
+    box-shadow 0.3s,
+    border-color 0.3s;
   border: 1px solid var(--card-border);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   position: relative;
+}
+
+.crypto-card.negative {
+  --trend-rgb: 255, 68, 68;
 }
 
 .crypto-card:hover {
   transform: translateY(-5px);
-  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(var(--trend-rgb), 0.45);
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.25),
+    0 0 24px rgba(var(--trend-rgb), 0.18);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .crypto-card:hover {
+    transform: none;
+  }
 }
 
 .crypto-card-link {
@@ -188,6 +206,35 @@
 }
 
 /* ---- Stats ---- */
+.ath-progress {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ath-progress-track {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--card-border);
+  overflow: hidden;
+}
+
+.ath-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  /* teinte 0 (rouge) → 120 (vert) selon la proximité de l'ATH */
+  background: linear-gradient(90deg, hsl(var(--ath-hue) 85% 45% / 0.4), hsl(var(--ath-hue) 85% 50%));
+  transition: width 0.6s ease;
+}
+
+.ath-progress-label {
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
 .crypto-stats {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;

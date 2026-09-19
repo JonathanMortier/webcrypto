@@ -404,3 +404,38 @@
     left: 8px;
   }
 }
+
+/* ---- Price flash on live update ---- */
+.price-flash-up,
+.price-flash-down {
+  border-radius: 6px;
+}
+
+.price-flash-up {
+  animation: price-flash-up 1.2s ease-out;
+}
+
+.price-flash-down {
+  animation: price-flash-down 1.2s ease-out;
+}
+
+@keyframes price-flash-up {
+  from {
+    background-color: rgba(0, 255, 136, 0.35);
+    box-shadow: 0 0 0 4px rgba(0, 255, 136, 0.35);
+  }
+}
+
+@keyframes price-flash-down {
+  from {
+    background-color: rgba(255, 68, 68, 0.35);
+    box-shadow: 0 0 0 4px rgba(255, 68, 68, 0.35);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .price-flash-up,
+  .price-flash-down {
+    animation: none;
+  }
+}

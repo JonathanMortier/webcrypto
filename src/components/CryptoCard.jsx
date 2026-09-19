@@ -26,6 +26,16 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite, hideRan
     setShowChart((prev) => !prev);
   }, []);
 
+  // Track price moves during render so the price element can be re-keyed and its flash animation replayed
+  const [priceMove, setPriceMove] = useState({ price: coin.current_price, dir: null, count: 0 });
+  if (priceMove.price !== coin.current_price) {
+    setPriceMove({
+      price: coin.current_price,
+      dir: coin.current_price > priceMove.price ? 'up' : 'down',
+      count: priceMove.count + 1,
+    });
+  }
+
   const change = coin.price_change_percentage_24h ?? 0;
   const isPositive = change >= 0;
   const changeClass = isPositive ? 'positive' : 'negative';
@@ -154,7 +164,9 @@ export default function CryptoCard({ coin, isFavorite, onToggleFavorite, hideRan
           </div>
         )}
         <div className="crypto-main-row">
-          <span className="crypto-price">${formatPrice(coin.current_price)}</span>
+          <span key={priceMove.count} className={`crypto-price${priceMove.dir ? ` price-flash-${priceMove.dir}` : ''}`}>
+            ${formatPrice(coin.current_price)}
+          </span>
           <span className={`crypto-change ${changeClass}`}>
             {changeSign}
             {change.toFixed(2)}%

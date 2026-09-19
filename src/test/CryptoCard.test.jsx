@@ -228,4 +228,38 @@ describe('CryptoCard', () => {
       expect(hueFor(1000000)).toBe(6); // far from ATH -> red
     });
   });
+
+  describe('price flash on update', () => {
+    it('should not flash on first render', () => {
+      const { container } = render(withRouter(<CryptoCard coin={mockCoin} />));
+      expect(container.querySelector('.crypto-price')).not.toHaveClass('price-flash-up');
+      expect(container.querySelector('.crypto-price')).not.toHaveClass('price-flash-down');
+    });
+
+    it('should flash up when the price increases', () => {
+      const { container, rerender } = render(withRouter(<CryptoCard coin={mockCoin} />));
+      rerender(withRouter(<CryptoCard coin={{ ...mockCoin, current_price: 51000 }} />));
+      expect(container.querySelector('.crypto-price')).toHaveClass('price-flash-up');
+    });
+
+    it('should flash down when the price decreases', () => {
+      const { container, rerender } = render(withRouter(<CryptoCard coin={mockCoin} />));
+      rerender(withRouter(<CryptoCard coin={{ ...mockCoin, current_price: 49000 }} />));
+      expect(container.querySelector('.crypto-price')).toHaveClass('price-flash-down');
+    });
+
+    it('should replay the animation by remounting the price element on each change', () => {
+      const { container, rerender } = render(withRouter(<CryptoCard coin={mockCoin} />));
+      rerender(withRouter(<CryptoCard coin={{ ...mockCoin, current_price: 51000 }} />));
+      const first = container.querySelector('.crypto-price');
+      rerender(withRouter(<CryptoCard coin={{ ...mockCoin, current_price: 52000 }} />));
+      expect(container.querySelector('.crypto-price')).not.toBe(first);
+    });
+
+    it('should not flash when the price is unchanged', () => {
+      const { container, rerender } = render(withRouter(<CryptoCard coin={mockCoin} />));
+      rerender(withRouter(<CryptoCard coin={{ ...mockCoin, market_cap: 2 }} />));
+      expect(container.querySelector('.crypto-price')).not.toHaveClass('price-flash-up');
+    });
+  });
 });

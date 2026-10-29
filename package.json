@@ -1,7 +1,7 @@
 {
   "name": "cryptowatch",
   "private": true,
-  "version": "0.3.3-SNAPSHOT",
+  "version": "0.3.3",
   "type": "module",
   "scripts": {
     "clean": "rimraf dist",

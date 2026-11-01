@@ -38,11 +38,12 @@ function getCurrentPosition() {
 }
 
 async function fetchLocationByIP() {
-  const res = await fetch('https://ip-api.com/json/');
+  // ipwho.is supports HTTPS on its free tier (ip-api.com does not).
+  const res = await fetch('https://ipwho.is/');
   if (!res.ok) throw new Error('IP geolocation failed');
   const data = await res.json();
-  if (data.status === 'fail') throw new Error('IP geolocation returned fail');
-  return { lat: data.lat, lon: data.lon, city: data.city, country: data.country };
+  if (!data.success) throw new Error('IP geolocation returned fail');
+  return { lat: data.latitude, lon: data.longitude, city: data.city, country: data.country };
 }
 
 export async function detectLocation() {

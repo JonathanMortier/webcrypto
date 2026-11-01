@@ -71,7 +71,7 @@ export const CATEGORY_IDS = [
 export const CATEGORIES_URL = `${COINGECKO_BASE}/api/v3/coins/categories?order=market_cap_desc`;
 
 export const CATEGORY_MARKETS_URL = (categoryId) =>
-  `${COINGECKO_BASE}/api/v3/coins/markets?vs_currency=usd&category=${categoryId}&order=market_cap_desc&per_page=50&page=1&sparkline=true&price_change_percentage=24h`;
+  `${COINGECKO_BASE}/api/v3/coins/markets?vs_currency=usd&category=${encodeURIComponent(categoryId)}&order=market_cap_desc&per_page=50&page=1&sparkline=true&price_change_percentage=24h`;
 
 export const ALERT_THRESHOLD = 5;
 

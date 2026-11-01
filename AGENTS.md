@@ -53,6 +53,7 @@ src/
 │   ├── constants.js        # Config: URLs, TTLs, stablecoins, indices, ALERT_THRESHOLD
 │   ├── cryptoImages.json   # 37 coin IDs + CoinGecko image URLs
 │   ├── imageCache.js       # Local image mapping + pre-caching
+│   ├── sanitize.js         # sanitizeHtml (DOMPurify), htmlToText, safeExternalUrl
 │   ├── utils.js            # formatPrice, formatLargeNumber, getChangeClass, etc.
 │   └── weatherApi.js       # Geolocation + WeatherAPI.com fetch
 ├── pages/
@@ -205,7 +206,7 @@ Uses `withCache(key, ttlMs, fetchFn)` decorator for localStorage caching.
 ## Weather Feature
 
 - **`detectLocation()`**: GPS → IP fallback (ip-api.com), cached 24h
-- **`fetchWeather(lat, lon)`**: WeatherAPI.com (requires `VITE_WEATHER_API_KEY`), cached 10min
+- **`fetchWeather(lat, lon)`**: calls `/api/weather` (server-side proxy `api/weather.js`, Express route in `server.js`, Vite proxy in dev) which adds the WeatherAPI.com key. Requires `WEATHER_API_KEY` in `.env` / Vercel env (**never** `VITE_`-prefixed). Cached 10min
 - Rendered by `WeatherWidget.jsx` inside `MarketIndicators`
 
 ## PWA
@@ -222,8 +223,14 @@ Uses `withCache(key, ttlMs, fetchFn)` decorator for localStorage caching.
 ## Proxy Architecture
 
 - Dev: Vite proxy (`/api/yahoo/*` → Yahoo, `/api/coingecko/*` → CoinGecko)
-- Vercel: `api/yahoo.js` / `api/coingecko.js` serverless functions
+- Vercel: `api/yahoo.js` / `api/coingecko.js` serverless functions built on `api/_proxy.js` (GET only, path allowlist, forced JSON, no CORS, best-effort per-IP rate limit). **Add new upstream paths to the allowlist** or they return 404.
 - Local prod: Express `server.js` with rate limiter + proxy middleware
+
+## Security
+
+- **CSP & security headers** are defined once in `vercel.json`; `server.js` reads them from there. There is no CSP in dev (Vite needs inline scripts). Add any new external domain (fetch/img) to the CSP.
+- **Third-party HTML** (e.g. CoinGecko descriptions) must go through `sanitizeHtml()`; third-party URLs through `safeExternalUrl()`.
+- Encode user/API-provided values in URLs with `encodeURIComponent`.
 
 ## Deployment
 

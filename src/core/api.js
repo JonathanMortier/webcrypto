@@ -285,7 +285,9 @@ export const fetchSpaceXPrice = withCache('spacex_price', 300_000, async () => {
 });
 
 export async function fetchCoinHistory(coinId, days = 7) {
-  const response = await fetch(`${COINGECKO_BASE}/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=${days}`);
+  const response = await fetch(
+    `${COINGECKO_BASE}/api/v3/coins/${encodeURIComponent(coinId)}/market_chart?vs_currency=usd&days=${days}`,
+  );
   if (!response.ok) {
     throw new Error("Erreur lors de la récupération de l'historique");
   }
@@ -294,7 +296,7 @@ export async function fetchCoinHistory(coinId, days = 7) {
 
 export async function fetchCoinDetail(coinId) {
   const response = await fetch(
-    `${COINGECKO_BASE}/api/v3/coins/${coinId}?localization=false&tickers=false&community_data=true&developer_data=false&sparkline=true`,
+    `${COINGECKO_BASE}/api/v3/coins/${encodeURIComponent(coinId)}?localization=false&tickers=false&community_data=true&developer_data=false&sparkline=true`,
   );
   if (!response.ok) {
     throw new Error(`Impossible de récupérer les détails (${coinId})`);

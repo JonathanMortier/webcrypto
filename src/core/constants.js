@@ -71,14 +71,13 @@ export const CATEGORY_IDS = [
 export const CATEGORIES_URL = `${COINGECKO_BASE}/api/v3/coins/categories?order=market_cap_desc`;
 
 export const CATEGORY_MARKETS_URL = (categoryId) =>
-  `${COINGECKO_BASE}/api/v3/coins/markets?vs_currency=usd&category=${categoryId}&order=market_cap_desc&per_page=50&page=1&sparkline=true&price_change_percentage=24h`;
+  `${COINGECKO_BASE}/api/v3/coins/markets?vs_currency=usd&category=${encodeURIComponent(categoryId)}&order=market_cap_desc&per_page=50&page=1&sparkline=true&price_change_percentage=24h`;
 
 export const ALERT_THRESHOLD = 5;
 
 export const RANK_HISTORY_MAX_AGE_DAYS = 30;
 
-export const WEATHER_API_KEY = import.meta.env.VITE_WEATHER_API_KEY || '';
-export const WEATHER_BASE_URL = 'https://api.weatherapi.com/v1';
+export const WEATHER_PROXY_URL = '/api/weather';
 
 export const INDICES = [
   { id: 'sp500', name: 'S&P 500', symbol: '^GSPC', currency: '$' },

@@ -9,7 +9,7 @@ You are a security expert auditing a React + Vite crypto dashboard.
 Focus on:
 
 - Content Security Policy (CSP) misconfigurations in index.html
-- API key exposure (VITE_WEATHER_API_KEY, CoinGecko, Yahoo Finance)
+- API key exposure (WEATHER_API_KEY must stay server-side, never `VITE_`; CoinGecko, Yahoo Finance)
 - XSS vulnerabilities in user-rendered content
 - CORS issues in proxy architecture (Vercel serverless + Express)
 - localStorage敏感 data (favorites, prices, holdings)

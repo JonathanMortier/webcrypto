@@ -24,6 +24,7 @@ import subprocess
 import sys
 import time
 from datetime import datetime
+from urllib.parse import quote
 
 # Configuration
 CATEGORIES_JSON = './src/core/cryptoCategories.json'
@@ -45,13 +46,14 @@ THEME_PATTERN = (
     r'layer-1|metaverse|nft|dex|oracle|depin|rwa|stablecoin|mica|real world assets'
 )
 
-HEADERS = '-H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-CURL = f'curl -s --max-time 30 {HEADERS}"'
+USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+CURL = ['curl', '-s', '--max-time', '30', '-H', f'User-Agent: {USER_AGENT}']
 
 
 def fetch_json(url):
     """Fetch a URL and parse its JSON response."""
-    result = subprocess.run(f'{CURL} "{url}"', shell=True, capture_output=True, text=True)
+    # Argument list (no shell): API-supplied values cannot inject commands.
+    result = subprocess.run([*CURL, url], capture_output=True, text=True)
     try:
         return json.loads(result.stdout or '[]')
     except json.JSONDecodeError:
@@ -118,7 +120,7 @@ def main():
 
     result = {}
     for i, cat in enumerate(selected, 1):
-        coins = fetch_json(MARKETS_BY_CATEGORY_URL.format(cat_id=cat['id'], per_page=PER_CATEGORY))
+        coins = fetch_json(MARKETS_BY_CATEGORY_URL.format(cat_id=quote(cat['id'], safe=''), per_page=PER_CATEGORY))
         if not isinstance(coins, list):
             coins = []
         for coin in coins:

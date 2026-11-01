@@ -1,4 +1,4 @@
-import { WEATHER_API_KEY, WEATHER_BASE_URL } from './constants.js';
+import { WEATHER_PROXY_URL } from './constants.js';
 
 const CACHE_PREFIX = 'cryptowatch_weather_';
 const LOCATION_CACHE_KEY = CACHE_PREFIX + 'location';
@@ -38,11 +38,12 @@ function getCurrentPosition() {
 }
 
 async function fetchLocationByIP() {
-  const res = await fetch('https://ip-api.com/json/');
+  // ipwho.is supports HTTPS on its free tier (ip-api.com does not).
+  const res = await fetch('https://ipwho.is/');
   if (!res.ok) throw new Error('IP geolocation failed');
   const data = await res.json();
-  if (data.status === 'fail') throw new Error('IP geolocation returned fail');
-  return { lat: data.lat, lon: data.lon, city: data.city, country: data.country };
+  if (!data.success) throw new Error('IP geolocation returned fail');
+  return { lat: data.latitude, lon: data.longitude, city: data.city, country: data.country };
 }
 
 export async function detectLocation() {
@@ -69,8 +70,6 @@ export async function detectLocation() {
 }
 
 export async function fetchWeather(lat, lon) {
-  if (!WEATHER_API_KEY) return null;
-
   const cacheKey = `weather_${lat.toFixed(2)}_${lon.toFixed(2)}`;
   const cached = getFromLocalStorage(CACHE_PREFIX + cacheKey);
   if (cached && Date.now() - cached.timestamp < WEATHER_CACHE_TTL) {
@@ -78,7 +77,8 @@ export async function fetchWeather(lat, lon) {
   }
 
   try {
-    const res = await fetch(`${WEATHER_BASE_URL}/current.json?key=${WEATHER_API_KEY}&q=${lat},${lon}&aqi=no`);
+    // Server-side proxy (api/weather.js) adds the API key; it never ships to the browser.
+    const res = await fetch(`${WEATHER_PROXY_URL}?lat=${lat.toFixed(2)}&lon=${lon.toFixed(2)}`);
     if (!res.ok) throw new Error(`WeatherAPI HTTP ${res.status}`);
     const data = await res.json();
     const result = {

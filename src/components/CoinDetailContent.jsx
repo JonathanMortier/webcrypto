@@ -1,6 +1,7 @@
 import { useState, lazy, Suspense } from 'react';
 import { formatPrice, formatLargeNumber, getChangeClass, getChangeSign } from '../core/utils.js';
 import { getImageUrl } from '../core/imageCache.js';
+import { sanitizeHtml, htmlToText, safeExternalUrl } from '../core/sanitize.js';
 
 const PriceChart = lazy(() => import('./PriceChart.jsx'));
 
@@ -16,13 +17,14 @@ export default function CoinDetailContent({ coin, timeframe, setTimeframe, chart
   const atlDate = md.atl_date?.usd ? new Date(md.atl_date.usd).toLocaleDateString('fr-FR') : 'N/A';
 
   const description = coin.description?.en || '';
-  const descTruncated = description.length > 300;
-  const descText = descExpanded || !descTruncated ? description : description.slice(0, 300) + '...';
+  const descPlain = htmlToText(description);
+  const descTruncated = descPlain.length > 300;
 
   const categories = coin.categories || [];
   const links = coin.links || {};
-  const homepage = links.homepage?.find((h) => h) || '';
-  const explorers = (links.blockchain_site || []).filter(Boolean);
+  const homepage = (links.homepage || []).map(safeExternalUrl).find(Boolean) || '';
+  const explorers = (links.blockchain_site || []).map(safeExternalUrl).filter(Boolean);
+  const subredditUrl = safeExternalUrl(links.subreddit_url);
   const sentimentUp = coin.sentiment_votes_up_percentage ?? null;
   const sentimentDown = coin.sentiment_votes_down_percentage ?? null;
 
@@ -89,7 +91,11 @@ export default function CoinDetailContent({ coin, timeframe, setTimeframe, chart
       {description && (
         <div className="coin-detail-section">
           <h2 className="coin-detail-section-title">À propos</h2>
-          <p className="coin-detail-desc" dangerouslySetInnerHTML={{ __html: descText }} />
+          {descExpanded || !descTruncated ? (
+            <p className="coin-detail-desc" dangerouslySetInnerHTML={{ __html: sanitizeHtml(description) }} />
+          ) : (
+            <p className="coin-detail-desc">{descPlain.slice(0, 300)}...</p>
+          )}
           {descTruncated && (
             <button className="coin-detail-desc-toggle" onClick={() => setDescExpanded(!descExpanded)}>
               {descExpanded ? 'Réduire' : 'Lire la suite'}
@@ -230,7 +236,7 @@ export default function CoinDetailContent({ coin, timeframe, setTimeframe, chart
 
       {(homepage ||
         explorers.length > 0 ||
-        links.subreddit_url ||
+        subredditUrl ||
         links.twitter_screen_name ||
         links.telegram_channel_identifier) && (
         <div className="coin-detail-section">
@@ -281,7 +287,7 @@ export default function CoinDetailContent({ coin, timeframe, setTimeframe, chart
             })}
             {links.twitter_screen_name && (
               <a
-                href={`https://x.com/${links.twitter_screen_name}`}
+                href={`https://x.com/${encodeURIComponent(links.twitter_screen_name)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="coin-detail-link-btn"
@@ -293,9 +299,9 @@ export default function CoinDetailContent({ coin, timeframe, setTimeframe, chart
                 X (Twitter)
               </a>
             )}
-            {links.subreddit_url && (
+            {subredditUrl && (
               <a
-                href={links.subreddit_url}
+                href={subredditUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="coin-detail-link-btn"
@@ -309,7 +315,7 @@ export default function CoinDetailContent({ coin, timeframe, setTimeframe, chart
             )}
             {links.telegram_channel_identifier && (
               <a
-                href={`https://t.me/${links.telegram_channel_identifier}`}
+                href={`https://t.me/${encodeURIComponent(links.telegram_channel_identifier)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="coin-detail-link-btn"

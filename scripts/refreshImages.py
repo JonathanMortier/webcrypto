@@ -10,6 +10,7 @@ Usage:
 import json
 import subprocess
 import os
+import re
 import time
 from datetime import datetime, timedelta
 
@@ -27,18 +28,14 @@ SKIP_SYMBOLS = {
     'figr_heloc', 'usyc', 'usdy',
 }
 
-HEADERS = '-H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"'
+USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+SAFE_ID = re.compile(r'^[a-z0-9._-]+$')
 
 
 def fetch_api():
     """Fetch crypto data from CoinGecko API."""
     print("Fetching crypto data from CoinGecko...")
-    result = subprocess.run(
-        f'curl -s "{API_URL}"',
-        shell=True,
-        capture_output=True,
-        text=True
-    )
+    result = subprocess.run(['curl', '-s', API_URL], capture_output=True, text=True)
     return json.loads(result.stdout)
 
 
@@ -67,10 +64,8 @@ def should_update():
 
 def download_image(url, filepath):
     """Download a single image."""
-    result = subprocess.run(
-        f'curl -s -L {HEADERS} -o {filepath} "{url}"',
-        shell=True
-    )
+    # Argument list (no shell): API-supplied values cannot inject commands.
+    subprocess.run(['curl', '-s', '-L', '--proto', '=https', '-H', f'User-Agent: {USER_AGENT}', '-o', filepath, url])
     return os.path.exists(filepath) and os.path.getsize(filepath) > 100
 
 
@@ -109,6 +104,10 @@ def main():
     total = len(image_urls)
 
     for i, item in enumerate(image_urls):
+        if not SAFE_ID.match(item['id']) or '..' in item['id'] or not str(item.get('image') or '').startswith('https://'):
+            failed += 1
+            print(f'  [{i+1}/{total}] SKIPPED (unsafe id/url): {item["id"]!r}')
+            continue
         filepath = f'{IMAGES_DIR}/{item["id"]}.png'
         if download_image(item['image'], filepath):
             success += 1

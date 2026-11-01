@@ -1,41 +1,25 @@
-# Rapport de Sécurité - CryptoWatch
+# Rapport de sécurité - CryptoWatch
 
-## ✅ Points Forts
+_Dernier audit : 2026-11-01_
 
-| Domaine         | Observation                                                         |
-| --------------- | ------------------------------------------------------------------- |
-| **Dépendances** | Aucune vulnérabilité détectée (npm audit)                           |
-| **HTTPS**       | Toutes les API externes utilisent HTTPS (CoinGecko, Alternative.me) |
-| **Cache API**   | TTL paramétrable (60s) - limite les appels abusifs                  |
-| **Filtrage**    | Stablecoins filtrés des données affichées                           |
-| **CORS**        | Vite config minimaliste, pas de configurations risquées             |
+## Corrigé
 
-### ⚠️ Points d'Attention
+| Niveau      | Problème                                                                                                                      | Correction                                                                                                                     |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Haut        | XSS : description CoinGecko injectée via `dangerouslySetInnerHTML` sans nettoyage                                             | `sanitizeHtml()` (DOMPurify, balises de mise en forme + liens http(s) uniquement) ; aperçu tronqué en texte brut               |
+| Moyen       | CSP avec `script-src 'unsafe-inline'` (dans une balise `<meta>`)                                                              | CSP stricte servie en en-tête HTTP (`vercel.json`, réutilisée par `server.js`), sans `unsafe-inline` pour les scripts          |
+| Moyen       | Proxys Vercel ouverts : CORS `*`, tout chemin accepté, `Content-Type` amont relayé, erreurs détaillées                        | `api/_proxy.js` : GET uniquement, liste blanche de chemins, JSON forcé, pas de CORS, message d'erreur générique, limite par IP |
+| Moyen       | `server.js` : rate limit et en-têtes de sécurité non appliqués aux proxys                                                     | Middlewares déplacés avant les proxys ; `x-powered-by` désactivé                                                               |
+| Bas         | Liens externes issus de l'API sans contrôle de schéma                                                                         | `safeExternalUrl()` (http/https uniquement) ; identifiants encodés                                                             |
+| Bas         | Scripts Python : `subprocess` avec `shell=True` et valeurs venant de l'API                                                    | Liste d'arguments sans shell ; validation des id/URL d'images                                                                  |
+| Bas         | `coinId` / `categoryId` non encodés dans les URL                                                                              | `encodeURIComponent`                                                                                                           |
+| Bas         | Dépendances de dev : `zod` (haut), `colord` (modéré)                                                                          | `npm audit fix`                                                                                                                |
+| Moyen       | Clé WeatherAPI exposée dans le bundle (`VITE_WEATHER_API_KEY`) ; pas de restriction par domaine possible sur l'offre gratuite | Proxy serveur `api/weather.js` (clé `WEATHER_API_KEY` côté serveur, coordonnées validées et arrondies, cache edge 10 min)      |
+| Fonctionnel | `ip-api.com` en HTTPS réservé à l'offre payante → géolocalisation IP toujours en échec                                        | Remplacé par `ipwho.is` (HTTPS gratuit)                                                                                        |
 
-| Niveau     | Problème               | Emplacement          | Recommandation                                                                                                                                                                |
-| ---------- | ---------------------- | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Faible** | **API Key absente**    | `constants.js:16,19` | CoinGecko free tier = public mais pas de clé dédiée. Limites strictes (10-30 req/min). OK pour dev, migrer vers clé API si trafic aumenta.                                    |
-| **Medium** | **Cache mémoire**      | `api.js:3`           | `apiCache` est un Map en mémoire. Problèmes: - Perdu au refresh - Pas de persistance cross-tab - Usage mémoire croissant. OK pour petits datasets, envisage Redis pour scale. |
-| **Faible** | **Rate Limiter**       | _Absent_             | Pas de protection rate limiting côté client. Si l'API fail, le retry automatique peut déclencher des cascading failures. Ajouter un exponential backoff.                      |
-| **Info**   | **Theme localStorage** | `App.jsx:19`         | Theme sauvegardé en localStorage (pas vulnérable mais info tracking possible). OK, c'est une preference utilisateur classique.                                                |
-| **Info**   | **Clavier global**     | `App.jsx:109`        | Event listeners globaux sur touches R/F/T. Faible risque de keylogging si malware sur machine. Risque acceptable.                                                             |
+## Reste à faire (hors code)
 
-### 🔒 Résumé
-
-```
-Sécurité globale: BONNE ✓
-- Pas de vulnérabilités critiques
-- Pas de données sensibles exposées
-- APIs tierces fiables (CoinGecko, Alternative.me)
-- Code propre et simple
-```
-
-**Recommandations prioritaires:**
-
-1. Ajouter un **retry avec backoff exponentiel** dans `api.js`
-2. Migrer vers **Clé API CoinGecko** si le site est publié en production
-3. Ajouter un **rate limit côté client** (max 1 req toutes les 5s)
-
----
-
-_Rapport généré le 18 avril 2026_
+- **Clé WeatherAPI** : renommer la variable Vercel `VITE_WEATHER_API_KEY` en `WEATHER_API_KEY`, puis régénérer la clé (l'ancienne a été publique).
+- **Rate limit Vercel** : la limite dans `api/_proxy.js` est par instance (mémoire non partagée). Pour une limite stricte, ajouter une règle Vercel Firewall sur `/api/*`.
+- **Dépendances de dev** : `deepmerge`, `glob`, `minimatch` (modéré). Seules des corrections `--force` (cassantes) existent ; outils de build/lint uniquement, non livrés.
+- **GitHub Actions** : épingler les actions par SHA plutôt que par tag (`@v4`).

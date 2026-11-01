@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import visualizer from 'rollup-plugin-visualizer';
@@ -55,11 +55,24 @@ if (process.env.ANALYZE) {
   plugins.push(visualizer({ filename: 'dist/stats.html' }));
 }
 
-export default defineConfig({
+// Dev-only proxy for the weather endpoint: mirrors api/weather.js and injects the
+// server-side WEATHER_API_KEY from .env so it never reaches the browser bundle.
+const weatherDevProxy = (apiKey) => ({
+  target: 'https://api.weatherapi.com',
+  changeOrigin: true,
+  rewrite: (path) => {
+    const params = new URL(path, 'http://localhost').searchParams;
+    const q = `${Number(params.get('lat')).toFixed(2)},${Number(params.get('lon')).toFixed(2)}`;
+    return `/v1/current.json?${new URLSearchParams({ key: apiKey, q, aqi: 'no' })}`;
+  },
+});
+
+export default defineConfig(({ mode }) => ({
   plugins,
   base: './',
   server: {
     proxy: {
+      '/api/weather': weatherDevProxy(loadEnv(mode, process.cwd(), '').WEATHER_API_KEY || ''),
       '/api/yahoo': {
         target: 'https://query1.finance.yahoo.com',
         changeOrigin: true,
@@ -95,4 +108,4 @@ export default defineConfig({
       reportsDirectory: 'coverage',
     },
   },
-});
+}));

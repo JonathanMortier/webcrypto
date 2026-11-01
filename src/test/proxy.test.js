@@ -1,6 +1,8 @@
+/* global process */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import coingecko from '../../api/coingecko.js';
 import yahoo from '../../api/yahoo.js';
+import weather from '../../api/weather.js';
 
 function mockRes() {
   const res = {
@@ -105,5 +107,69 @@ describe('API proxies', () => {
       await coingecko(r, last);
     }
     expect(last.statusCode).toBe(429);
+  });
+});
+
+describe('Weather proxy', () => {
+  const ORIGINAL_KEY = process.env.WEATHER_API_KEY;
+
+  beforeEach(() => {
+    process.env.WEATHER_API_KEY = 'secret-key';
+    globalThis.fetch = vi.fn(async () => ({
+      ok: true,
+      status: 200,
+      text: async () => '{"current":{}}',
+    }));
+  });
+  afterEach(() => {
+    process.env.WEATHER_API_KEY = ORIGINAL_KEY;
+    vi.restoreAllMocks();
+  });
+
+  it('adds the key server-side and rounds coordinates', async () => {
+    const res = mockRes();
+    await weather(req({ lat: '48.856613', lon: '2.352222' }), res);
+    const url = new URL(fetch.mock.calls[0][0]);
+    expect(url.origin + url.pathname).toBe('https://api.weatherapi.com/v1/current.json');
+    expect(url.searchParams.get('key')).toBe('secret-key');
+    expect(url.searchParams.get('q')).toBe('48.86,2.35');
+    expect(res.statusCode).toBe(200);
+    expect(res.headers['Cache-Control']).toContain('s-maxage=600');
+  });
+
+  it.each([
+    [{ lat: 'abc', lon: '2' }],
+    [{ lat: '95', lon: '2' }],
+    [{ lat: '48', lon: '-181' }],
+    [{ lat: '48' }],
+    [{ lat: '48', lon: '2&key=other' }],
+  ])('rejects invalid coordinates %j', async (query) => {
+    const res = mockRes();
+    await weather(req(query), res);
+    expect(res.statusCode).toBe(400);
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('returns 503 when the key is not configured', async () => {
+    delete process.env.WEATHER_API_KEY;
+    const res = mockRes();
+    await weather(req({ lat: '48', lon: '2' }), res);
+    expect(res.statusCode).toBe(503);
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('never leaks the key or upstream details on error', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    fetch.mockResolvedValueOnce({ ok: false, status: 401, text: async () => '{"error":"API key secret-key invalid"}' });
+    const res = mockRes();
+    await weather(req({ lat: '48', lon: '2' }), res);
+    expect(res.statusCode).toBe(502);
+    expect(JSON.stringify(res.body)).not.toContain('secret-key');
+  });
+
+  it('rejects non-GET methods', async () => {
+    const res = mockRes();
+    await weather(req({ lat: '48', lon: '2' }, 'POST'), res);
+    expect(res.statusCode).toBe(405);
   });
 });

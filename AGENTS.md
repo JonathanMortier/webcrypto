@@ -206,7 +206,7 @@ Uses `withCache(key, ttlMs, fetchFn)` decorator for localStorage caching.
 ## Weather Feature
 
 - **`detectLocation()`**: GPS → IP fallback (ip-api.com), cached 24h
-- **`fetchWeather(lat, lon)`**: WeatherAPI.com (requires `VITE_WEATHER_API_KEY`), cached 10min
+- **`fetchWeather(lat, lon)`**: calls `/api/weather` (server-side proxy `api/weather.js`, Express route in `server.js`, Vite proxy in dev) which adds the WeatherAPI.com key. Requires `WEATHER_API_KEY` in `.env` / Vercel env (**never** `VITE_`-prefixed). Cached 10min
 - Rendered by `WeatherWidget.jsx` inside `MarketIndicators`
 
 ## PWA

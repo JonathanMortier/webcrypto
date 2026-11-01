@@ -77,8 +77,7 @@ export const ALERT_THRESHOLD = 5;
 
 export const RANK_HISTORY_MAX_AGE_DAYS = 30;
 
-export const WEATHER_API_KEY = import.meta.env.VITE_WEATHER_API_KEY || '';
-export const WEATHER_BASE_URL = 'https://api.weatherapi.com/v1';
+export const WEATHER_PROXY_URL = '/api/weather';
 
 export const INDICES = [
   { id: 'sp500', name: 'S&P 500', symbol: '^GSPC', currency: '$' },

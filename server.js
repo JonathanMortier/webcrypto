@@ -4,8 +4,16 @@ import { createProxyMiddleware } from 'http-proxy-middleware';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import weatherHandler from './api/weather.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Load .env (e.g. WEATHER_API_KEY) if present; real environment variables take precedence.
+try {
+  process.loadEnvFile(path.join(__dirname, '.env'));
+} catch {
+  // No .env file: rely on the environment.
+}
 const PORT = process.env.PORT || 5173;
 
 const app = express();
@@ -37,6 +45,8 @@ app.use((_req, res, next) => {
 });
 
 app.use('/api', limiter);
+
+app.get('/api/weather', weatherHandler);
 
 app.use(
   '/api/yahoo',

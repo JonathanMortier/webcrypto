@@ -1,6 +1,6 @@
 // Shared logic for the Vercel serverless proxies (files prefixed with "_" are not exposed as routes).
 
-const USER_AGENT =
+export const USER_AGENT =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36';
 
 // Best-effort per-instance rate limit. Serverless instances do not share memory,
@@ -9,7 +9,7 @@ const WINDOW_MS = 60_000;
 const MAX_REQUESTS = 100;
 const hits = new Map();
 
-function isRateLimited(ip) {
+export function isRateLimited(ip) {
   const now = Date.now();
   const entry = hits.get(ip);
   if (!entry || now - entry.start > WINDOW_MS) {
@@ -19,6 +19,14 @@ function isRateLimited(ip) {
   }
   entry.count += 1;
   return entry.count > MAX_REQUESTS;
+}
+
+export function getClientIp(req) {
+  return (
+    String(req.headers['x-forwarded-for'] || '')
+      .split(',')[0]
+      .trim() || 'unknown'
+  );
 }
 
 function buildQueryString(query) {
@@ -41,11 +49,7 @@ export function createProxy(baseUrl, allowedPaths) {
       return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const ip =
-      String(req.headers['x-forwarded-for'] || '')
-        .split(',')[0]
-        .trim() || 'unknown';
-    if (isRateLimited(ip)) {
+    if (isRateLimited(getClientIp(req))) {
       return res.status(429).json({ error: 'Too many requests, please try again later' });
     }
 

@@ -50,7 +50,9 @@ describe('CoinDetailContent security', () => {
       },
     });
     const hrefs = [...container.querySelectorAll('a')].map((a) => a.getAttribute('href'));
-    expect(hrefs.some((h) => h?.startsWith('javascript:'))).toBe(false);
+    expect(
+      hrefs.some((h) => /^(javascript|data|vbscript):/.test((h ?? '').trim().toLowerCase())),
+    ).toBe(false);
     expect(hrefs).toContain('https://etherscan.io/token/0x1');
   });
 });

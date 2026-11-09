@@ -17,8 +17,12 @@ updates:
       # Listed first: a dependency is assigned to the first group that matches it.
       react:
         patterns: ["react", "react-dom", "@types/react", "@types/react-dom"]
-      patch-updates:
-        update-types: ["patch"]
+      # @vitest/coverage-v8 etc. pin the exact vitest version, so they move together.
+      vitest:
+        patterns: ["vitest", "@vitest/*"]
+      # Major updates are intentionally left out so each one gets its own PR to review.
+      minor-and-patch:
+        update-types: ["minor", "patch"]
 
   # Keeps the SHA-pinned actions in .github/workflows up to date.
   - package-ecosystem: "github-actions"
